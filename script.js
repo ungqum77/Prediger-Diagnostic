@@ -28,18 +28,18 @@ const STRINGS = {
     sortingTitleHold: '보류한 카드를 다시 확인해볼까요?',
     sortingSubtitleHold: '마음에 들면 오른쪽, 아니면 왼쪽으로 밀어주세요.',
     textExit: '나가기',
-    likedLabel: '선택한 카드 (LIKED)',
+    likedLabel: '실시간 선택 카드',
     s9Title: '나를 가장 잘 설명하는 9장 선택',
-    s9Subtitle: '좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 선택해주세요.',
+    s9Subtitle: '좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.',
     s9TextSelected: '선택됨',
-    btnS9Next: '다음 단계로',
-    r3Title: '가장 중요한 3장 순서대로 선택',
-    r3Subtitle: '선택한 9장 중 가장 핵심적인 3장을 순위대로 골라주세요.',
-    r3TextSelected: '선택됨',
-    btnR3Next: '분석 시작하기',
+    btnS9Next: '다음 단계로 이동',
+    r3Title: '최종 핵심 3장 순위 결정',
+    r3Subtitle: '선택한 9장 중 가장 나다운 3장을 순서대로 클릭하세요.',
+    r3TextSelected: 'Ranked',
+    btnR3Next: '분석 리포트 생성하기',
     anaStatusText: '심층 분석을 진행 중입니다...',
     textReportFor: 'DIAGNOSIS REPORT',
-    labelAi: 'AI 분석 리포트',
+    labelAi: 'AI 종합 분석 리포트',
     labelJobs: '추천 직업군',
     btnRestart: '다시 진단하기',
     aiLoading: '분석 결과를 정리하고 있습니다...',
@@ -54,14 +54,14 @@ const STRINGS = {
     sortingTitleHold: 'Review your held cards',
     sortingSubtitleHold: 'Swipe right to like, left to reject.',
     textExit: 'Exit',
-    likedLabel: 'Selected Cards (LIKED)',
+    likedLabel: 'Realtime Liked',
     s9Title: 'Select Exactly 9 Cards',
     s9Subtitle: 'Pick 9 cards that describe you best from your liked list.',
     s9TextSelected: 'Selected',
     btnS9Next: 'Next Step',
     r3Title: 'Rank Your Top 3',
     r3Subtitle: 'Select your Top 1, 2, and 3 from the 9 cards.',
-    r3TextSelected: 'Selected',
+    r3TextSelected: 'Ranked',
     btnR3Next: 'Analyze My Profile',
     anaStatusText: 'Deep analysis in progress...',
     textReportFor: 'DIAGNOSIS REPORT',
@@ -88,6 +88,7 @@ const el = {
   cardStack: document.getElementById('card-stack'),
   likedList: document.getElementById('liked-list'),
   progressBar: document.getElementById('progress-bar'),
+  progressText: document.getElementById('progress-text-display'),
   
   countLike: document.getElementById('count-like'),
   countHold: document.getElementById('count-hold'),
@@ -180,7 +181,7 @@ async function handleIntroSubmit(e) {
 
   const btn = document.getElementById('btn-start');
   btn.disabled = true;
-  btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>`;
+  btn.innerHTML = `<div class="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>`;
 
   try {
     await loadData();
@@ -223,6 +224,13 @@ function renderStack() {
   if (titleEl) titleEl.textContent = isMain ? s.sortingTitleMain : s.sortingTitleHold;
   if (subtitleEl) subtitleEl.textContent = isMain ? s.sortingSubtitleMain : s.sortingSubtitleHold;
   
+  // Phase Indicator Update
+  const indicators = document.querySelectorAll('#phase-indicator .phase-badge');
+  indicators.forEach((ind, idx) => {
+    ind.classList.toggle('active', (isMain && idx === 0) || (!isMain && idx === 1));
+    ind.classList.toggle('done', !isMain && idx === 0);
+  });
+
   const btnPass = document.getElementById('btn-swipe-up');
   if (btnPass) btnPass.style.visibility = isMain ? 'visible' : 'hidden';
 
@@ -239,16 +247,16 @@ function renderStack() {
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
     cardEl.innerHTML = `
-      <div class="relative w-full h-[70%] bg-slate-100 overflow-hidden">
+      <div class="relative w-full h-[65%] bg-slate-100 overflow-hidden">
         <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
         <div class="stamp stamp-like">LIKE</div>
         <div class="stamp stamp-nope">NOPE</div>
       </div>
-      <div class="p-8 h-[30%] bg-white flex flex-col justify-center text-center">
-        <h3 class="text-2xl font-black text-slate-800 mb-2 leading-tight">${keyword}</h3>
-        <p class="text-sm text-slate-400 font-medium line-clamp-2">${modeData.desc}</p>
+      <div class="p-10 h-[35%] bg-white flex flex-col justify-center text-center">
+        <h3 class="leading-tight">${keyword}</h3>
+        <p class="mt-4">${modeData.desc}</p>
       </div>
-      <div class="absolute top-6 right-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-300 border border-slate-100 uppercase tracking-widest">
+      <div class="absolute top-8 right-8 bg-white/95 backdrop-blur-xl px-4 py-2 rounded-2xl text-[12px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
         ${card.dimension}
       </div>
     `;
@@ -328,12 +336,15 @@ function checkSortingCompletion() {
 
 function addToLikedList(card) {
   if (!el.likedList) return;
+  const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
+  const imgPath = `/assets/images/${imgFolder}/${card[state.mode].img}`;
   const keyword = card['keyword_' + state.lang.toLowerCase()];
+  
   const item = document.createElement('div');
-  item.className = 'flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in shadow-sm';
+  item.className = 'liked-thumb';
   item.innerHTML = `
-    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[10px] font-black text-blue-500">${card.dimension}</div>
-    <span class="text-sm font-bold text-slate-700">${keyword}</span>
+    <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
+    <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
   el.likedList.prepend(item);
 }
@@ -342,6 +353,7 @@ function updateProgress() {
   const currentPool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
   const p = (state.currentIndex / currentPool.length) * 100;
   if (el.progressBar) el.progressBar.style.width = `${p}%`;
+  if (el.progressText) el.progressText.textContent = `${state.currentIndex} / ${currentPool.length}`;
   
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
   if (el.countHold) el.countHold.textContent = state.heldCards.length;
@@ -349,6 +361,7 @@ function updateProgress() {
 }
 
 function finishSorting() {
+  window.scrollTo(0, 0);
   transition(el.sortingSection, el.select9Section, 'flex');
   renderSelect9Grid();
 }
@@ -376,11 +389,11 @@ function renderSelect9Grid() {
     const keyword = card['keyword_' + state.lang.toLowerCase()];
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    cardEl.className = 'selection-card relative rounded-3xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
+    cardEl.className = 'selection-card relative rounded-[2rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-      <div class="absolute bottom-5 left-5 right-5"><h4 class="text-white font-black text-sm">${keyword}</h4></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
+      <div class="absolute bottom-4 left-4 right-4"><h4 class="text-white font-black text-xs">${keyword}</h4></div>
       <div class="badge-container"></div>
     `;
     cardEl.onclick = () => {
@@ -403,12 +416,13 @@ function updateS9UI() {
   if (el.s9Count) el.s9Count.textContent = state.top9Cards.length;
   if (el.btnS9Next) {
     el.btnS9Next.disabled = state.top9Cards.length !== 9;
-    el.btnS9Next.className = `w-full sm:w-[400px] py-6 font-black rounded-3xl transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnS9Next.className = `w-full sm:w-[450px] py-8 font-black rounded-[2.5rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
 // --- STEP 5: RANK TOP 3 ---
 function startRanking() {
+  window.scrollTo(0, 0);
   transition(el.select9Section, el.rank3Section, 'flex');
   renderRank3Grid();
 }
@@ -435,10 +449,10 @@ function renderRank3Grid() {
     const keyword = card['keyword_' + state.lang.toLowerCase()];
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    cardEl.className = 'selection-card relative rounded-3xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
+    cardEl.className = 'selection-card relative rounded-[2.5rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
       <div class="absolute bottom-5 left-5 right-5"><h4 class="text-white font-black text-sm">${keyword}</h4></div>
       <div class="badge-container"></div>
     `;
@@ -464,14 +478,14 @@ function updateR3UI() {
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
   if (el.btnR3Next) {
     el.btnR3Next.disabled = state.rankedCards.length !== 3;
-    el.btnR3Next.className = `w-full sm:w-[400px] py-6 font-black rounded-3xl transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnR3Next.className = `w-full sm:w-[450px] py-8 font-black rounded-[2.5rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
 // --- STEP 6: ANALYSIS & ADS ---
 function startAnalysis() {
-  transition(el.rank3Section, el.adsOverlay, 'flex');
   window.scrollTo(0, 0);
+  transition(el.rank3Section, el.adsOverlay, 'flex');
 
   // Analysis simulation
   setTimeout(() => {
@@ -481,8 +495,8 @@ function startAnalysis() {
 
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
-  transition(el.adsOverlay, el.resultSection, 'block');
   window.scrollTo(0, 0);
+  transition(el.adsOverlay, el.resultSection, 'block');
 
   // 1. SCORING LOGIC
   const scores = { D: 0, I: 0, P: 0, T: 0 };
@@ -529,7 +543,7 @@ async function showResult() {
   if (resTag) resTag.textContent = key;
   
   if (el.jobList) {
-    el.jobList.innerHTML = (data.jobs || []).map(j => `<span class="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black">${j}</span>`).join('');
+    el.jobList.innerHTML = (data.jobs || []).map(j => `<span class="px-8 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] text-sm font-black">${j}</span>`).join('');
   }
 
   const max = Math.max(scores.D, scores.I, scores.P, scores.T, 10);
@@ -584,11 +598,13 @@ function transition(from, to, display = 'block') {
       to.classList.remove('hidden');
       to.style.display = display;
       gsap.fromTo(to, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5 });
+      window.scrollTo(0, 0); // Jump to top on every transition
     }});
   } else {
     from.classList.add('hidden');
     to.classList.remove('hidden');
     to.style.display = display;
+    window.scrollTo(0, 0);
   }
 }
 
