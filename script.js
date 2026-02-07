@@ -214,9 +214,6 @@ async function loadData() {
 
 // --- STEP 2 & 3: SORTING ---
 function renderStack() {
-  // CRITICAL: Scroll top
-  window.scrollTo(0, 0);
-  
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   
@@ -402,9 +399,6 @@ function finishSorting() {
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
-  // CRITICAL: Scroll top
-  window.scrollTo(0, 0);
-
   if (!el.s9Grid) return;
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
@@ -463,9 +457,6 @@ function startRanking() {
 }
 
 function renderRank3Grid() {
-  // CRITICAL: Scroll top
-  window.scrollTo(0, 0);
-
   if (!el.r3Grid) return;
   
   // Enforce 3x3 grid layout (Tailwind)
@@ -534,9 +525,7 @@ function startAnalysis() {
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
   transition(el.adsOverlay, el.resultSection, 'block');
-  // CRITICAL: Scroll top
-  window.scrollTo(0, 0);
-
+  
   // 1. SCORING LOGIC (REWRITTEN)
   // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
   const scores = { D: 0, I: 0, P: 0, T: 0 };
@@ -650,34 +639,28 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // CRITICAL: FORCE SCROLL TO TOP IMMEDIATELY
+  // 1. Hide previous immediately to collapse layout
+  from.classList.add('hidden');
+  from.style.display = 'none';
+
+  // 2. Prepare new element
+  to.classList.remove('hidden');
+  to.style.display = display;
+  
+  // 3. FORCE SCROLL TO TOP (Critical Fix)
   window.scrollTo(0, 0);
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 
+  // 4. Animate in (Fade up)
   if (window.gsap) {
-    gsap.to(from, { opacity: 0, y: -20, duration: 0.2, onComplete: () => {
-      from.classList.add('hidden');
-      to.classList.remove('hidden');
-      to.style.display = display;
-      
-      // CRITICAL: FORCE SCROLL TO TOP AGAIN AFTER LAYOUT CHANGE
-      window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-      
-      // Safety timeout for browser reflow
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 50);
-
-      gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
-    }});
+    gsap.fromTo(to, 
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.4, clearProps: "all" }
+    );
   } else {
-    from.classList.add('hidden');
-    to.classList.remove('hidden');
-    to.style.display = display;
-    window.scrollTo(0, 0);
+    to.style.opacity = '1';
+    to.style.transform = 'translateY(0)';
   }
 }
 

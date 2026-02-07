@@ -6,12 +6,43 @@
   --card-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.12);
 }
 
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  /* Disable smooth scrolling to allow immediate jumps to top */
+  scroll-behavior: auto !important; 
+}
+
 body {
   overscroll-behavior: contain;
   -webkit-tap-highlight-color: transparent;
   background-color: var(--bg-main);
   color: #1E293B;
-  height: 100%;
+  /* FORCE Layout to start from top, preventing vertical center push */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important; 
+  align-items: center;
+}
+
+#app {
+  /* Ensure app container also starts from top */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+section {
+  /* Ensure individual sections flow naturally */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1550px;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
