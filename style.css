@@ -10,7 +10,6 @@ html, body {
   height: auto;
   min-height: 100%;
   overflow-x: hidden;
-  /* Disable smooth scrolling to allow immediate jumps to top */
   scroll-behavior: auto !important; 
 }
 
@@ -19,7 +18,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   background-color: var(--bg-main);
   color: #1E293B;
-  /* FORCE Layout to start from top, preventing vertical center push */
+  /* CRITICAL: Enforce top alignment flow */
   display: flex;
   flex-direction: column;
   justify-content: flex-start !important; 
@@ -27,7 +26,7 @@ body {
 }
 
 #app {
-  /* Ensure app container also starts from top */
+  /* Ensure app container starts from top */
   display: flex;
   flex-direction: column;
   justify-content: flex-start !important;
@@ -37,7 +36,6 @@ body {
 }
 
 section {
-  /* Ensure individual sections flow naturally */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -121,7 +119,6 @@ section {
   border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Card Content Typography - Reduced for better visibility */
 .card-item h3 {
   font-size: 1.5rem !important;
   font-weight: 900;
@@ -153,7 +150,7 @@ section {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Sorting Buttons - Slightly reduced size to fit better */
+/* Sorting Buttons */
 .sorting-btn {
   width: 64px;
   height: 64px;

@@ -11,7 +11,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <!-- GSAP & Draggable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -26,13 +26,13 @@
 {
   "imports": {
     "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
   }
 }
 </script>
 </head>
-<body class="bg-[#F1F5F9] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen selection:bg-blue-100 overflow-x-hidden flex flex-col items-center">
+<body class="bg-[#F1F5F9] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen selection:bg-blue-100 overflow-x-hidden">
 
   <!-- Full Screen Ad Overlay (Analysis Phase) -->
   <div id="adsense-overlay" class="hidden fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <main id="app" class="w-full max-w-[1550px] flex flex-col items-center p-4 sm:p-6">
+  <main id="app" class="w-full max-w-[1550px] mx-auto flex flex-col items-center p-4 sm:p-6 py-10 min-h-screen">
     
     <!-- 1. INTRO SECTION -->
     <section id="intro-section" class="w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/50 p-8 text-center my-4 transition-all duration-500">
@@ -82,7 +82,7 @@
     </section>
 
     <!-- 2 & 3. SORTING SECTION -->
-    <section id="sorting-section" class="hidden w-full max-w-[1500px] flex flex-col bg-white rounded-[3rem] shadow-2xl overflow-hidden my-4 h-[90vh] sm:h-[85vh]">
+    <section id="sorting-section" class="hidden w-full max-w-[1500px] flex-col bg-white rounded-[3rem] shadow-2xl overflow-hidden my-4 h-[90vh] sm:h-[85vh]">
       <!-- Header Dashboard -->
       <div class="px-6 py-4 bg-white border-b border-slate-50 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-4">
@@ -169,7 +169,7 @@
     </section>
 
     <!-- 4. SELECT TOP 9 SECTION -->
-    <section id="select9-section" class="hidden w-full max-w-[1300px] bg-white rounded-[3rem] shadow-2xl flex flex-col min-h-[85vh] overflow-hidden my-6">
+    <section id="select9-section" class="hidden w-full max-w-[1300px] bg-white rounded-[3rem] shadow-2xl flex-col min-h-[85vh] overflow-hidden my-6">
       <div class="p-8 sm:p-10 flex-1 overflow-y-auto custom-scrollbar">
         <div class="text-center mb-8">
           <div class="flex justify-center gap-3 mb-6">
@@ -193,7 +193,7 @@
     </section>
 
     <!-- 5. RANK TOP 3 SECTION -->
-    <section id="rank3-section" class="hidden w-full max-w-[1000px] bg-white rounded-[3rem] shadow-2xl flex flex-col min-h-[80vh] overflow-hidden my-6">
+    <section id="rank3-section" class="hidden w-full max-w-[1000px] bg-white rounded-[3rem] shadow-2xl flex-col min-h-[80vh] overflow-hidden my-6">
       <div class="p-8 sm:p-10 flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center">
         <div class="text-center mb-8 w-full">
           <div class="flex justify-center gap-3 mb-6">
@@ -219,7 +219,8 @@
     </section>
 
     <!-- 7. RESULT SECTION -->
-    <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[3rem] shadow-2xl overflow-y-auto my-6 pb-20">
+    <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[3rem] shadow-2xl my-6 pb-20">
+      
       <!-- Container for PDF generation -->
       <div id="result-content-container" class="p-8 sm:p-16 bg-white rounded-[3rem]">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 pb-16 border-b border-slate-100">
@@ -256,8 +257,11 @@
                 </div>
               </div>
            </div>
-           <!-- AI Side -->
+           
+           <!-- Text Content Side -->
            <div class="lg:col-span-7 space-y-10">
+              
+              <!-- Gemini AI Report Section -->
               <div class="bg-gradient-to-br from-[#1E88E5] to-[#0D47A1] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
                 <div class="flex items-center gap-6 mb-12">
                   <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-2xl flex items-center justify-center text-4xl">🤖</div>
@@ -269,12 +273,14 @@
                 </div>
                 <div id="ai-result" class="hidden text-blue-50 text-lg leading-relaxed space-y-8 font-medium bg-white/5 p-10 rounded-[2.5rem]"></div>
               </div>
+              
+              <!-- Detailed Info Cards -->
               <div class="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm space-y-10">
                 <!-- Traits & Energy -->
                 <div>
                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Traits Analysis</h3>
                    <p id="result-traits" class="text-slate-700 font-medium leading-relaxed mb-6">...</p>
-                   <!-- Energy Field -->
+                   
                    <div id="energy-container" class="hidden bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
                       <h4 class="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">Energy Flow</h4>
                       <p id="result-energy" class="text-slate-700 font-medium text-sm leading-relaxed">...</p>
@@ -295,8 +301,8 @@
                 
                 <!-- NCS Codes -->
                 <div id="ncs-container" class="hidden">
-                   <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">NCS Codes (Competency Standards)</h3>
-                   <ul id="result-ncs" class="list-disc list-inside text-slate-600 font-medium text-sm space-y-2 bg-slate-50 p-6 rounded-[2rem]"></ul>
+                   <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">NCS Codes</h3>
+                   <ul id="result-ncs" class="grid grid-cols-2 gap-2 text-slate-600 font-bold text-xs"></ul>
                 </div>
                 
                 <!-- Activity Guide -->
@@ -305,22 +311,25 @@
                    <p id="result-guide" class="text-slate-700 font-medium leading-relaxed bg-blue-50/50 p-6 rounded-[2rem] border border-blue-50">...</p>
                 </div>
                 
+                <!-- Role Models -->
                 <div>
                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Potential Role Models</h3>
-                   <div id="result-role-models" class="text-slate-700 font-medium leading-relaxed"></div>
+                   <div id="result-role-models" class="flex flex-wrap gap-3"></div>
                 </div>
               </div>
             </div>
         </div>
       </div>
-      <!-- Buttons outside PDF container -->
-      <div class="px-8 sm:px-16 flex flex-col gap-4">
+
+      <!-- Action Buttons (Excluded from PDF) -->
+      <div class="px-8 sm:px-16 flex flex-col gap-4 mt-8">
           <button id="btn-download-pdf" class="w-full py-6 bg-slate-900 text-white font-black rounded-[2.5rem] hover:bg-slate-800 transition-all text-lg uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
              Download Report as PDF
           </button>
           <button id="btn-restart" class="w-full py-8 bg-slate-50 border border-slate-100 text-slate-400 font-black rounded-[2.5rem] hover:bg-white hover:text-slate-900 hover:border-slate-300 transition-all text-lg uppercase tracking-[0.3em] shadow-sm">다시 진단하기</button>
       </div>
+
     </section>
   </main>
 

@@ -155,23 +155,21 @@ function init() {
 }
 
 function downloadPDF() {
-  // Target the container that has the white background and rounded corners in Result Section
   const element = document.getElementById('result-content-container');
   const btn = el.btnDownloadPdf;
   
   if (!element) return;
   
-  // Provide Feedback
   const originalText = btn.innerHTML;
   btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Generating...`;
   btn.disabled = true;
 
   const opt = {
-    margin: [0.5, 0.5], // [top, left, bottom, right] if 4 values, or vertical/horizontal if 2
+    margin: [0.2, 0.2, 0.2, 0.2],
     filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
   
   if (typeof html2pdf !== 'undefined') {
@@ -279,7 +277,6 @@ function renderStack() {
     ind.classList.toggle('done', !isMain && idx === 0);
   });
 
-  // Toggle HOLD button visibility based on phase
   const btnPass = document.getElementById('btn-swipe-up');
   if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
 
@@ -291,7 +288,9 @@ function renderStack() {
     cardEl.className = 'card-item';
     
     const modeData = card[state.mode];
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    // NOTE: Using 'keyword_kr' or 'keyword_en' based on lang
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword; // fallback
     const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
@@ -326,7 +325,7 @@ function setupDraggable(cardEl, cardData) {
   const isMain = state.currentSortingStep === 'main';
 
   Draggable.create(cardEl, {
-    type: isMain ? "x,y" : "x", // Phase 2: Vertical Hold Action Disable
+    type: isMain ? "x,y" : "x",
     onDrag: function() {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');
@@ -411,7 +410,8 @@ function addToThumbnailList(card, target) {
   if (!listEl) return;
   const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
   const imgPath = `/assets/images/${imgFolder}/${card[state.mode].img}`;
-  const keyword = card['keyword_' + state.lang.toLowerCase()];
+  const keywordKey = 'keyword_' + state.lang.toLowerCase();
+  const keyword = card[keywordKey] || card.keyword;
   
   const item = document.createElement('div');
   item.className = 'liked-thumb';
@@ -419,7 +419,6 @@ function addToThumbnailList(card, target) {
     <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
     <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
-  // appendChild: Stack behind (at the end of the list)
   listEl.appendChild(item);
 }
 
@@ -432,7 +431,6 @@ function updateProgress() {
   
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
   if (el.countHold) {
-    // Show remaining count during held review
     const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex);
     el.countHold.textContent = Math.max(0, heldCount);
   }
@@ -463,7 +461,8 @@ function renderSelect9Grid() {
 
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
@@ -506,7 +505,6 @@ function startRanking() {
 function renderRank3Grid() {
   if (!el.r3Grid) return;
   
-  // Enforce 3x3 grid layout (Tailwind)
   el.r3Grid.className = 'grid grid-cols-3 gap-3 w-full max-w-[500px]';
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
@@ -524,10 +522,10 @@ function renderRank3Grid() {
 
   state.top9Cards.forEach(card => {
     const cardEl = document.createElement('div');
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    // Scale down size to fit 3x3 neatly
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group w-full';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
@@ -573,8 +571,8 @@ function startAnalysis() {
 async function showResult() {
   transition(el.adsOverlay, el.resultSection, 'block');
   
-  // 1. SCORING LOGIC (REWRITTEN)
-  // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
+  // 1. SCORING LOGIC
+  // Top 1 = +5, Top 2 = +4, Top 3 = +3, Others in Top 9 = +1
   const scores = { D: 0, I: 0, P: 0, T: 0 };
   
   state.rankedCards.forEach((card, idx) => {
@@ -591,20 +589,15 @@ async function showResult() {
     }
   });
 
+  // Calculate Coordinates
   const x = scores.T - scores.P;
   const y = scores.D - scores.I;
 
-  // 2. COORDINATE CALCULATION & KEY MAPPING
+  // 2. COORDINATE CALCULATION & KEY MAPPING (SINGULAR KEYS)
   const getResultKey = (cx, cy) => {
-    // Check CENTER threshold first (Strict matching logic)
     if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
-    
-    // Key mapping based on quadrants (Singular THING, IDEA)
-    if (cy >= 0) {
-      return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
-    } else {
-      return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
-    }
+    if (cy >= 0) return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
+    else return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
   };
 
   const key = getResultKey(x, y);
@@ -616,9 +609,12 @@ function renderReport(key, scores, x, y) {
   const data = state.contentsDB[key] || state.contentsDB["CENTER"] || { 
     title: "Balanced Type", 
     summary: "Exploring all possibilities.", 
-    traits: { desc: "Flexible interests." },
+    traits: { desc: "Flexible interests.", energy: "Adapts to surroundings." },
     job_families: [],
-    role_models: []
+    majors: [],
+    ncs_codes: [],
+    role_models: [],
+    activity_guide: "Try various things."
   };
 
   if (el.resTitle) el.resTitle.textContent = data.title;
@@ -627,15 +623,10 @@ function renderReport(key, scores, x, y) {
   
   // TRAITS & ENERGY
   if (el.resTraits) {
-    if (typeof data.traits === 'string') {
-        el.resTraits.textContent = data.traits;
-        if(el.resEnergyContainer) el.resEnergyContainer.style.display = 'none'; 
-    } else {
-        el.resTraits.textContent = data.traits?.desc || "";
-        if(el.resEnergy && el.resEnergyContainer) {
-            el.resEnergy.textContent = data.traits?.energy || "";
-            el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
-        }
+    el.resTraits.textContent = data.traits?.desc || (typeof data.traits === 'string' ? data.traits : "");
+    if(el.resEnergy && el.resEnergyContainer) {
+        el.resEnergy.textContent = data.traits?.energy || "";
+        el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
     }
   }
   
@@ -645,21 +636,20 @@ function renderReport(key, scores, x, y) {
     el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
-  // MAJORS (New)
+  // MAJORS
   if (el.resMajors) {
     const majors = data.majors || [];
     el.resMajors.innerHTML = majors.map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
-    // Hide container logic if empty could be here, but parent is shared in grid
   }
 
-  // NCS CODES (New)
+  // NCS CODES
   if (el.resNCS && el.resNCSContainer) {
     const ncs = data.ncs_codes || [];
     el.resNCS.innerHTML = ncs.map(c => `<li>${c}</li>`).join('');
     el.resNCSContainer.style.display = ncs.length > 0 ? 'block' : 'none';
   }
 
-  // GUIDE (New)
+  // GUIDE
   if (el.resGuide && el.resGuideContainer) {
     el.resGuide.textContent = data.activity_guide || "";
     el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none';
@@ -668,7 +658,11 @@ function renderReport(key, scores, x, y) {
   // ROLE MODELS
   if (el.resRoleModels) {
     const rmodels = data.role_models || [];
-    el.resRoleModels.textContent = rmodels.map(m => typeof m === 'object' ? (m.name || m.title || "Unknown") : m).join(", ");
+    el.resRoleModels.innerHTML = rmodels.map(m => {
+       const name = typeof m === 'object' ? m.name : m;
+       const desc = typeof m === 'object' ? m.desc : '';
+       return `<span class="inline-flex flex-col bg-slate-50 px-4 py-2 rounded-xl border border-slate-100"><strong class="text-slate-800 text-sm">${name}</strong><small class="text-slate-500 text-xs">${desc}</small></span>`;
+    }).join('');
   }
 
   // Animate Propensity Bars
@@ -720,20 +714,17 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // 1. Hide previous immediately to collapse layout
   from.classList.add('hidden');
   from.style.display = 'none';
 
-  // 2. Prepare new element
   to.classList.remove('hidden');
   to.style.display = display;
   
-  // 3. FORCE SCROLL TO TOP (Critical Fix)
+  // FORCE SCROLL TO TOP
   window.scrollTo(0, 0);
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 
-  // 4. Animate in (Fade up)
   if (window.gsap) {
     gsap.fromTo(to, 
       { opacity: 0, y: 20 },
