@@ -28,8 +28,6 @@ const STRINGS = {
     sortingTitleHold: '보류한 카드를 다시 확인해볼까요?',
     sortingSubtitleHold: '마음에 들면 오른쪽, 아니면 왼쪽으로 밀어주세요.',
     textExit: '나가기',
-    likedLabel: '선택한 카드 목록',
-    heldLabel: '보류 카드 목록',
     s9Title: '나를 가장 잘 설명하는 9장 선택',
     s9Subtitle: '좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.',
     s9TextSelected: '선택됨',
@@ -55,8 +53,6 @@ const STRINGS = {
     sortingTitleHold: 'Review your held cards',
     sortingSubtitleHold: 'Swipe right to like, left to reject.',
     textExit: 'Exit',
-    likedLabel: 'Liked Cards',
-    heldLabel: 'Held Cards',
     s9Title: 'Select Exactly 9 Cards',
     s9Subtitle: 'Pick 9 cards that describe you best from your liked list.',
     s9TextSelected: 'Selected',
@@ -164,11 +160,6 @@ function updateUIStrings() {
   
   const textExit = document.getElementById('text-exit');
   if (textExit) textExit.textContent = s.textExit;
-  
-  const likedLabel = document.getElementById('text-liked-label');
-  if (likedLabel) likedLabel.textContent = s.likedLabel;
-  const heldLabel = document.getElementById('text-held-label');
-  if (heldLabel) heldLabel.textContent = s.heldLabel;
 
   if (el.anaStatusText) el.anaStatusText.textContent = s.anaStatusText;
 }
@@ -216,7 +207,6 @@ async function loadData() {
 
 // --- STEP 2 & 3: SORTING ---
 function renderStack() {
-  window.scrollTo(0, 0);
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   
@@ -236,9 +226,6 @@ function renderStack() {
     ind.classList.toggle('done', !isMain && idx === 0);
   });
 
-  const btnPass = document.getElementById('btn-swipe-up');
-  if (btnPass) btnPass.style.visibility = isMain ? 'visible' : 'hidden';
-
   const stack = currentPool.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
   stack.forEach((card, i) => {
@@ -256,6 +243,7 @@ function renderStack() {
         <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
         <div class="stamp stamp-like">LIKE</div>
         <div class="stamp stamp-nope">NOPE</div>
+        <div class="stamp stamp-hold">HELD</div>
       </div>
       <div class="p-10 h-[35%] bg-white flex flex-col justify-center text-center">
         <h3 class="leading-tight">${keyword}</h3>
@@ -284,13 +272,16 @@ function setupDraggable(cardEl, cardData) {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');
       const nopeStamp = cardEl.querySelector('.stamp-nope');
+      const holdStamp = cardEl.querySelector('.stamp-hold');
+      
       if (likeStamp) gsap.set(likeStamp, { opacity: Math.max(0, Math.min(1, this.x / 100)) });
       if (nopeStamp) gsap.set(nopeStamp, { opacity: Math.max(0, Math.min(1, -this.x / 100)) });
+      if (holdStamp) gsap.set(holdStamp, { opacity: Math.max(0, Math.min(1, Math.abs(this.y) / 100)) });
     },
     onDragEnd: function() {
       if (this.x > 120) handleSwipe('right', cardEl, cardData);
       else if (this.x < -120) handleSwipe('left', cardEl, cardData);
-      else if (this.y < -120 && state.currentSortingStep === 'main') handleSwipe('up', cardEl, cardData);
+      else if (Math.abs(this.y) > 120) handleSwipe(this.y < 0 ? 'up' : 'down', cardEl, cardData); // Both up and down send to held
       else {
         gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
         gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.3 });
@@ -308,11 +299,16 @@ function swipe(dir) {
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
   if (dir === 'right') { 
-    x = 800; rot = 45; state.likedCards.push(cardData); addToThumbnailList(cardData, 'liked'); 
+    x = 800; rot = 45; 
+    state.likedCards.push(cardData); 
+    addToThumbnailList(cardData, 'liked'); 
   }
-  else if (dir === 'left') { x = -800; rot = -45; state.rejectedCards.push(cardData); }
-  else if (dir === 'up') { 
-    y = -800; 
+  else if (dir === 'left') { 
+    x = -800; rot = -45; 
+    state.rejectedCards.push(cardData); 
+  }
+  else if (dir === 'up' || dir === 'down') { 
+    y = dir === 'up' ? -800 : 800; 
     state.heldCards.push(cardData); 
     addToThumbnailList(cardData, 'held');
   }
@@ -397,11 +393,11 @@ function renderSelect9Grid() {
     const keyword = card['keyword_' + state.lang.toLowerCase()];
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    cardEl.className = 'selection-card relative rounded-[2rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
+    cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
-      <div class="absolute bottom-4 left-4 right-4"><h4 class="text-white font-black text-xs">${keyword}</h4></div>
+      <div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div>
       <div class="badge-container"></div>
     `;
     cardEl.onclick = () => {
@@ -424,7 +420,7 @@ function updateS9UI() {
   if (el.s9Count) el.s9Count.textContent = state.top9Cards.length;
   if (el.btnS9Next) {
     el.btnS9Next.disabled = state.top9Cards.length !== 9;
-    el.btnS9Next.className = `w-full sm:w-[450px] py-8 font-black rounded-[2.5rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnS9Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
@@ -455,7 +451,7 @@ function renderRank3Grid() {
     const keyword = card['keyword_' + state.lang.toLowerCase()];
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    cardEl.className = 'selection-card relative rounded-[2.5rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
+    cardEl.className = 'selection-card relative rounded-[2rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
@@ -484,7 +480,7 @@ function updateR3UI() {
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
   if (el.btnR3Next) {
     el.btnR3Next.disabled = state.rankedCards.length !== 3;
-    el.btnR3Next.className = `w-full sm:w-[450px] py-8 font-black rounded-[2.5rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnR3Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
@@ -597,19 +593,21 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // Force reset scroll before transition begins for better UX
-  window.scrollTo(0, 0);
+  // Instant jump to top
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 
   if (window.gsap) {
-    gsap.to(from, { opacity: 0, y: -20, duration: 0.3, onComplete: () => {
+    gsap.to(from, { opacity: 0, y: -20, duration: 0.2, onComplete: () => {
       from.classList.add('hidden');
       to.classList.remove('hidden');
       to.style.display = display;
       
-      // Secondary scroll reset to ensure element is captured correctly
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Ensure scroll is at absolute top again after container is revealed
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       
-      gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 });
+      gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
     }});
   } else {
     from.classList.add('hidden');
