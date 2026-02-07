@@ -111,9 +111,18 @@ const el = {
   resTitle: document.getElementById('result-title'),
   resSummary: document.getElementById('result-summary'),
   resTraits: document.getElementById('result-traits'),
+  resEnergy: document.getElementById('result-energy'),
+  resEnergyContainer: document.getElementById('energy-container'),
   resJobs: document.getElementById('result-jobs'),
+  resMajors: document.getElementById('result-majors'),
+  resNCS: document.getElementById('result-ncs'),
+  resNCSContainer: document.getElementById('ncs-container'),
+  resGuide: document.getElementById('result-guide'),
+  resGuideContainer: document.getElementById('guide-container'),
   resRoleModels: document.getElementById('result-role-models'),
-  resTag: document.getElementById('result-tag')
+  resTag: document.getElementById('result-tag'),
+  
+  btnDownloadPdf: document.getElementById('btn-download-pdf')
 };
 
 // --- INITIALIZATION ---
@@ -138,9 +147,45 @@ function init() {
   if (el.btnS9Next) el.btnS9Next.onclick = startRanking;
   if (el.btnR3Next) el.btnR3Next.onclick = startAnalysis;
   if (el.btnSkipAd) el.btnSkipAd.onclick = showResult;
+  if (el.btnDownloadPdf) el.btnDownloadPdf.onclick = downloadPDF;
 
   if (typeof gsap !== 'undefined') {
     gsap.from(".intro-anim", { y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" });
+  }
+}
+
+function downloadPDF() {
+  const element = document.getElementById('result-content-container');
+  const btn = el.btnDownloadPdf;
+  
+  if (!element) return;
+  
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Generating...`;
+  btn.disabled = true;
+
+  const opt = {
+    margin: [0.2, 0.2, 0.2, 0.2],
+    filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(element).save().then(() => {
+       btn.innerHTML = originalText;
+       btn.disabled = false;
+    }).catch(err => {
+       console.error(err);
+       btn.innerHTML = originalText;
+       btn.disabled = false;
+       alert("PDF Generation Failed");
+    });
+  } else {
+    alert("PDF generator not loaded. Please refresh.");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
 
@@ -214,7 +259,6 @@ async function loadData() {
 
 // --- STEP 2 & 3: SORTING ---
 function renderStack() {
-  window.scrollTo(0, 0);
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   
@@ -233,7 +277,6 @@ function renderStack() {
     ind.classList.toggle('done', !isMain && idx === 0);
   });
 
-  // Toggle HOLD button visibility based on phase
   const btnPass = document.getElementById('btn-swipe-up');
   if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
 
@@ -245,7 +288,9 @@ function renderStack() {
     cardEl.className = 'card-item';
     
     const modeData = card[state.mode];
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    // NOTE: Using 'keyword_kr' or 'keyword_en' based on lang
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword; // fallback
     const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
@@ -280,7 +325,7 @@ function setupDraggable(cardEl, cardData) {
   const isMain = state.currentSortingStep === 'main';
 
   Draggable.create(cardEl, {
-    type: isMain ? "x,y" : "x", // Phase 2: Vertical Hold Action Disable
+    type: isMain ? "x,y" : "x",
     onDrag: function() {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');
@@ -365,7 +410,8 @@ function addToThumbnailList(card, target) {
   if (!listEl) return;
   const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
   const imgPath = `/assets/images/${imgFolder}/${card[state.mode].img}`;
-  const keyword = card['keyword_' + state.lang.toLowerCase()];
+  const keywordKey = 'keyword_' + state.lang.toLowerCase();
+  const keyword = card[keywordKey] || card.keyword;
   
   const item = document.createElement('div');
   item.className = 'liked-thumb';
@@ -373,7 +419,6 @@ function addToThumbnailList(card, target) {
     <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
     <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
-  // appendChild로 변경하여 뒤에 쌓이도록 함
   listEl.appendChild(item);
 }
 
@@ -386,7 +431,6 @@ function updateProgress() {
   
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
   if (el.countHold) {
-    // 보류 단계에서는 남은 갯수가 보이도록 수정
     const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex);
     el.countHold.textContent = Math.max(0, heldCount);
   }
@@ -394,13 +438,12 @@ function updateProgress() {
 }
 
 function finishSorting() {
+  renderSelect9Grid(); // Pre-render content to establish layout
   transition(el.sortingSection, el.select9Section, 'flex');
-  renderSelect9Grid();
 }
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
-  window.scrollTo(0, 0);
   if (!el.s9Grid) return;
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
@@ -418,7 +461,8 @@ function renderSelect9Grid() {
 
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
@@ -448,22 +492,20 @@ function updateS9UI() {
   if (el.s9Count) el.s9Count.textContent = state.top9Cards.length;
   if (el.btnS9Next) {
     el.btnS9Next.disabled = state.top9Cards.length !== 9;
-    el.btnS9Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnS9Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
 // --- STEP 5: RANK TOP 3 ---
 function startRanking() {
+  renderRank3Grid(); // Pre-render content
   transition(el.select9Section, el.rank3Section, 'flex');
-  renderRank3Grid();
 }
 
 function renderRank3Grid() {
-  window.scrollTo(0, 0);
   if (!el.r3Grid) return;
   
-  // Enforce 3x3 grid layout (Tailwind)
-  el.r3Grid.className = 'grid grid-cols-3 gap-4 max-w-2xl mx-auto items-center justify-center';
+  el.r3Grid.className = 'grid grid-cols-3 gap-3 w-full max-w-[500px]';
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
   updateR3UI();
@@ -480,10 +522,10 @@ function renderRank3Grid() {
 
   state.top9Cards.forEach(card => {
     const cardEl = document.createElement('div');
-    const keyword = card['keyword_' + state.lang.toLowerCase()];
+    const keywordKey = 'keyword_' + state.lang.toLowerCase();
+    const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    // Scale down size to fit 3x3 neatly
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group w-full';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
@@ -513,7 +555,7 @@ function updateR3UI() {
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
   if (el.btnR3Next) {
     el.btnR3Next.disabled = state.rankedCards.length !== 3;
-    el.btnR3Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnR3Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
@@ -527,11 +569,8 @@ function startAnalysis() {
 
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
-  transition(el.adsOverlay, el.resultSection, 'block');
-  window.scrollTo({ top: 0, behavior: 'instant' });
-
-  // 1. SCORING LOGIC (REWRITTEN)
-  // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
+  // 1. SCORING LOGIC
+  // Top 1 = +5, Top 2 = +4, Top 3 = +3, Others in Top 9 = +1
   const scores = { D: 0, I: 0, P: 0, T: 0 };
   
   state.rankedCards.forEach((card, idx) => {
@@ -548,24 +587,21 @@ async function showResult() {
     }
   });
 
+  // Calculate Coordinates
   const x = scores.T - scores.P;
   const y = scores.D - scores.I;
 
-  // 2. COORDINATE CALCULATION & KEY MAPPING
+  // 2. COORDINATE CALCULATION & KEY MAPPING (SINGULAR KEYS)
   const getResultKey = (cx, cy) => {
-    // Check CENTER threshold first (Strict matching logic)
     if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
-    
-    // Key mapping based on quadrants (Singular THING, IDEA)
-    if (cy >= 0) {
-      return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
-    } else {
-      return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
-    }
+    if (cy >= 0) return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
+    else return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
   };
 
   const key = getResultKey(x, y);
-  renderReport(key, scores, x, y);
+  
+  renderReport(key, scores, x, y); // Render first
+  transition(el.adsOverlay, el.resultSection, 'block'); // Then show
   generateAIReport();
 }
 
@@ -573,25 +609,60 @@ function renderReport(key, scores, x, y) {
   const data = state.contentsDB[key] || state.contentsDB["CENTER"] || { 
     title: "Balanced Type", 
     summary: "Exploring all possibilities.", 
-    traits: { desc: "Flexible interests." },
+    traits: { desc: "Flexible interests.", energy: "Adapts to surroundings." },
     job_families: [],
-    role_models: []
+    majors: [],
+    ncs_codes: [],
+    role_models: [],
+    activity_guide: "Try various things."
   };
 
   if (el.resTitle) el.resTitle.textContent = data.title;
   if (el.resSummary) el.resSummary.textContent = data.summary;
-  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || data.traits || "";
   if (el.resTag) el.resTag.textContent = key;
   
+  // TRAITS & ENERGY
+  if (el.resTraits) {
+    el.resTraits.textContent = data.traits?.desc || (typeof data.traits === 'string' ? data.traits : "");
+    if(el.resEnergy && el.resEnergyContainer) {
+        el.resEnergy.textContent = data.traits?.energy || "";
+        el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
+    }
+  }
+  
+  // JOBS
   if (el.resJobs) {
     const jobs = data.job_families || data.jobs || [];
     el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
-  // BUG FIX: Handle role_models if they are objects
+  // MAJORS
+  if (el.resMajors) {
+    const majors = data.majors || [];
+    el.resMajors.innerHTML = majors.map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
+  }
+
+  // NCS CODES
+  if (el.resNCS && el.resNCSContainer) {
+    const ncs = data.ncs_codes || [];
+    el.resNCS.innerHTML = ncs.map(c => `<li>${c}</li>`).join('');
+    el.resNCSContainer.style.display = ncs.length > 0 ? 'block' : 'none';
+  }
+
+  // GUIDE
+  if (el.resGuide && el.resGuideContainer) {
+    el.resGuide.textContent = data.activity_guide || "";
+    el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none';
+  }
+
+  // ROLE MODELS
   if (el.resRoleModels) {
     const rmodels = data.role_models || [];
-    el.resRoleModels.textContent = rmodels.map(m => typeof m === 'object' ? (m.name || m.title || "Unknown") : m).join(", ");
+    el.resRoleModels.innerHTML = rmodels.map(m => {
+       const name = typeof m === 'object' ? m.name : m;
+       const desc = typeof m === 'object' ? m.desc : '';
+       return `<span class="inline-flex flex-col bg-slate-50 px-4 py-2 rounded-xl border border-slate-100"><strong class="text-slate-800 text-sm">${name}</strong><small class="text-slate-500 text-xs">${desc}</small></span>`;
+    }).join('');
   }
 
   // Animate Propensity Bars
@@ -643,27 +714,37 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // CRITICAL: Ensure scroll to top on every transition
-  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  // 1. Hide previous
+  from.classList.add('hidden');
+  from.style.display = 'none';
 
-  if (window.gsap) {
-    gsap.to(from, { opacity: 0, y: -20, duration: 0.2, onComplete: () => {
-      from.classList.add('hidden');
-      to.classList.remove('hidden');
-      to.style.display = display;
-      
-      // Secondary safety reset
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      
-      gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
-    }});
-  } else {
-    from.classList.add('hidden');
-    to.classList.remove('hidden');
-    to.style.display = display;
+  // 2. Prepare new
+  to.classList.remove('hidden');
+  to.style.display = display;
+  
+  // 3. FORCE SCROLL TO TOP IMMEDIATELY
+  window.scrollTo(0, 0);
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  
+  // Extra safety for some browsers/devices
+  setTimeout(() => {
     window.scrollTo(0, 0);
+  }, 10);
+
+  // 4. ANIMATION (CLEAN FADE IN)
+  if (window.gsap) {
+    // Reset any previous transforms first
+    gsap.set(to, { clearProps: "all" });
+    
+    // Animate opacity only, start at y:0 to ensure it renders at top
+    gsap.fromTo(to, 
+      { opacity: 0, y: 0 },
+      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", clearProps: "all" }
+    );
+  } else {
+    to.style.opacity = '1';
+    to.style.transform = 'none';
   }
 }
 

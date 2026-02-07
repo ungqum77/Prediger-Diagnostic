@@ -6,12 +6,41 @@
   --card-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.12);
 }
 
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: auto !important; 
+}
+
 body {
   overscroll-behavior: contain;
   -webkit-tap-highlight-color: transparent;
   background-color: var(--bg-main);
   color: #1E293B;
-  height: 100%;
+  /* CRITICAL: Enforce top alignment flow */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important; 
+  align-items: center;
+}
+
+#app {
+  /* Ensure app container starts from top */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start !important;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1550px;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -90,7 +119,6 @@ body {
   border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Card Content Typography - Reduced for better visibility */
 .card-item h3 {
   font-size: 1.5rem !important;
   font-weight: 900;
@@ -122,7 +150,7 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Sorting Buttons - Slightly reduced size to fit better */
+/* Sorting Buttons */
 .sorting-btn {
   width: 64px;
   height: 64px;
