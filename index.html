@@ -28,9 +28,8 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-[#F1F5F9] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen selection:bg-blue-100 overflow-x-hidden">
+<body class="bg-[#F1F5F9] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen selection:bg-blue-100 overflow-x-hidden flex flex-col items-center">
 
   <!-- Full Screen Ad Overlay (Analysis Phase) -->
   <div id="adsense-overlay" class="hidden fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
@@ -48,10 +47,10 @@
     </div>
   </div>
 
-  <main id="app" class="max-w-[1400px] mx-auto min-h-screen flex flex-col items-center p-4">
+  <main id="app" class="w-full max-w-[1440px] flex flex-col items-center p-4 sm:p-6">
     
     <!-- 1. INTRO SECTION -->
-    <section id="intro-section" class="w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl shadow-slate-300/50 p-12 sm:p-20 text-center my-auto transition-all duration-500">
+    <section id="intro-section" class="w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl shadow-slate-300/50 p-12 sm:p-20 text-center my-10 transition-all duration-500">
       <div class="mb-12 intro-anim">
         <div class="inline-block p-8 mb-10 rounded-[2.5rem] bg-blue-50 text-6xl shadow-sm rotate-3">✨</div>
         <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mb-6 leading-tight">프레디저<br>적성 검사</h1>
@@ -80,9 +79,9 @@
     </section>
 
     <!-- 2 & 3. SORTING SECTION -->
-    <section id="sorting-section" class="hidden w-full max-w-[1200px] flex flex-col bg-white rounded-[4rem] shadow-2xl overflow-hidden my-auto h-[90vh] sm:h-[85vh]">
+    <section id="sorting-section" class="hidden w-full max-w-[1300px] flex flex-col bg-white rounded-[4rem] shadow-2xl overflow-hidden my-6 h-[90vh] sm:h-[85vh]">
       <!-- Header Dashboard -->
-      <div class="px-10 py-8 bg-white border-b border-slate-50 flex flex-wrap items-center justify-between gap-6">
+      <div class="px-10 py-6 bg-white border-b border-slate-50 flex flex-wrap items-center justify-between gap-6">
         <div class="flex items-center gap-6">
           <button id="btn-exit" class="text-slate-300 hover:text-slate-900 transition-colors text-[10px] font-black tracking-widest uppercase flex items-center gap-2">
             <span>&larr;</span> <span id="text-exit">EXIT</span>
@@ -120,8 +119,26 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <!-- Sidebar (Thumbnails) - MOVED TO LEFT -->
+        <div class="hidden lg:flex w-[420px] bg-slate-50/50 border-r border-slate-100 flex-col shadow-inner">
+          <div class="p-8 pb-4">
+             <h2 id="sorting-title" class="text-2xl font-black text-slate-800 leading-tight">...</h2>
+             <p id="sorting-subtitle" class="text-sm text-slate-500 font-medium mt-2">...</p>
+          </div>
+          <div class="flex-1 p-8 overflow-y-auto custom-scrollbar space-y-10">
+            <div>
+              <h3 id="text-liked-label" class="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mb-4">선택한 카드 목록</h3>
+              <div id="liked-list" class="grid grid-cols-3 gap-3"></div>
+            </div>
+            <div>
+              <h3 id="text-held-label" class="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em] mb-4">보류 카드 목록</h3>
+              <div id="held-list" class="grid grid-cols-3 gap-3"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Card Area -->
-        <div class="flex-1 bg-slate-50 flex flex-col items-center justify-center p-8 sm:p-14 relative overflow-hidden">
+        <div class="flex-1 bg-white flex flex-col items-center justify-center p-8 sm:p-14 relative overflow-hidden">
           <div id="card-stack" class="relative w-full max-w-[380px] aspect-[3/4] sm:max-w-[420px]"></div>
           
           <!-- Controls -->
@@ -137,23 +154,11 @@
             </button>
           </div>
         </div>
-
-        <!-- Sidebar (Thumbnails) -->
-        <div class="hidden lg:flex w-[380px] bg-white border-l border-slate-100 flex-col shadow-inner">
-          <div class="p-10 pb-6">
-             <h2 id="sorting-title" class="text-2xl font-black text-slate-800 leading-tight">...</h2>
-             <p id="sorting-subtitle" class="text-sm text-slate-500 font-medium mt-3">...</p>
-          </div>
-          <div class="flex-1 p-8 overflow-y-auto custom-scrollbar bg-slate-50/30">
-            <h3 id="text-liked-label" class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-6">선택한 카드 썸네일</h3>
-            <div id="liked-list" class="grid grid-cols-3 gap-3"></div>
-          </div>
-        </div>
       </div>
     </section>
 
     <!-- 4. SELECT TOP 9 SECTION -->
-    <section id="select9-section" class="hidden w-full max-w-[1200px] bg-white rounded-[4rem] shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:min-h-[85vh] overflow-hidden my-auto">
+    <section id="select9-section" class="hidden w-full max-w-[1200px] bg-white rounded-[4rem] shadow-2xl flex flex-col h-auto min-h-[85vh] overflow-hidden my-10">
       <div class="p-10 sm:p-20 flex-1 overflow-y-auto custom-scrollbar">
         <div class="text-center mb-16">
           <div class="flex justify-center gap-4 mb-8">
@@ -177,7 +182,7 @@
     </section>
 
     <!-- 5. RANK TOP 3 SECTION -->
-    <section id="rank3-section" class="hidden w-full max-w-[1100px] bg-white rounded-[4rem] shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:min-h-[80vh] overflow-hidden my-auto">
+    <section id="rank3-section" class="hidden w-full max-w-[1100px] bg-white rounded-[4rem] shadow-2xl flex flex-col h-auto min-h-[80vh] overflow-hidden my-10">
       <div class="p-10 sm:p-20 flex-1 overflow-y-auto custom-scrollbar">
         <div class="text-center mb-16">
           <div class="flex justify-center gap-4 mb-8">
@@ -202,7 +207,7 @@
     </section>
 
     <!-- 7. RESULT SECTION -->
-    <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[5rem] shadow-2xl overflow-y-auto pb-24">
+    <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[5rem] shadow-2xl overflow-y-auto my-10 pb-24">
       <div class="p-10 sm:p-20">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-14 mb-24 pb-24 border-b border-slate-100">
           <div class="flex-1">
@@ -263,6 +268,5 @@
   </main>
 
   <script type="module" src="script.js"></script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>

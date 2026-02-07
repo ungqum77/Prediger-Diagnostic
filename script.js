@@ -28,7 +28,8 @@ const STRINGS = {
     sortingTitleHold: '보류한 카드를 다시 확인해볼까요?',
     sortingSubtitleHold: '마음에 들면 오른쪽, 아니면 왼쪽으로 밀어주세요.',
     textExit: '나가기',
-    likedLabel: '실시간 선택 카드',
+    likedLabel: '선택한 카드 목록',
+    heldLabel: '보류 카드 목록',
     s9Title: '나를 가장 잘 설명하는 9장 선택',
     s9Subtitle: '좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.',
     s9TextSelected: '선택됨',
@@ -54,7 +55,8 @@ const STRINGS = {
     sortingTitleHold: 'Review your held cards',
     sortingSubtitleHold: 'Swipe right to like, left to reject.',
     textExit: 'Exit',
-    likedLabel: 'Realtime Liked',
+    likedLabel: 'Liked Cards',
+    heldLabel: 'Held Cards',
     s9Title: 'Select Exactly 9 Cards',
     s9Subtitle: 'Pick 9 cards that describe you best from your liked list.',
     s9TextSelected: 'Selected',
@@ -87,6 +89,7 @@ const el = {
   langToggle: document.getElementById('lang-toggle'),
   cardStack: document.getElementById('card-stack'),
   likedList: document.getElementById('liked-list'),
+  heldList: document.getElementById('held-list'),
   progressBar: document.getElementById('progress-bar'),
   progressText: document.getElementById('progress-text-display'),
   
@@ -164,6 +167,8 @@ function updateUIStrings() {
   
   const likedLabel = document.getElementById('text-liked-label');
   if (likedLabel) likedLabel.textContent = s.likedLabel;
+  const heldLabel = document.getElementById('text-held-label');
+  if (heldLabel) heldLabel.textContent = s.heldLabel;
 
   if (el.anaStatusText) el.anaStatusText.textContent = s.anaStatusText;
 }
@@ -303,10 +308,14 @@ function swipe(dir) {
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
   if (dir === 'right') { 
-    x = 800; rot = 45; state.likedCards.push(cardData); addToLikedList(cardData); 
+    x = 800; rot = 45; state.likedCards.push(cardData); addToThumbnailList(cardData, 'liked'); 
   }
   else if (dir === 'left') { x = -800; rot = -45; state.rejectedCards.push(cardData); }
-  else if (dir === 'up') { y = -800; state.heldCards.push(cardData); }
+  else if (dir === 'up') { 
+    y = -800; 
+    state.heldCards.push(cardData); 
+    addToThumbnailList(cardData, 'held');
+  }
 
   if (window.gsap) {
     gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, onComplete: () => {
@@ -334,8 +343,9 @@ function checkSortingCompletion() {
   }
 }
 
-function addToLikedList(card) {
-  if (!el.likedList) return;
+function addToThumbnailList(card, target) {
+  const listEl = target === 'liked' ? el.likedList : el.heldList;
+  if (!listEl) return;
   const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
   const imgPath = `/assets/images/${imgFolder}/${card[state.mode].img}`;
   const keyword = card['keyword_' + state.lang.toLowerCase()];
@@ -346,7 +356,7 @@ function addToLikedList(card) {
     <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
     <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
-  el.likedList.prepend(item);
+  listEl.prepend(item);
 }
 
 function updateProgress() {
@@ -361,14 +371,12 @@ function updateProgress() {
 }
 
 function finishSorting() {
-  window.scrollTo(0, 0);
   transition(el.sortingSection, el.select9Section, 'flex');
   renderSelect9Grid();
 }
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
-  window.scrollTo(0, 0);
   if (!el.s9Grid) return;
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
@@ -422,13 +430,11 @@ function updateS9UI() {
 
 // --- STEP 5: RANK TOP 3 ---
 function startRanking() {
-  window.scrollTo(0, 0);
   transition(el.select9Section, el.rank3Section, 'flex');
   renderRank3Grid();
 }
 
 function renderRank3Grid() {
-  window.scrollTo(0, 0);
   if (!el.r3Grid) return;
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
@@ -484,7 +490,6 @@ function updateR3UI() {
 
 // --- STEP 6: ANALYSIS & ADS ---
 function startAnalysis() {
-  window.scrollTo(0, 0);
   transition(el.rank3Section, el.adsOverlay, 'flex');
 
   // Analysis simulation
@@ -495,7 +500,6 @@ function startAnalysis() {
 
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
-  window.scrollTo(0, 0);
   transition(el.adsOverlay, el.resultSection, 'block');
 
   // 1. SCORING LOGIC
@@ -592,13 +596,20 @@ async function generateAIReport() {
 // --- UTILS ---
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
+  
+  // Force reset scroll before transition begins for better UX
+  window.scrollTo(0, 0);
+
   if (window.gsap) {
-    gsap.to(from, { opacity: 0, y: -30, duration: 0.4, onComplete: () => {
+    gsap.to(from, { opacity: 0, y: -20, duration: 0.3, onComplete: () => {
       from.classList.add('hidden');
       to.classList.remove('hidden');
       to.style.display = display;
-      gsap.fromTo(to, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5 });
-      window.scrollTo(0, 0); // Jump to top on every transition
+      
+      // Secondary scroll reset to ensure element is captured correctly
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      
+      gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 });
     }});
   } else {
     from.classList.add('hidden');
