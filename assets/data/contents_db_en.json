@@ -1,0 +1,293 @@
+{
+  "DATA": {
+    "title": "The Organizer (Data)",
+    "summary": "A systematic architect who creates order through facts and records.",
+    "traits": {
+      "desc": "You show excellent talent in handling information, records, and numbers. Even in chaotic situations, you have the ability to find rules and build systems to create stability. You trust facts over feelings and play a key role in organizational efficiency through your thoroughness and diligence.",
+      "energy": "Your energy comes from the 'Past' and 'Accumulated Data'. You rely on records and experiences to reduce uncertainty in the present and design stable structures."
+    },
+    "job_families": [
+      "Accounting & Finance",
+      "Data Analysis & Science",
+      "Office Administration",
+      "Library & Records Management",
+      "Quality Control",
+      "Logistics & Operations"
+    ],
+    "majors": [
+      "Accounting",
+      "Statistics",
+      "Information Science",
+      "Public Administration",
+      "Law",
+      "Management Information Systems (MIS)"
+    ],
+    "ncs_codes": [
+      "Business Operations (C)",
+      "Financial Transactions (D)",
+      "Records & Communications (C)"
+    ],
+    "role_models": [
+      { "name": "Warren Buffett", "desc": "Investment genius known for analyzing financial records" },
+      { "name": "Sherlock Holmes", "desc": "Detective who pieces together small data points to find the truth" }
+    ],
+    "activity_guide": "Try keeping a detailed journal of your expenses or planning a trip using a spreadsheet."
+  },
+  "IDEA": {
+    "title": "The Innovator (Idea)",
+    "summary": "A creative explorer who draws the future with new thoughts and imagination.",
+    "traits": {
+      "desc": "You are strongly attracted to internal activities involving abstract concepts, theories, and new ways of expression. You see unique perspectives that others miss and have the potential to break molds and lead innovation.",
+      "energy": "Your energy comes from the 'Future'. Instead of settling for reality, you are most passionate when imagining tomorrow's possibilities and asking 'What if?'."
+    },
+    "job_families": [
+      "Writer / Screenwriter",
+      "Scientific Researcher (Theory)",
+      "Philosopher",
+      "Graphic Designer",
+      "Creative Director",
+      "Strategic Planner",
+      "Psychologist"
+    ],
+    "majors": [
+      "Philosophy",
+      "Literature",
+      "Visual Design",
+      "Physics",
+      "Psychology",
+      "Marketing",
+      "Cultural Contents"
+    ],
+    "ncs_codes": [
+      "Creative/Performing Arts (R)",
+      "Social Sciences (P)",
+      "Natural Sciences (O)"
+    ],
+    "role_models": [
+      { "name": "J.K. Rowling", "desc": "Author who captivated the world with pure imagination" },
+      { "name": "Albert Einstein", "desc": "Scientist who revealed the universe's principles through thought experiments" }
+    ],
+    "activity_guide": "Watch SF movies to imagine the future, or keep an idea notebook."
+  },
+  "PEOPLE": {
+    "title": "The Supporter (People)",
+    "summary": "A warm helper who grows together with others through communication and empathy.",
+    "traits": {
+      "desc": "You shine in activities that involve interacting with, helping, educating, or persuading others. With your excellent ability to read emotions, you bring vitality to organizations and communities.",
+      "energy": "Your energy stays in the 'Present' and 'Relationships'. The connection, conversation, and emotional exchange with people right now are your strongest driving forces."
+    },
+    "job_families": [
+      "Teacher / Educator",
+      "Counselor / Therapist",
+      "Social Worker",
+      "Nurse / Healthcare Provider",
+      "Sales Representative",
+      "Human Resources (HR)",
+      "Service Industry"
+    ],
+    "majors": [
+      "Education",
+      "Social Work",
+      "Psychology",
+      "Nursing",
+      "Hospitality Management",
+      "Communications"
+    ],
+    "ncs_codes": [
+      "Education & Related Services (U)",
+      "Social & Government Services (V)",
+      "General Health Care (T)"
+    ],
+    "role_models": [
+      { "name": "Oprah Winfrey", "desc": "Talk show host who heals hearts through empathy and communication" },
+      { "name": "Mother Teresa", "desc": "A symbol of selfless service and love for humanity" }
+    ],
+    "activity_guide": "Participate in volunteer work or become a peer counselor for friends."
+  },
+  "THING": {
+    "title": "The Maker (Thing)",
+    "summary": "A practical artisan who creates tangible results using tools and technology.",
+    "traits": {
+      "desc": "You prefer working with machines, tools, and materials. You enjoy showing results through action rather than words and feel a high sense of achievement when you produce something tangible.",
+      "energy": "Your energy focuses on 'Completion' and 'Results'. You get the most energy when you see a finished product right in front of you."
+    },
+    "job_families": [
+      "Mechanical Engineer",
+      "Chef / Baker",
+      "Athlete",
+      "Architect / Builder",
+      "Pilot",
+      "Agriculture / Forestry",
+      "Computer Hardware Technician"
+    ],
+    "majors": [
+      "Mechanical Engineering",
+      "Culinary Arts",
+      "Sports Science",
+      "Architecture",
+      "Automotive Engineering",
+      "Agriculture"
+    ],
+    "ncs_codes": [
+      "Engineering & Technologies (M)",
+      "Construction & Maintenance (H)",
+      "Agriculture & Natural Resources (I)"
+    ],
+    "role_models": [
+      { "name": "Gordon Ramsay", "desc": "Star chef who commands the kitchen for the best dishes" },
+      { "name": "Michael Jordan", "desc": "Athlete who created results through physical training and skill" }
+    ],
+    "activity_guide": "Try hobbies like model building, cooking, or flying drones."
+  },
+  "DATA_PEOPLE": {
+    "title": "The Administrator",
+    "summary": "A leader who manages people within a systematic framework.",
+    "traits": {
+      "desc": "You possess the ability to manage and persuade people (People) while adhering to rules and procedures (Data). You excel at collaborating with others to achieve goals in a structured environment.",
+      "energy": "You leverage 'Stable Systems (Past)' to lead 'People (Present)'. You respect tradition and discipline while building current teamwork."
+    },
+    "job_families": [
+      "Business Manager",
+      "School Administrator",
+      "Secretary / Office Manager",
+      "Store Manager",
+      "Sales Management"
+    ],
+    "majors": [
+      "Business Administration",
+      "Public Administration",
+      "Hospitality Management",
+      "Real Estate"
+    ],
+    "ncs_codes": [
+      "Management & Planning (B)",
+      "Marketing & Sales (A)"
+    ],
+    "role_models": [
+      { "name": "Ban Ki-moon", "desc": "Former UN Secretary-General who coordinated peace within protocols" }
+    ],
+    "activity_guide": "Become a club officer or treasurer to set rules and lead meetings."
+  },
+  "DATA_THING": {
+    "title": "The Researcher",
+    "summary": "An investigator who pursues perfection by combining precise data and technology.",
+    "traits": {
+      "desc": "You excel at analyzing factual information (Data) using precise tools or technology (Thing). You explore phenomena based on objective facts and value logic and empirical evidence over emotion.",
+      "energy": "You use 'Past Data' to produce 'Current Results'. You are immersed when solving problems using accumulated knowledge."
+    },
+    "job_families": [
+      "Computer Programmer",
+      "Lab Researcher",
+      "Big Data Specialist",
+      "Accountant / Auditor",
+      "Information Security Analyst"
+    ],
+    "majors": [
+      "Computer Science",
+      "Biotechnology",
+      "Applied Statistics",
+      "Electronic Engineering"
+    ],
+    "ncs_codes": [
+      "Natural Sciences & Mathematics (O)",
+      "Engineering & Technologies (M)"
+    ],
+    "role_models": [
+      { "name": "Bill Gates", "desc": "Founder of Microsoft who combined coding (Thing) with business data (Data)" }
+    ],
+    "activity_guide": "Learn coding or assemble science kits to understand principles."
+  },
+  "IDEA_PEOPLE": {
+    "title": "The Inspirer",
+    "summary": "An inspiring educator who plants dreams and visions in people.",
+    "traits": {
+      "desc": "You are passionate about moving people's hearts and creating change (People) through creative thoughts (Idea). You go beyond transferring knowledge to inspiring others and unlocking their potential.",
+      "energy": "You plant a 'Vision of the Future' in 'People of the Present'. You lead people towards a hopeful tomorrow."
+    },
+    "job_families": [
+      "Teacher / Professor",
+      "Journalist / Reporter",
+      "Counselor",
+      "Advertising / PR",
+      "Actor / Musician",
+      "Influencer"
+    ],
+    "majors": [
+      "Journalism & Broadcasting",
+      "Education",
+      "Theater & Arts",
+      "Psychology",
+      "Political Science"
+    ],
+    "ncs_codes": [
+      "Applied Arts (Written & Spoken) (S)",
+      "Creative/Performing Arts (R)"
+    ],
+    "role_models": [
+      { "name": "Martin Luther King Jr.", "desc": "Leader who moved the world with a vision (Idea) and speech" }
+    ],
+    "activity_guide": "Join a debate club or share your thoughts on a blog or YouTube."
+  },
+  "IDEA_THING": {
+    "title": "The Pioneer",
+    "summary": "A creative inventor who realizes new ideas with concrete technology.",
+    "traits": {
+      "desc": "You are a convergence talent who realizes unique ideas (Idea) into actual working objects or technology (Thing). You have both engineering and artistic senses to turn abstract imagination into reality.",
+      "energy": "You turn 'Future Imagination' into 'Real Results'. You create what others only dream of."
+    },
+    "job_families": [
+      "Architect / Interior Designer",
+      "Game Developer",
+      "Product Designer",
+      "Chef (Menu Development)",
+      "R&D Engineer",
+      "Entrepreneur"
+    ],
+    "majors": [
+      "Architecture",
+      "Game Engineering",
+      "Industrial Design",
+      "Food Science"
+    ],
+    "ncs_codes": [
+      "Applied Arts (Visual) (Q)",
+      "Engineering & Technologies (M)"
+    ],
+    "role_models": [
+      { "name": "Steve Jobs", "desc": "Innovator who combined humanities (Idea) with technology (Thing)" },
+      { "name": "Elon Musk", "desc": "Visionary turning sci-fi ideas into real rockets and cars" }
+    ],
+    "activity_guide": "Learn 3D printing or develop your own cooking recipe."
+  },
+  "CENTER": {
+    "title": "The Balancer",
+    "summary": "A balanced talent who adapts flexibly to any situation.",
+    "traits": {
+      "desc": "You have balanced interests and capabilities in all areas: Data, Ideas, People, and Things. This means you have the potential to integrate diverse fields or perform necessary roles flexibly depending on the situation.",
+      "energy": "You freely cross the flow of time: Past, Present, and Future. Your flexibility is your greatest weapon."
+    },
+    "job_families": [
+      "CEO / Entrepreneur",
+      "Project Manager (PM)",
+      "Consultant",
+      "Producer (PD)",
+      "Career Coach",
+      "Elementary School Teacher"
+    ],
+    "majors": [
+      "Liberal Arts",
+      "Industrial Engineering",
+      "Education",
+      "Business Administration"
+    ],
+    "ncs_codes": [
+      "Management & Planning (B)",
+      "Education & Related Services (U)"
+    ],
+    "role_models": [
+      { "name": "Leonardo da Vinci", "desc": "The ultimate polymath crossing art, science, and technology" },
+      { "name": "Jeff Bezos", "desc": "Founder of Amazon who integrated technology, logistics, and customer service" }
+    ],
+    "activity_guide": "Read books in various fields and experience diverse club activities."
+  }
+}

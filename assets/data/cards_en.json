@@ -1,0 +1,687 @@
+{
+  "meta": {
+    "total_count": 52,
+    "back_images": {
+      "adult": "card_back_adult.png",
+      "child": "card_back_child.png"
+    }
+  },
+  "cards": [
+    {
+      "id": 1,
+      "dimension": "D",
+      "keyword": "Records & Organization",
+      "adult": {
+        "img": "card_01_D_records_adult.png",
+        "desc": "Systematically organizing records, facts, and data to maintain order and efficiency."
+      },
+      "child": {
+        "img": "card_01_D_records.png",
+        "desc": "The squirrel organizes acorns by size. Do you like keeping things neat and tidy?"
+      }
+    },
+    {
+      "id": 2,
+      "dimension": "D",
+      "keyword": "Precision",
+      "adult": {
+        "img": "card_02_D_precision_adult.png",
+        "desc": "Performing tasks with high accuracy, following strict standards and detailed procedures."
+      },
+      "child": {
+        "img": "card_02_D_precision.png",
+        "desc": "The owl measures leaves very carefully. Do you like doing things exactly right?"
+      }
+    },
+    {
+      "id": 3,
+      "dimension": "D",
+      "keyword": "Financial Transactions",
+      "adult": {
+        "img": "card_03_D_financial_adult.png",
+        "desc": "Handling money, numbers, and budgets to achieve economic efficiency."
+      },
+      "child": {
+        "img": "card_03_D_financial.png",
+        "desc": "Counting coins and writing numbers in a book. Do you like counting money?"
+      }
+    },
+    {
+      "id": 4,
+      "dimension": "D",
+      "keyword": "Office Procedures",
+      "adult": {
+        "img": "card_04_D_admin_adult.png",
+        "desc": "Following systematic business procedures to process documents and information."
+      },
+      "child": {
+        "img": "card_04_D_office.png",
+        "desc": "The pelican delivers letters to friends. Do you like organizing and delivering news?"
+      }
+    },
+    {
+      "id": 5,
+      "dimension": "D",
+      "keyword": "Following Rules",
+      "adult": {
+        "img": "card_05_D_rules_adult.png",
+        "desc": "Adhering to established rules and structured guidelines in work environments."
+      },
+      "child": {
+        "img": "card_05_D_rules.png",
+        "desc": "Waiting for the green light. Do you like following rules and keeping promises?"
+      }
+    },
+    {
+      "id": 6,
+      "dimension": "D",
+      "keyword": "Analyzing Data",
+      "adult": {
+        "img": "card_06_D_analysis_adult.png",
+        "desc": "Examining facts and statistics to identify trends and draw logical conclusions."
+      },
+      "child": {
+        "img": "card_06_D_analysis.png",
+        "desc": "The dog teacher explains the graph. Do you like looking at numbers and facts?"
+      }
+    },
+    {
+      "id": 7,
+      "dimension": "D",
+      "keyword": "Creating Order",
+      "adult": {
+        "img": "card_07_D_order_adult.png",
+        "desc": "Arranging information or objects systematically to bring structure to chaos."
+      },
+      "child": {
+        "img": "card_07_D_order.png",
+        "desc": "Cleaning up toys into boxes. Does a clean room make you feel good?"
+      }
+    },
+    {
+      "id": 8,
+      "dimension": "D",
+      "keyword": "Quality Control",
+      "adult": {
+        "img": "card_08_D_quality_adult.png",
+        "desc": "Inspecting products or services to ensure they meet specific standards."
+      },
+      "child": {
+        "img": "card_08_D_quality.png",
+        "desc": "Picking out the bad apples. Are you good at finding small mistakes?"
+      }
+    },
+    {
+      "id": 9,
+      "dimension": "D",
+      "keyword": "Computer Operation",
+      "adult": {
+        "img": "card_09_D_computer_adult.png",
+        "desc": "Operating computer systems or business machines to process data."
+      },
+      "child": {
+        "img": "card_09_D_computer.png",
+        "desc": "Typing on a keyboard like a pilot. Do you enjoy using computers?"
+      }
+    },
+    {
+      "id": 10,
+      "dimension": "D",
+      "keyword": "Systematic Manipulation",
+      "adult": {
+        "img": "card_10_D_systematic_adult.png",
+        "desc": "Handling data and objects in a strictly ordered, step-by-step manner."
+      },
+      "child": {
+        "img": "card_10_D_systematic.png",
+        "desc": "Assembling gears in the right order. do you like following steps one by one?"
+      }
+    },
+    {
+      "id": 11,
+      "dimension": "D",
+      "keyword": "Storage & Dispatching",
+      "adult": {
+        "img": "card_11_D_storage_adult.png",
+        "desc": "Systematically storing goods and distributing them accurately upon request."
+      },
+      "child": {
+        "img": "card_11_D_storage.png",
+        "desc": "The bee stores honey and delivers it. Are you good at keeping things safe?"
+      }
+    },
+    {
+      "id": 12,
+      "dimension": "D",
+      "keyword": "Information Management",
+      "adult": {
+        "img": "card_12_D_info_adult.png",
+        "desc": "Collecting, recording, and retrieving factual information to assist others."
+      },
+      "child": {
+        "img": "card_12_D_info.png",
+        "desc": "Finding the right book in the library. Are you fast at finding information?"
+      }
+    },
+    {
+      "id": 13,
+      "dimension": "D",
+      "keyword": "Business Machines",
+      "adult": {
+        "img": "card_13_D_machine_adult.png",
+        "desc": "Using office automation tools to input and process business data."
+      },
+      "child": {
+        "img": "card_13_D_machine.png",
+        "desc": "Organizing papers from the copier. Do machines fascinate you?"
+      }
+    },
+    {
+      "id": 14,
+      "dimension": "I",
+      "keyword": "New Ideas",
+      "adult": {
+        "img": "card_14_I_new_ideas_adult.png",
+        "desc": "Generating novel concepts, theories, or insights that didn't exist before."
+      },
+      "child": {
+        "img": "card_14_I_new_ideas.png",
+        "desc": "A light bulb turns on! Do you often come up with fun, new ideas?"
+      }
+    },
+    {
+      "id": 15,
+      "dimension": "I",
+      "keyword": "Creative Expression",
+      "adult": {
+        "img": "card_15_I_creative_expression_adult.png",
+        "desc": "Expressing thoughts or feelings through writing, art, or other media."
+      },
+      "child": {
+        "img": "card_15_I_creative_expression.png",
+        "desc": "Painting with rainbow colors. Do you like expressing your own feelings?"
+      }
+    },
+    {
+      "id": 16,
+      "dimension": "I",
+      "keyword": "Problem Solving",
+      "adult": {
+        "img": "card_16_I_problem_solving_adult.png",
+        "desc": "Analyzing complex situations to find logical or innovative solutions."
+      },
+      "child": {
+        "img": "card_16_I_problem_solving.png",
+        "desc": "Solving a maze puzzle. Do you enjoy figuring out difficult problems?"
+      }
+    },
+    {
+      "id": 17,
+      "dimension": "I",
+      "keyword": "Scientific Inquiry",
+      "adult": {
+        "img": "card_17_I_inquiry_adult.png",
+        "desc": "Observing natural phenomena and conducting experiments to understand principles."
+      },
+      "child": {
+        "img": "card_17_I_scientific.png",
+        "desc": "Looking at leaves through a microscope. Do you ask 'Why?' a lot?"
+      }
+    },
+    {
+      "id": 18,
+      "dimension": "I",
+      "keyword": "Abstract Thinking",
+      "adult": {
+        "img": "card_18_I_abstract_adult.png",
+        "desc": "Thinking deeply about concepts, theories, and ideas that are not visible."
+      },
+      "child": {
+        "img": "card_18_I_abstract.png",
+        "desc": "Imagining shapes in the clouds. Do you like to daydream and imagine things?"
+      }
+    },
+    {
+      "id": 19,
+      "dimension": "I",
+      "keyword": "Writing",
+      "adult": {
+        "img": "card_19_I_writing_adult.png",
+        "desc": "Using language to compose and convey original ideas or information."
+      },
+      "child": {
+        "img": "card_19_I_writing.png",
+        "desc": "Writing an adventure story. Do you enjoy writing fun stories?"
+      }
+    },
+    {
+      "id": 20,
+      "dimension": "I",
+      "keyword": "Artistic Creation",
+      "adult": {
+        "img": "card_20_I_art_adult.png",
+        "desc": "Creating beauty or meaning through visual or auditory media."
+      },
+      "child": {
+        "img": "card_20_I_artistic.png",
+        "desc": "Making a statue with clay. Do you love creating art?"
+      }
+    },
+    {
+      "id": 21,
+      "dimension": "I",
+      "keyword": "Research & Development",
+      "adult": {
+        "img": "card_21_I_rnd_adult.png",
+        "desc": "Discovering new knowledge or applying it to develop new products."
+      },
+      "child": {
+        "img": "card_21_I_rnd.png",
+        "desc": "Designing a new airplane. Do you like inventing new and better things?"
+      }
+    },
+    {
+      "id": 22,
+      "dimension": "I",
+      "keyword": "Planning & Design",
+      "adult": {
+        "img": "card_22_I_planning_adult.png",
+        "desc": "Conceiving new strategies or designs to achieve future goals."
+      },
+      "child": {
+        "img": "card_22_I_planning.png",
+        "desc": "Drawing a plan for a sandcastle. Do you like making plans before starting?"
+      }
+    },
+    {
+      "id": 23,
+      "dimension": "I",
+      "keyword": "Analytical Thinking",
+      "adult": {
+        "img": "card_23_I_analytical_adult.png",
+        "desc": "Breaking down information to understand relationships and logic."
+      },
+      "child": {
+        "img": "card_23_I_analytical.png",
+        "desc": "Finding clues with a magnifying glass. Do you like to solve mysteries?"
+      }
+    },
+    {
+      "id": 24,
+      "dimension": "I",
+      "keyword": "Intellectual Curiosity",
+      "adult": {
+        "img": "card_24_I_curiosity_adult.png",
+        "desc": "Seeking new knowledge and enjoying intellectual stimulation."
+      },
+      "child": {
+        "img": "card_24_I_curiosity.png",
+        "desc": "Reading books and asking questions. Is learning new things fun for you?"
+      }
+    },
+    {
+      "id": 25,
+      "dimension": "I",
+      "keyword": "Inventing",
+      "adult": {
+        "img": "card_25_I_inventing_adult.png",
+        "desc": "Creating tools or systems that did not exist before."
+      },
+      "child": {
+        "img": "card_25_I_inventing.png",
+        "desc": "Building a robot friend. Do you want to be an inventor?"
+      }
+    },
+    {
+      "id": 26,
+      "dimension": "I",
+      "keyword": "Critiquing",
+      "adult": {
+        "img": "card_26_I_critiquing_adult.png",
+        "desc": "Evaluating works, theories, or ideas to provide critical perspective."
+      },
+      "child": {
+        "img": "card_26_I_critiquing.png",
+        "desc": "Tasting food and giving a score. Are you good at judging what is best?"
+      }
+    },
+    {
+      "id": 27,
+      "dimension": "P",
+      "keyword": "Helping Others",
+      "adult": {
+        "img": "card_27_P_helping_adult.png",
+        "desc": "Providing services or support to improve the welfare of others."
+      },
+      "child": {
+        "img": "card_27_P_teaching.png",
+        "desc": "Helping a friend who fell down. Does helping others make you happy?"
+      }
+    },
+    {
+      "id": 28,
+      "dimension": "P",
+      "keyword": "Educating",
+      "adult": {
+        "img": "card_28_P_educating_adult.png",
+        "desc": "Imparting knowledge or skills to help others learn and grow."
+      },
+      "child": {
+        "img": "card_28_P_counseling.png",
+        "desc": "Teaching the ABCs to baby ducks. Do you like teaching things to others?"
+      }
+    },
+    {
+      "id": 29,
+      "dimension": "P",
+      "keyword": "Persuading",
+      "adult": {
+        "img": "card_29_P_persuading_adult.png",
+        "desc": "Communicating to influence the thoughts or actions of others."
+      },
+      "child": {
+        "img": "card_29_P_helping.png",
+        "desc": "Explaining why your toy is fun. Can you change your friend's mind?"
+      }
+    },
+    {
+      "id": 30,
+      "dimension": "P",
+      "keyword": "Influencing Others",
+      "adult": {
+        "img": "card_30_P_influencing_adult.png",
+        "desc": "Leading and directing others to achieve organizational goals."
+      },
+      "child": {
+        "img": "card_30_P_persuading.png",
+        "desc": "Leading friends on an adventure. Do you like being the leader?"
+      }
+    },
+    {
+      "id": 31,
+      "dimension": "P",
+      "keyword": "Serving",
+      "adult": {
+        "img": "card_31_P_serving_adult.png",
+        "desc": "Attending to the needs of people and providing comfort or service."
+      },
+      "child": {
+        "img": "card_31_P_leadership.png",
+        "desc": "Serving delicious tea to guests. Do you like making people feel welcome?"
+      }
+    },
+    {
+      "id": 32,
+      "dimension": "P",
+      "keyword": "Leadership",
+      "adult": {
+        "img": "card_32_P_leadership_adult.png",
+        "desc": "Planning and directing group activities to guide people toward a goal."
+      },
+      "child": {
+        "img": "card_32_P_teamwork.png",
+        "desc": "Conducting an orchestra. Do you dream of leading a big group?"
+      }
+    },
+    {
+      "id": 33,
+      "dimension": "P",
+      "keyword": "Public Contact",
+      "adult": {
+        "img": "card_33_P_public_contact_adult.png",
+        "desc": "Interacting and conversing with various people on a daily basis."
+      },
+      "child": {
+        "img": "card_33_P_public_speaking.png",
+        "desc": "Speaking in front of many people. Do you enjoy meeting new people?"
+      }
+    },
+    {
+      "id": 34,
+      "dimension": "P",
+      "keyword": "Counseling",
+      "adult": {
+        "img": "card_34_P_counseling_adult.png",
+        "desc": "Listening to others' problems and providing psychological support."
+      },
+      "child": {
+        "img": "card_34_P_selling.png",
+        "desc": "Listening to a friend's worry. Are you a good listener?"
+      }
+    },
+    {
+      "id": 35,
+      "dimension": "P",
+      "keyword": "Entertaining",
+      "adult": {
+        "img": "card_35_P_entertaining_adult.png",
+        "desc": "Performing to bring joy, amusement, or emotion to an audience."
+      },
+      "child": {
+        "img": "card_35_P_caregiving.png",
+        "desc": "Doing magic tricks on stage. Do you like making people laugh?"
+      }
+    },
+    {
+      "id": 36,
+      "dimension": "P",
+      "keyword": "Teamwork",
+      "adult": {
+        "img": "card_36_P_teamwork_adult.png",
+        "desc": "Collaborating and communicating with colleagues for a common goal."
+      },
+      "child": {
+        "img": "card_36_P_entertaining.png",
+        "desc": "Working together like ants. Do you like doing things with a team?"
+      }
+    },
+    {
+      "id": 37,
+      "dimension": "P",
+      "keyword": "Sales",
+      "adult": {
+        "img": "card_37_P_sales_adult.png",
+        "desc": "Promoting products or services and persuading others to buy them."
+      },
+      "child": {
+        "img": "card_37_P_socializing.png",
+        "desc": "Selling things at a market. Is playing shopkeeper fun for you?"
+      }
+    },
+    {
+      "id": 38,
+      "dimension": "P",
+      "keyword": "Supervision",
+      "adult": {
+        "img": "card_38_P_supervision_adult.png",
+        "desc": "Overseeing the work of others and managing performance."
+      },
+      "child": {
+        "img": "card_38_P_mediating.png",
+        "desc": "Watching the playground like a referee. Do you like keeping order?"
+      }
+    },
+    {
+      "id": 39,
+      "dimension": "P",
+      "keyword": "Curing/Nursing",
+      "adult": {
+        "img": "card_39_P_nursing_adult.png",
+        "desc": "Treating the sick and helping people recover their health."
+      },
+      "child": {
+        "img": "card_39_P_hospitality.png",
+        "desc": "Nursing a sick baby bear. Do you want to be a doctor or nurse?"
+      }
+    },
+    {
+      "id": 40,
+      "dimension": "T",
+      "keyword": "Making or Fixing",
+      "adult": {
+        "img": "card_40_T_fixing_adult.png",
+        "desc": "Using hands or tools to build or repair physical objects."
+      },
+      "child": {
+        "img": "card_40_T_operating.png",
+        "desc": "Fixing a broken toy car. Do you like fixing things that are broken?"
+      }
+    },
+    {
+      "id": 41,
+      "dimension": "T",
+      "keyword": "Operating Machines",
+      "adult": {
+        "img": "card_41_T_operating_adult.png",
+        "desc": "Controlling heavy machinery or complex equipment."
+      },
+      "child": {
+        "img": "card_41_T_using_tools.png",
+        "desc": "Driving a big excavator. Do big machines look cool to you?"
+      }
+    },
+    {
+      "id": 42,
+      "dimension": "T",
+      "keyword": "Using Tools",
+      "adult": {
+        "img": "card_42_T_tools_adult.png",
+        "desc": "Skillfully handling hand tools or power tools for a task."
+      },
+      "child": {
+        "img": "card_42_T_building.png",
+        "desc": "Building a birdhouse with a hammer. Are you good with tools?"
+      }
+    },
+    {
+      "id": 43,
+      "dimension": "T",
+      "keyword": "Physical Activity",
+      "adult": {
+        "img": "card_43_T_physical_adult.png",
+        "desc": "Using the body to exert strength or move actively."
+      },
+      "child": {
+        "img": "card_43_T_repairing.png",
+        "desc": "Kicking a soccer ball hard. Do you love moving your body?"
+      }
+    },
+    {
+      "id": 44,
+      "dimension": "T",
+      "keyword": "Working Outside",
+      "adult": {
+        "img": "card_44_T_outdoor_adult.png",
+        "desc": "Working outdoors, dealing with nature and the weather."
+      },
+      "child": {
+        "img": "card_44_T_precision.png",
+        "desc": "Camping in the forest. Do you like being outdoors?"
+      }
+    },
+    {
+      "id": 45,
+      "dimension": "T",
+      "keyword": "Living Things",
+      "adult": {
+        "img": "card_45_T_living_adult.png",
+        "desc": "Growing plants or caring for animals."
+      },
+      "child": {
+        "img": "card_45_T_quality.png",
+        "desc": "Watering flowers in the garden. Do you like taking care of plants or animals?"
+      }
+    },
+    {
+      "id": 46,
+      "dimension": "T",
+      "keyword": "Handling Materials",
+      "adult": {
+        "img": "card_46_T_materials_adult.png",
+        "desc": "Processing materials like wood, metal, or food."
+      },
+      "child": {
+        "img": "card_46_T_driving.png",
+        "desc": "Kneading dough to make bread. Do you like touching and making things?"
+      }
+    },
+    {
+      "id": 47,
+      "dimension": "T",
+      "keyword": "Engineering/Tech",
+      "adult": {
+        "img": "card_47_T_tech_adult.png",
+        "desc": "Applying technical principles to install or maintain systems."
+      },
+      "child": {
+        "img": "card_47_T_growing.png",
+        "desc": "Assembling a robot arm. Are you curious about how machines work?"
+      }
+    },
+    {
+      "id": 48,
+      "dimension": "T",
+      "keyword": "Transport / Cooking",
+      "adult": {
+        "img": "card_48_T_transport_adult.png",
+        "desc": "Driving vehicles or operating transport equipment."
+      },
+      "child": {
+        "img": "card_48_T_cooking.png",
+        "desc": "Cooking with delicious ingredients. Do you like making food?"
+      }
+    },
+    {
+      "id": 49,
+      "dimension": "T",
+      "keyword": "Construction",
+      "adult": {
+        "img": "card_49_T_construction_adult.png",
+        "desc": "Building structures or maintaining facilities."
+      },
+      "child": {
+        "img": "card_49_T_measuring.png",
+        "desc": "Building a strong brick house. Do you like building big things?"
+      }
+    },
+    {
+      "id": 50,
+      "dimension": "T",
+      "keyword": "Precision Work",
+      "adult": {
+        "img": "card_50_T_precision_work_adult.png",
+        "desc": "Working with small objects requiring high dexterity."
+      },
+      "child": {
+        "img": "card_50_T_resource.png",
+        "desc": "Fixing tiny watch parts. Are you good with small details?"
+      }
+    },
+    {
+      "id": 51,
+      "dimension": "T",
+      "keyword": "Field Work",
+      "adult": {
+        "img": "card_51_T_fieldwork_adult.png",
+        "desc": "Working directly at production or industrial sites."
+      },
+      "child": {
+        "img": "card_51_T_cleaning.png",
+        "desc": "Harvesting corn on a farm. Do you like working in the field?"
+      }
+    },
+    {
+      "id": 52,
+      "dimension": "T",
+      "keyword": "Safety & Security",
+      "adult": {
+        "img": "card_52_T_security_adult.png",
+        "desc": "Protecting people or property and controlling physical environments."
+      },
+      "child": {
+        "img": "card_52_T_physical.png",
+        "desc": "Guarding the village like a police officer. Is keeping things safe cool?"
+      }
+    }
+  ]
+}
