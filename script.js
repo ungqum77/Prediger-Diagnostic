@@ -190,8 +190,8 @@ async function loadData() {
   const suffix = state.lang.toLowerCase();
   
   // Use relative paths carefully for hosting
-  const cardsPath = `/assets/data/cards_${suffix}.json`;
-  const contentPath = `/assets/data/contents_db_${suffix}.json`;
+  const cardsPath = `assets/data/cards_${suffix}.json`;
+  const contentPath = `assets/data/contents_db_${suffix}.json`;
 
   const cardsRes = await fetch(cardsPath);
   if (!cardsRes.ok) {
@@ -226,7 +226,7 @@ function renderStack() {
     
     // Logic: Map 'child' mode to 'kids' folder as requested by user
     const folderName = state.mode === 'child' ? 'kids' : 'adult';
-    const imgPath = `/assets/images/${folderName}/${modeData.img}`;
+    const imgPath = `assets/images/${folderName}/${modeData.img}`;
     
     cardEl.innerHTML = `
       <div class="relative w-full h-[70%] bg-slate-100 overflow-hidden">
@@ -349,7 +349,7 @@ function renderRankingGrid() {
     
     cardEl.className = 'selection-card relative rounded-3xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
-      <img src="/assets/images/${folderName}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
+      <img src="assets/images/${folderName}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
       <div class="absolute bottom-5 left-5 right-5"><h4 class="text-white font-black text-base">${keyword}</h4></div>
       <div class="badge-container"></div>
