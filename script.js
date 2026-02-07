@@ -438,8 +438,8 @@ function updateProgress() {
 }
 
 function finishSorting() {
+  renderSelect9Grid(); // Pre-render content to establish layout
   transition(el.sortingSection, el.select9Section, 'flex');
-  renderSelect9Grid();
 }
 
 // --- STEP 4: SELECT TOP 9 ---
@@ -498,8 +498,8 @@ function updateS9UI() {
 
 // --- STEP 5: RANK TOP 3 ---
 function startRanking() {
+  renderRank3Grid(); // Pre-render content
   transition(el.select9Section, el.rank3Section, 'flex');
-  renderRank3Grid();
 }
 
 function renderRank3Grid() {
@@ -569,8 +569,6 @@ function startAnalysis() {
 
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
-  transition(el.adsOverlay, el.resultSection, 'block');
-  
   // 1. SCORING LOGIC
   // Top 1 = +5, Top 2 = +4, Top 3 = +3, Others in Top 9 = +1
   const scores = { D: 0, I: 0, P: 0, T: 0 };
@@ -601,7 +599,9 @@ async function showResult() {
   };
 
   const key = getResultKey(x, y);
-  renderReport(key, scores, x, y);
+  
+  renderReport(key, scores, x, y); // Render first
+  transition(el.adsOverlay, el.resultSection, 'block'); // Then show
   generateAIReport();
 }
 
@@ -714,25 +714,37 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
+  // 1. Hide previous
   from.classList.add('hidden');
   from.style.display = 'none';
 
+  // 2. Prepare new
   to.classList.remove('hidden');
   to.style.display = display;
   
-  // FORCE SCROLL TO TOP
+  // 3. FORCE SCROLL TO TOP IMMEDIATELY
   window.scrollTo(0, 0);
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
+  
+  // Extra safety for some browsers/devices
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+  }, 10);
 
+  // 4. ANIMATION (CLEAN FADE IN)
   if (window.gsap) {
+    // Reset any previous transforms first
+    gsap.set(to, { clearProps: "all" });
+    
+    // Animate opacity only, start at y:0 to ensure it renders at top
     gsap.fromTo(to, 
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.4, clearProps: "all" }
+      { opacity: 0, y: 0 },
+      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", clearProps: "all" }
     );
   } else {
     to.style.opacity = '1';
-    to.style.transform = 'translateY(0)';
+    to.style.transform = 'none';
   }
 }
 
