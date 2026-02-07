@@ -1,0 +1,687 @@
+{
+  "meta": {
+    "total_count": 52,
+    "back_images": {
+      "adult": "card_back_adult.png",
+      "child": "card_back_child.png"
+    }
+  },
+  "cards": [
+    {
+      "id": 1,
+      "dimension": "D",
+      "keyword_kr": "기록",
+      "adult": {
+        "img": "card_01_D_records_adult.png",
+        "desc": "사실과 기록을 체계적으로 정리하고 유지 관리하는 활동입니다."
+      },
+      "child": {
+        "img": "card_01_D_records.png",
+        "desc": "다람쥐가 도토리들을 크기별로 정리해요. 차곡차곡 정리하는 걸 좋아하나요?"
+      }
+    },
+    {
+      "id": 2,
+      "dimension": "D",
+      "keyword_kr": "판독/조사/감사",
+      "adult": {
+        "img": "card_02_D_precision_adult.png",
+        "desc": "정확한 표준을 사용하여 측정하거나 세밀한 절차를 따르는 활동입니다."
+      },
+      "child": {
+        "img": "card_02_D_precision.png",
+        "desc": "부엉이가 자로 길이를 아주 정확하게 재고 있어요. 꼼꼼한 게 좋나요?"
+      }
+    },
+    {
+      "id": 3,
+      "dimension": "D",
+      "keyword_kr": "회계",
+      "adult": {
+        "img": "card_03_D_financial_adult.png",
+        "desc": "경제적 이익을 위해 숫자와 데이터를 다루며, 예산을 수립하는 활동입니다."
+      },
+      "child": {
+        "img": "card_03_D_financial.png",
+        "desc": "돼지 저금통에 동전을 세면서 장부에 숫자를 적어요. 돈 계산이 재미있나요?"
+      }
+    },
+    {
+      "id": 4,
+      "dimension": "D",
+      "keyword_kr": "편집",
+      "adult": {
+        "img": "card_04_D_admin_adult.png",
+        "desc": "체계적인 절차에 따라 문서를 작성하고 정보를 전송하는 비즈니스 활동입니다."
+      },
+      "child": {
+        "img": "card_04_D_office.png",
+        "desc": "우체부가 편지를 가방에 담아 배달해요. 소식을 전하는 게 좋은가요?"
+      }
+    },
+    {
+      "id": 5,
+      "dimension": "D",
+      "keyword_kr": "판정",
+      "adult": {
+        "img": "card_05_D_rules_adult.png",
+        "desc": "정해진 규칙과 절차에 따라 업무를 수행하며 구조화된 환경을 선호합니다."
+      },
+      "child": {
+        "img": "card_05_D_rules.png",
+        "desc": "신호등이 초록불로 바뀌기를 기다려요. 약속과 규칙을 잘 지키나요?"
+      }
+    },
+    {
+      "id": 6,
+      "dimension": "D",
+      "keyword_kr": "분석",
+      "adult": {
+        "img": "card_06_D_analysis_adult.png",
+        "desc": "사실과 통계를 분석하여 경향성을 파악하고 논리적인 결론을 도출합니다."
+      },
+      "child": {
+        "img": "card_06_D_analysis.png",
+        "desc": "선생님이 칠판의 그래프를 설명해요. 이것저것 따져보는 게 좋나요?"
+      }
+    },
+    {
+      "id": 7,
+      "dimension": "D",
+      "keyword_kr": "분류 정리",
+      "adult": {
+        "img": "card_07_D_order_adult.png",
+        "desc": "혼란스러운 정보나 사물을 체계적으로 배열하여 질서를 부여합니다."
+      },
+      "child": {
+        "img": "card_07_D_order.png",
+        "desc": "어지러진 장난감을 상자에 착착 정리해요. 깨끗하게 정리하면 기분이 좋나요?"
+      }
+    },
+    {
+      "id": 8,
+      "dimension": "D",
+      "keyword_kr": "검토",
+      "adult": {
+        "img": "card_08_D_quality_adult.png",
+        "desc": "제품이나 서비스가 정해진 기준에 맞는지 확인하고 검증하는 활동입니다."
+      },
+      "child": {
+        "img": "card_08_D_quality.png",
+        "desc": "흠집 난 사과를 꼼꼼하게 골라내요. 틀린 그림 찾기를 잘하나요?"
+      }
+    },
+    {
+      "id": 9,
+      "dimension": "D",
+      "keyword_kr": "예산책정",
+      "adult": {
+        "img": "card_09_D_computer_adult.png",
+        "desc": "데이터 처리를 위해 비즈니스 머신이나 컴퓨터 시스템을 운용합니다."
+      },
+      "child": {
+        "img": "card_09_D_computer.png",
+        "desc": "컴퓨터 키보드를 두드리며 우주선을 조종해요. 컴퓨터 다루는 게 재미있나요?"
+      }
+    },
+    {
+      "id": 10,
+      "dimension": "D",
+      "keyword_kr": "설계도안",
+      "adult": {
+        "img": "card_10_D_systematic_adult.png",
+        "desc": "목표 달성을 위해 데이터와 사물을 명시적이고 질서 정연하게 조작합니다."
+      },
+      "child": {
+        "img": "card_10_D_systematic.png",
+        "desc": "톱니바퀴 장난감을 순서대로 조립해요. 순서대로 딱딱 맞추는 게 좋은가요?"
+      }
+    },
+    {
+      "id": 11,
+      "dimension": "D",
+      "keyword_kr": "단서수집탐색",
+      "adult": {
+        "img": "card_11_D_storage_adult.png",
+        "desc": "물품이나 정보를 체계적으로 저장하고 요청에 따라 정확하게 분배합니다."
+      },
+      "child": {
+        "img": "card_11_D_storage.png",
+        "desc": "꿀단지 창고에서 꿀을 싣고 배달을 가요. 물건을 잘 챙겨주나요?"
+      }
+    },
+    {
+      "id": 12,
+      "dimension": "D",
+      "keyword_kr": "요약통계",
+      "adult": {
+        "img": "card_12_D_info_adult.png",
+        "desc": "사실적 정보를 수집, 기록, 저장, 검색하여 이용을 돕습니다."
+      },
+      "child": {
+        "img": "card_12_D_info.png",
+        "desc": "도서관에서 친구가 찾는 책을 척척 찾아줘요. 정보를 찾는 게 빠르나요?"
+      }
+    },
+    {
+      "id": 13,
+      "dimension": "D",
+      "keyword_kr": "연구",
+      "adult": {
+        "img": "card_13_D_machine_adult.png",
+        "desc": "사무 자동화 기기를 활용하여 데이터를 입력하고 처리합니다."
+      },
+      "child": {
+        "img": "card_13_D_machine.png",
+        "desc": "복사기에서 나오는 종이를 정리해요. 기계를 다루는 게 신기한가요?"
+      }
+    },
+    {
+      "id": 14,
+      "dimension": "I",
+      "keyword_kr": "아이디어 포착",
+      "adult": {
+        "img": "card_14_I_new_ideas_adult.png",
+        "desc": "기존에 없던 새로운 방식, 이론, 통찰을 만들어내거나 발견합니다."
+      },
+      "child": {
+        "img": "card_14_I_new_ideas.png",
+        "desc": "머리 위에 반짝 전구가 켜졌어요! 새로운 생각이 자주 떠오르나요?"
+      }
+    },
+    {
+      "id": 15,
+      "dimension": "I",
+      "keyword_kr": "프리젠테이션",
+      "adult": {
+        "img": "card_15_I_creative_expression_adult.png",
+        "desc": "글, 그림, 음악 등을 통해 자신의 생각이나 감정을 새롭게 표현합니다."
+      },
+      "child": {
+        "img": "card_15_I_creative_expression.png",
+        "desc": "무지개 물감으로 큰 그림을 그려요. 나만의 생각을 표현하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 16,
+      "dimension": "I",
+      "keyword_kr": "문제해결",
+      "adult": {
+        "img": "card_16_I_problem_solving_adult.png",
+        "desc": "복잡한 상황을 분석하고 논리적인 사고를 통해 해결책을 제시합니다."
+      },
+      "child": {
+        "img": "card_16_I_problem_solving.png",
+        "desc": "미로 지도를 보며 길을 찾아요. 어려운 문제를 푸는 게 재미있나요?"
+      }
+    },
+    {
+      "id": 17,
+      "dimension": "I",
+      "keyword_kr": "유추",
+      "adult": {
+        "img": "card_17_I_inquiry_adult.png",
+        "desc": "자연 현상이나 원리를 이해하기 위해 관찰하고 가설을 세워 실험합니다."
+      },
+      "child": {
+        "img": "card_17_I_scientific.png",
+        "desc": "현미경으로 나뭇잎을 자세히 관찰해요. '왜 그럴까?' 궁금한 게 많나요?"
+      }
+    },
+    {
+      "id": 18,
+      "dimension": "I",
+      "keyword_kr": "개념화",
+      "adult": {
+        "img": "card_18_I_abstract_adult.png",
+        "desc": "눈에 보이지 않는 개념, 이론, 철학적 주제를 깊이 있게 생각합니다."
+      },
+      "child": {
+        "img": "card_18_I_abstract.png",
+        "desc": "구름을 보며 별자리를 상상해요. 눈에 안 보이는 걸 상상하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 19,
+      "dimension": "I",
+      "keyword_kr": "글쓰기",
+      "adult": {
+        "img": "card_19_I_writing_adult.png",
+        "desc": "언어를 사용하여 정보나 아이디어를 독창적으로 구성하고 전달합니다."
+      },
+      "child": {
+        "img": "card_19_I_writing.png",
+        "desc": "깃털 펜으로 모험 이야기를 써요. 재미있는 이야기를 짓는 게 좋나요?"
+      }
+    },
+    {
+      "id": 20,
+      "dimension": "I",
+      "keyword_kr": "홍보/마케팅",
+      "adult": {
+        "img": "card_20_I_art_adult.png",
+        "desc": "시각적, 청각적 매체를 통해 아름다움이나 의미를 창조합니다."
+      },
+      "child": {
+        "img": "card_20_I_artistic.png",
+        "desc": "조물조물 점토로 멋진 작품을 만들어요. 예술 작품을 만드는 게 좋나요?"
+      }
+    },
+    {
+      "id": 21,
+      "dimension": "I",
+      "keyword_kr": "개혁/개척",
+      "adult": {
+        "img": "card_21_I_rnd_adult.png",
+        "desc": "새로운 지식을 발견하거나 이를 응용하여 신제품이나 프로세스를 개발합니다."
+      },
+      "child": {
+        "img": "card_21_I_rnd.png",
+        "desc": "새로운 비행기를 설계하며 고민해요. 더 좋은 걸 연구하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 22,
+      "dimension": "I",
+      "keyword_kr": "전략개발",
+      "adult": {
+        "img": "card_22_I_planning_adult.png",
+        "desc": "미래의 목표를 달성하기 위해 새로운 전략이나 디자인을 구상합니다."
+      },
+      "child": {
+        "img": "card_22_I_planning.png",
+        "desc": "모래성을 짓기 전에 미리 그림을 그려봐요. 계획을 세우는 게 좋나요?"
+      }
+    },
+    {
+      "id": 23,
+      "dimension": "I",
+      "keyword_kr": "설명/해석/통역",
+      "adult": {
+        "img": "card_23_I_analytical_adult.png",
+        "desc": "복잡한 정보를 분해하고 관계를 파악하여 논리적인 통찰을 얻습니다."
+      },
+      "child": {
+        "img": "card_23_I_analytical.png",
+        "desc": "돋보기로 발자국 단서를 찾아요. 명탐정처럼 추리하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 24,
+      "dimension": "I",
+      "keyword_kr": "관계/결합/창의",
+      "adult": {
+        "img": "card_24_I_curiosity_adult.png",
+        "desc": "새로운 지식을 배우고 탐구하며 지적인 자극을 추구합니다."
+      },
+      "child": {
+        "img": "card_24_I_curiosity.png",
+        "desc": "책을 읽으며 '왜?'라고 질문해요. 새로운 걸 배우는 게 재미있나요?"
+      }
+    },
+    {
+      "id": 25,
+      "dimension": "I",
+      "keyword_kr": "발명",
+      "adult": {
+        "img": "card_25_I_inventing_adult.png",
+        "desc": "기존에 존재하지 않았던 도구, 기계, 시스템을 독창적으로 고안합니다."
+      },
+      "child": {
+        "img": "card_25_I_inventing.png",
+        "desc": "뚝딱뚝딱 신기한 로봇 친구를 만들어요. 발명가가 되고 싶나요?"
+      }
+    },
+    {
+      "id": 26,
+      "dimension": "I",
+      "keyword_kr": "변론/변호",
+      "adult": {
+        "img": "card_26_I_critiquing_adult.png",
+        "desc": "작품, 이론, 아이디어 등을 심도 있게 분석하고 평가하여 관점을 제시합니다."
+      },
+      "child": {
+        "img": "card_26_I_critiquing.png",
+        "desc": "요리 대회에서 맛을 보고 점수를 줘요. 무엇이 좋은지 평가를 잘하나요?"
+      }
+    },
+    {
+      "id": 27,
+      "dimension": "P",
+      "keyword_kr": "사회복지/봉사",
+      "adult": {
+        "img": "card_27_P_helping_adult.png",
+        "desc": "사람들의 문제를 해결해주거나 서비스를 제공하여 복지를 증진합니다."
+      },
+      "child": {
+        "img": "card_27_P_helping.png",
+        "desc": "넘어진 친구에게 밴드를 붙여줘요. 친구를 도와주는 게 기쁜가요?"
+      }
+    },
+    {
+      "id": 28,
+      "dimension": "P",
+      "keyword_kr": "교육",
+      "adult": {
+        "img": "card_28_P_educating_adult.png",
+        "desc": "지식이나 기술을 타인에게 전달하고 성장하도록 돕습니다."
+      },
+      "child": {
+        "img": "card_28_P_teaching.png",
+        "desc": "칠판 앞에서 아기들에게 글자를 가르쳐요. 알려주는 게 좋나요?"
+      }
+    },
+    {
+      "id": 29,
+      "dimension": "P",
+      "keyword_kr": "협상",
+      "adult": {
+        "img": "card_29_P_persuading_adult.png",
+        "desc": "타인의 생각이나 행동을 변화시키기 위해 소통하고 영향을 미칩니다."
+      },
+      "child": {
+        "img": "card_29_P_persuading",
+        "desc": "내 장난감이 왜 재미있는지 설명해요. 친구 마음을 잘 움직이나요?"
+      }
+    },
+    {
+      "id": 30,
+      "dimension": "P",
+      "keyword_kr": "팀웍/격려",
+      "adult": {
+        "img": "card_30_P_influencing_adult.png",
+        "desc": "조직의 목표 달성을 위해 타인을 이끌고 지휘합니다."
+      },
+      "child": {
+        "img": "card_30_P_socializing.png",
+        "desc": "골목 대장처럼 친구들을 이끌고 가요. 대장이 되는 게 좋나요?"
+      }
+    },
+    {
+      "id": 31,
+      "dimension": "P",
+      "keyword_kr": "고객응대/서비스",
+      "adult": {
+        "img": "card_31_P_serving_adult.png",
+        "desc": "사람들의 요구를 파악하고 편의나 즐거움을 제공합니다."
+      },
+      "child": {
+        "img": "card_31_P_saving.png",
+        "desc": "카페에서 손님에게 맛있는 차를 대접해요. 남을 기쁘게 하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 32,
+      "dimension": "P",
+      "keyword_kr": "통솔/지휘",
+      "adult": {
+        "img": "card_32_P_leadership_adult.png",
+        "desc": "집단의 활동을 계획하고 지시하며 목표를 향해 통솔합니다."
+      },
+      "child": {
+        "img": "card_32_P_leadership.png",
+        "desc": "지휘자가 되어 연주를 이끌어요. 앞에서 지휘하는 게 멋져 보이나요?"
+      }
+    },
+    {
+      "id": 33,
+      "dimension": "P",
+      "keyword_kr": "교제/네트워킹",
+      "adult": {
+        "img": "card_33_P_public_contact_adult.png",
+        "desc": "매일 다양한 사람들을 만나고 대화하며 상호작용합니다."
+      },
+      "child": {
+        "img": "card_33_P_public_speaking.png",
+        "desc": "많은 사람 앞에서 씩씩하게 발표해요. 사람들 앞에 서는 게 좋나요?"
+      }
+    },
+    {
+      "id": 34,
+      "dimension": "P",
+      "keyword_kr": "상담/코칭",
+      "adult": {
+        "img": "card_34_P_counseling_adult.png",
+        "desc": "타인의 고민을 경청하고 심리적 지원과 문제 해결을 돕습니다."
+      },
+      "child": {
+        "img": "card_34_P_counseling.png",
+        "desc": "고민 있는 친구 이야기를 잘 들어줘요. 상담해 주는 게 보람 있나요?"
+      }
+    },
+    {
+      "id": 35,
+      "dimension": "P",
+      "keyword_kr": "조율/조화",
+      "adult": {
+        "img": "card_35_P_entertaining_adult.png",
+        "desc": "사람들에게 즐거움, 감동, 재미를 제공하기 위해 공연하거나 소통합니다."
+      },
+      "child": {
+        "img": "card_35_P_entertaining.png",
+        "desc": "무대 위에서 마술쇼를 하며 친구들을 웃겨요. 남을 즐겁게 하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 36,
+      "dimension": "P",
+      "keyword_kr": "공동 작업",
+      "adult": {
+        "img": "card_36_P_teamwork_adult.png",
+        "desc": "동료들과 협력하고 소통하며 공동의 목표를 위해 함께 일합니다."
+      },
+      "child": {
+        "img": "card_36_P_teamwork.png",
+        "desc": "서로 협력하면 일도 잘되죠. 같이 협동하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 37,
+      "dimension": "P",
+      "keyword_kr": "판매/영업",
+      "adult": {
+        "img": "card_37_P_sales_adult.png",
+        "desc": "상품이나 서비스를 타인에게 소개하고 구매하도록 설득합니다."
+      },
+      "child": {
+        "img": "card_37_P_selling.png",
+        "desc": "시장에서 물건을 멋지게 소개하며 팔아요. 물건 파는 놀이가 재미있나요?"
+      }
+    },
+    {
+      "id": 38,
+      "dimension": "P",
+      "keyword_kr": "마찰해결/협의/중재",
+      "adult": {
+        "img": "card_38_P_supervision_adult.png",
+        "desc": "타인의 업무를 계획하고 감독하며 성과를 관리합니다."
+      },
+      "child": {
+        "img": "card_38_P_mediating.png",
+        "desc": "운동장에서 친구들이 규칙을 잘 지키나 봐요. 심판 보는 게 좋나요?"
+      }
+    },
+    {
+      "id": 39,
+      "dimension": "P",
+      "keyword_kr": "훈련/육성",
+      "adult": {
+        "img": "card_39_P_nursing_adult.png",
+        "desc": "아픈 사람을 돌보고 치료하며 건강을 회복하도록 돕습니다."
+      },
+      "child": {
+        "img": "card_39_P_caregiving.png",
+        "desc": "아픈 아기 곰을 간호해 줘요. 아픈 친구를 보면 돌봐주고 싶나요?"
+      }
+    },
+    {
+      "id": 40,
+      "dimension": "T",
+      "keyword_kr": "제작",
+      "adult": {
+        "img": "card_40_T_fixing_adult.png",
+        "desc": "도구를 사용하여 물건을 제작하거나 수리하는 활동입니다."
+      },
+      "child": {
+        "img": "card_40_T_repairing.png",
+        "desc": "망가진 장난감 자동차를 고쳐요. 고장 난 걸 고치는 게 좋나요?"
+      }
+    },
+    {
+      "id": 41,
+      "dimension": "T",
+      "keyword_kr": "운용/자동",
+      "adult": {
+        "img": "card_41_T_operating_adult.png",
+        "desc": "기계나 중장비, 복잡한 설비를 운전하거나 조종합니다."
+      },
+      "child": {
+        "img": "card_41_T_operating.png",
+        "desc": "커다란 포크레인을 운전해요. 큰 기계를 조종하는 게 멋져 보이나요?"
+      }
+    },
+    {
+      "id": 42,
+      "dimension": "T",
+      "keyword_kr": "도구이용",
+      "adult": {
+        "img": "card_42_T_tools_adult.png",
+        "desc": "작업 수행을 위해 손 도구나 전동 공구를 능숙하게 다룹니다."
+      },
+      "child": {
+        "img": "card_42_T_using_tools.png",
+        "desc": "망치로 뚝딱뚝딱 새집을 지어요. 도구를 쓰는 게 능숙한가요?"
+      }
+    },
+    {
+      "id": 43,
+      "dimension": "T",
+      "keyword_kr": "물류/이동/체인관리",
+      "adult": {
+        "img": "card_43_T_physical_adult.png",
+        "desc": "몸을 사용하여 힘을 쓰거나 활발하게 움직이며 수행합니다."
+      },
+      "child": {
+        "img": "card_43_T_physical.png",
+        "desc": "땀을 흘리며 축구공을 뻥 차요. 몸을 움직이는 게 상쾌한가요?"
+      }
+    },
+    {
+      "id": 44,
+      "dimension": "T",
+      "keyword_kr": "운송/수송",
+      "adult": {
+        "img": "card_44_T_outdoor_adult.png",
+        "desc": "실내가 아닌 야외 환경에서 자연, 날씨와 접하며 수행합니다."
+      },
+      "child": {
+        "img": "card_44_T_driving.png",
+        "desc": "자동차로 멋진 곳으로 고고고. 밖에서 활동하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 45,
+      "dimension": "T",
+      "keyword_kr": "관리/경작",
+      "adult": {
+        "img": "card_45_T_living_adult.png",
+        "desc": "식물이나 동물을 기르고 돌보며 재배하는 활동입니다."
+      },
+      "child": {
+        "img": "card_45_T_growing.png",
+        "desc": "텃밭에서 꽃에 물을 줘요. 식물이나 동물을 키우는 게 좋나요?"
+      }
+    },
+    {
+      "id": 46,
+      "dimension": "T",
+      "keyword_kr": "수집",
+      "adult": {
+        "img": "card_46_T_materials_adult.png",
+        "desc": "나무, 금속, 음식 등 구체적인 물성을 가진 재료를 가공합니다."
+      },
+      "child": {
+        "img": "card_46_T_measuring",
+        "desc": "나무, 금속, 음식 등 재료를 가공해요"
+      }
+    },
+    {
+      "id": 47,
+      "dimension": "T",
+      "keyword_kr": "과학기술/실험",
+      "adult": {
+        "img": "card_47_T_tech_adult.png",
+        "desc": "기술적 원리를 적용하여 시스템을 설치, 유지, 보수합니다."
+      },
+      "child": {
+        "img": "card_47_T_precision.png",
+        "desc": "이런 시스템은 어떤건지 파악하는게 너무 즐겁죠?"
+      }
+    },
+    {
+      "id": 48,
+      "dimension": "T",
+      "keyword_kr": "조립/조작", 
+      "adult": {
+        "img": "card_48_T_transport_adult.png",
+        "desc": "자동차, 트럭, 비행기 등 운송 수단을 직접 운전하거나 조작합니다."
+      },
+      "child": {
+        "img": "card_48_T_cooking.png", 
+        "desc": "맛있는 재료로 지글지글 요리를 해요. 음식을 직접 만드는 게 재미있나요?"
+      }
+    },
+    {
+      "id": 49,
+      "dimension": "T",
+      "keyword_kr": "건축/건설",
+      "adult": {
+        "img": "card_49_T_construction_adult.png",
+        "desc": "건물, 도로 등 구조물을 짓거나 시설을 유지 보수합니다."
+      },
+      "child": {
+        "img": "card_49_T_building.png",
+        "desc": "벽돌을 쌓아 튼튼한 집을 지어요. 무언가를 크게 짓는 게 좋나요?"
+      }
+    },
+    {
+      "id": 50,
+      "dimension": "T",
+      "keyword_kr": "구매/구입",
+      "adult": {
+        "img": "card_50_T_precision_work_adult.png",
+        "desc": "사물을 다룰 때 고도의 정밀함과 손기술을 사용하여 세밀하게 작업합니다."
+      },
+      "child": {
+        "img": "card_50_T_precision.png",
+        "desc": "작은 시계 부품을 핀셋으로 맞춰요. 아주 작은 것도 잘 다루나요?"
+      }
+    },
+    {
+      "id": 51,
+      "dimension": "T",
+      "keyword_kr": "현장관리",
+      "adult": {
+        "img": "card_51_T_fieldwork_adult.png",
+        "desc": "생산 현장이나 작업 현장에서 직접 몸으로 부딪히며 일합니다."
+      },
+      "child": {
+        "img": "card_51_T_resource.png",
+        "desc": "창고에서 수확한 곡물들을 분류해요. 현장에서 직접 일하는 게 좋나요?"
+      }
+    },
+    {
+      "id": 52,
+      "dimension": "T",
+      "keyword_kr": "유지/보수",
+      "adult": {
+        "img": "card_52_T_security_adult.png",
+        "desc": "사람이나 재산을 보호하기 위해 물리적인 환경을 통제하여 유지/보수 합니다."
+      },
+      "child": {
+        "img": "card_52_T_security.png",
+        "desc": "경찰 모자를 쓰고 마을을 지켜요. 안전하게 유지시키는 일이 멋진가요?"
+      }
+    }
+  ]
+}
