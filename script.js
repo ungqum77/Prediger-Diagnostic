@@ -373,17 +373,23 @@ function addToThumbnailList(card, target) {
     <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
     <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
-  listEl.prepend(item);
+  // appendChild로 변경하여 뒤에 쌓이도록 함
+  listEl.appendChild(item);
 }
 
 function updateProgress() {
-  const currentPool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
+  const isMain = state.currentSortingStep === 'main';
+  const currentPool = isMain ? state.cards : state.heldCards;
   const p = (state.currentIndex / currentPool.length) * 100;
   if (el.progressBar) el.progressBar.style.width = `${p}%`;
   if (el.progressText) el.progressText.textContent = `${state.currentIndex} / ${currentPool.length}`;
   
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
-  if (el.countHold) el.countHold.textContent = state.heldCards.length;
+  if (el.countHold) {
+    // 보류 단계에서는 남은 갯수가 보이도록 수정
+    const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex);
+    el.countHold.textContent = Math.max(0, heldCount);
+  }
   if (el.countNope) el.countNope.textContent = state.rejectedCards.length;
 }
 
@@ -455,6 +461,9 @@ function startRanking() {
 function renderRank3Grid() {
   window.scrollTo(0, 0);
   if (!el.r3Grid) return;
+  
+  // Enforce 3x3 grid layout (Tailwind)
+  el.r3Grid.className = 'grid grid-cols-3 gap-4 max-w-2xl mx-auto items-center justify-center';
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
   updateR3UI();
@@ -474,11 +483,12 @@ function renderRank3Grid() {
     const keyword = card['keyword_' + state.lang.toLowerCase()];
     const folder = state.mode === 'child' ? 'kids' : 'adult';
     
-    cardEl.className = 'selection-card relative rounded-[2rem] overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
+    // Scale down size to fit 3x3 neatly
+    cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group w-full';
     cardEl.innerHTML = `
       <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
-      <div class="absolute bottom-5 left-5 right-5"><h4 class="text-white font-black text-sm">${keyword}</h4></div>
+      <div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div>
       <div class="badge-container"></div>
     `;
     cardEl.onclick = () => {
@@ -518,7 +528,7 @@ function startAnalysis() {
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
   transition(el.adsOverlay, el.resultSection, 'block');
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'instant' });
 
   // 1. SCORING LOGIC (REWRITTEN)
   // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
@@ -578,9 +588,10 @@ function renderReport(key, scores, x, y) {
     el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
+  // BUG FIX: Handle role_models if they are objects
   if (el.resRoleModels) {
     const rmodels = data.role_models || [];
-    el.resRoleModels.textContent = rmodels.join(", ");
+    el.resRoleModels.textContent = rmodels.map(m => typeof m === 'object' ? (m.name || m.title || "Unknown") : m).join(", ");
   }
 
   // Animate Propensity Bars
