@@ -214,7 +214,9 @@ async function loadData() {
 
 // --- STEP 2 & 3: SORTING ---
 function renderStack() {
+  // CRITICAL: Scroll top
   window.scrollTo(0, 0);
+  
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   
@@ -373,7 +375,7 @@ function addToThumbnailList(card, target) {
     <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
     <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
   `;
-  // appendChild로 변경하여 뒤에 쌓이도록 함
+  // appendChild: Stack behind (at the end of the list)
   listEl.appendChild(item);
 }
 
@@ -386,7 +388,7 @@ function updateProgress() {
   
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
   if (el.countHold) {
-    // 보류 단계에서는 남은 갯수가 보이도록 수정
+    // Show remaining count during held review
     const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex);
     el.countHold.textContent = Math.max(0, heldCount);
   }
@@ -400,7 +402,9 @@ function finishSorting() {
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
+  // CRITICAL: Scroll top
   window.scrollTo(0, 0);
+
   if (!el.s9Grid) return;
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
@@ -448,7 +452,7 @@ function updateS9UI() {
   if (el.s9Count) el.s9Count.textContent = state.top9Cards.length;
   if (el.btnS9Next) {
     el.btnS9Next.disabled = state.top9Cards.length !== 9;
-    el.btnS9Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnS9Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
@@ -459,11 +463,13 @@ function startRanking() {
 }
 
 function renderRank3Grid() {
+  // CRITICAL: Scroll top
   window.scrollTo(0, 0);
+
   if (!el.r3Grid) return;
   
   // Enforce 3x3 grid layout (Tailwind)
-  el.r3Grid.className = 'grid grid-cols-3 gap-4 max-w-2xl mx-auto items-center justify-center';
+  el.r3Grid.className = 'grid grid-cols-3 gap-3 w-full max-w-[500px]';
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
   updateR3UI();
@@ -513,7 +519,7 @@ function updateR3UI() {
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
   if (el.btnR3Next) {
     el.btnR3Next.disabled = state.rankedCards.length !== 3;
-    el.btnR3Next.className = `w-full sm:w-[400px] py-6 font-black rounded-[2rem] transition-all shadow-xl hover:translate-y-[-2px] flex items-center justify-center gap-4 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+    el.btnR3Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
   }
 }
 
@@ -528,7 +534,8 @@ function startAnalysis() {
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
   transition(el.adsOverlay, el.resultSection, 'block');
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  // CRITICAL: Scroll top
+  window.scrollTo(0, 0);
 
   // 1. SCORING LOGIC (REWRITTEN)
   // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
@@ -643,10 +650,10 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // CRITICAL: Ensure scroll to top on every transition
-  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  document.documentElement.scrollTop = 0;
+  // CRITICAL: FORCE SCROLL TO TOP IMMEDIATELY
+  window.scrollTo(0, 0);
   document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
 
   if (window.gsap) {
     gsap.to(from, { opacity: 0, y: -20, duration: 0.2, onComplete: () => {
@@ -654,9 +661,16 @@ function transition(from, to, display = 'block') {
       to.classList.remove('hidden');
       to.style.display = display;
       
-      // Secondary safety reset
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      // CRITICAL: FORCE SCROLL TO TOP AGAIN AFTER LAYOUT CHANGE
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
       
+      // Safety timeout for browser reflow
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 50);
+
       gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
     }});
   } else {
