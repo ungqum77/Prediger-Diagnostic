@@ -111,9 +111,18 @@ const el = {
   resTitle: document.getElementById('result-title'),
   resSummary: document.getElementById('result-summary'),
   resTraits: document.getElementById('result-traits'),
+  resEnergy: document.getElementById('result-energy'),
+  resEnergyContainer: document.getElementById('energy-container'),
   resJobs: document.getElementById('result-jobs'),
+  resMajors: document.getElementById('result-majors'),
+  resNCS: document.getElementById('result-ncs'),
+  resNCSContainer: document.getElementById('ncs-container'),
+  resGuide: document.getElementById('result-guide'),
+  resGuideContainer: document.getElementById('guide-container'),
   resRoleModels: document.getElementById('result-role-models'),
-  resTag: document.getElementById('result-tag')
+  resTag: document.getElementById('result-tag'),
+  
+  btnDownloadPdf: document.getElementById('btn-download-pdf')
 };
 
 // --- INITIALIZATION ---
@@ -138,9 +147,47 @@ function init() {
   if (el.btnS9Next) el.btnS9Next.onclick = startRanking;
   if (el.btnR3Next) el.btnR3Next.onclick = startAnalysis;
   if (el.btnSkipAd) el.btnSkipAd.onclick = showResult;
+  if (el.btnDownloadPdf) el.btnDownloadPdf.onclick = downloadPDF;
 
   if (typeof gsap !== 'undefined') {
     gsap.from(".intro-anim", { y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" });
+  }
+}
+
+function downloadPDF() {
+  // Target the container that has the white background and rounded corners in Result Section
+  const element = document.getElementById('result-content-container');
+  const btn = el.btnDownloadPdf;
+  
+  if (!element) return;
+  
+  // Provide Feedback
+  const originalText = btn.innerHTML;
+  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Generating...`;
+  btn.disabled = true;
+
+  const opt = {
+    margin: [0.5, 0.5], // [top, left, bottom, right] if 4 values, or vertical/horizontal if 2
+    filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(element).save().then(() => {
+       btn.innerHTML = originalText;
+       btn.disabled = false;
+    }).catch(err => {
+       console.error(err);
+       btn.innerHTML = originalText;
+       btn.disabled = false;
+       alert("PDF Generation Failed");
+    });
+  } else {
+    alert("PDF generator not loaded. Please refresh.");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
 
@@ -576,15 +623,49 @@ function renderReport(key, scores, x, y) {
 
   if (el.resTitle) el.resTitle.textContent = data.title;
   if (el.resSummary) el.resSummary.textContent = data.summary;
-  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || data.traits || "";
   if (el.resTag) el.resTag.textContent = key;
   
+  // TRAITS & ENERGY
+  if (el.resTraits) {
+    if (typeof data.traits === 'string') {
+        el.resTraits.textContent = data.traits;
+        if(el.resEnergyContainer) el.resEnergyContainer.style.display = 'none'; 
+    } else {
+        el.resTraits.textContent = data.traits?.desc || "";
+        if(el.resEnergy && el.resEnergyContainer) {
+            el.resEnergy.textContent = data.traits?.energy || "";
+            el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
+        }
+    }
+  }
+  
+  // JOBS
   if (el.resJobs) {
     const jobs = data.job_families || data.jobs || [];
     el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
-  // BUG FIX: Handle role_models if they are objects
+  // MAJORS (New)
+  if (el.resMajors) {
+    const majors = data.majors || [];
+    el.resMajors.innerHTML = majors.map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
+    // Hide container logic if empty could be here, but parent is shared in grid
+  }
+
+  // NCS CODES (New)
+  if (el.resNCS && el.resNCSContainer) {
+    const ncs = data.ncs_codes || [];
+    el.resNCS.innerHTML = ncs.map(c => `<li>${c}</li>`).join('');
+    el.resNCSContainer.style.display = ncs.length > 0 ? 'block' : 'none';
+  }
+
+  // GUIDE (New)
+  if (el.resGuide && el.resGuideContainer) {
+    el.resGuide.textContent = data.activity_guide || "";
+    el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none';
+  }
+
+  // ROLE MODELS
   if (el.resRoleModels) {
     const rmodels = data.role_models || [];
     el.resRoleModels.textContent = rmodels.map(m => typeof m === 'object' ? (m.name || m.title || "Unknown") : m).join(", ");

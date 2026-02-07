@@ -17,6 +17,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
   
+  <!-- HTML2PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <link rel="stylesheet" href="style.css">
 
   <script type="importmap">
@@ -217,7 +220,8 @@
 
     <!-- 7. RESULT SECTION -->
     <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[3rem] shadow-2xl overflow-y-auto my-6 pb-20">
-      <div class="p-8 sm:p-16">
+      <!-- Container for PDF generation -->
+      <div id="result-content-container" class="p-8 sm:p-16 bg-white rounded-[3rem]">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 pb-16 border-b border-slate-100">
           <div class="flex-1">
             <span id="text-report-for" class="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em] mb-6 block">THE FINAL DIAGNOSIS</span>
@@ -265,23 +269,57 @@
                 </div>
                 <div id="ai-result" class="hidden text-blue-50 text-lg leading-relaxed space-y-8 font-medium bg-white/5 p-10 rounded-[2.5rem]"></div>
               </div>
-              <div class="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm space-y-8">
+              <div class="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm space-y-10">
+                <!-- Traits & Energy -->
                 <div>
                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Traits Analysis</h3>
-                   <p id="result-traits" class="text-slate-700 font-medium leading-relaxed">...</p>
+                   <p id="result-traits" class="text-slate-700 font-medium leading-relaxed mb-6">...</p>
+                   <!-- Energy Field -->
+                   <div id="energy-container" class="hidden bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
+                      <h4 class="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">Energy Flow</h4>
+                      <p id="result-energy" class="text-slate-700 font-medium text-sm leading-relaxed">...</p>
+                   </div>
                 </div>
-                <div>
-                   <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6">Recommended Jobs</h3>
-                   <div id="result-jobs" class="flex flex-wrap gap-3"></div>
+                
+                <!-- Jobs & Majors -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6">Recommended Jobs</h3>
+                    <div id="result-jobs" class="flex flex-wrap gap-3"></div>
+                  </div>
+                  <div>
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6">Recommended Majors</h3>
+                    <div id="result-majors" class="flex flex-wrap gap-2"></div>
+                  </div>
                 </div>
+                
+                <!-- NCS Codes -->
+                <div id="ncs-container" class="hidden">
+                   <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">NCS Codes (Competency Standards)</h3>
+                   <ul id="result-ncs" class="list-disc list-inside text-slate-600 font-medium text-sm space-y-2 bg-slate-50 p-6 rounded-[2rem]"></ul>
+                </div>
+                
+                <!-- Activity Guide -->
+                <div id="guide-container" class="hidden">
+                   <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Activity Guide</h3>
+                   <p id="result-guide" class="text-slate-700 font-medium leading-relaxed bg-blue-50/50 p-6 rounded-[2rem] border border-blue-50">...</p>
+                </div>
+                
                 <div>
                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] mb-4">Potential Role Models</h3>
                    <div id="result-role-models" class="text-slate-700 font-medium leading-relaxed"></div>
                 </div>
               </div>
-              <button id="btn-restart" class="w-full py-8 bg-slate-50 border border-slate-100 text-slate-400 font-black rounded-[2.5rem] hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all text-lg uppercase tracking-[0.3em] shadow-sm">다시 진단하기</button>
-           </div>
+            </div>
         </div>
+      </div>
+      <!-- Buttons outside PDF container -->
+      <div class="px-8 sm:px-16 flex flex-col gap-4">
+          <button id="btn-download-pdf" class="w-full py-6 bg-slate-900 text-white font-black rounded-[2.5rem] hover:bg-slate-800 transition-all text-lg uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+             Download Report as PDF
+          </button>
+          <button id="btn-restart" class="w-full py-8 bg-slate-50 border border-slate-100 text-slate-400 font-black rounded-[2.5rem] hover:bg-white hover:text-slate-900 hover:border-slate-300 transition-all text-lg uppercase tracking-[0.3em] shadow-sm">다시 진단하기</button>
       </div>
     </section>
   </main>
