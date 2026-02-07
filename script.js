@@ -233,6 +233,10 @@ function renderStack() {
     ind.classList.toggle('done', !isMain && idx === 0);
   });
 
+  // Toggle HOLD button visibility based on phase
+  const btnPass = document.getElementById('btn-swipe-up');
+  if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
+
   const stack = currentPool.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
   stack.forEach((card, i) => {
@@ -246,17 +250,17 @@ function renderStack() {
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
     cardEl.innerHTML = `
-      <div class="relative w-full h-[60%] bg-slate-100 overflow-hidden">
+      <div class="relative w-full h-[55%] bg-slate-100 overflow-hidden">
         <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
         <div class="stamp stamp-like">LIKE</div>
         <div class="stamp stamp-nope">NOPE</div>
         ${isMain ? '<div class="stamp stamp-hold">HELD</div>' : ''}
       </div>
-      <div class="px-6 py-4 h-[40%] bg-white flex flex-col items-center justify-center text-center overflow-hidden">
+      <div class="px-6 py-4 h-[45%] bg-white flex flex-col items-center justify-center text-center overflow-hidden">
         <h3 class="leading-tight shrink-0">${keyword}</h3>
-        <p class="mt-2 text-slate-500 overflow-hidden line-clamp-3">${modeData.desc}</p>
+        <p class="mt-1 text-slate-500 overflow-hidden line-clamp-3">${modeData.desc}</p>
       </div>
-      <div class="absolute top-6 right-6 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
+      <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-xl px-2 py-1 rounded-lg text-[8px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
         ${card.dimension}
       </div>
     `;
@@ -276,7 +280,7 @@ function setupDraggable(cardEl, cardData) {
   const isMain = state.currentSortingStep === 'main';
 
   Draggable.create(cardEl, {
-    type: isMain ? "x,y" : "x",
+    type: isMain ? "x,y" : "x", // Phase 2: Vertical Hold Action Disable
     onDrag: function() {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');

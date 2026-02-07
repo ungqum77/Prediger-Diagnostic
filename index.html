@@ -132,20 +132,21 @@
 
         <!-- Center: Card Stack & Controls -->
         <div class="flex-1 bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
-          <div class="mb-4 text-center">
-            <h2 id="sorting-title" class="text-2xl font-black text-slate-800 leading-tight">...</h2>
-            <p id="sorting-subtitle" class="text-sm text-slate-500 font-medium mt-1">...</p>
+          <div class="mb-2 text-center">
+            <h2 id="sorting-title" class="text-xl font-black text-slate-800 leading-tight">...</h2>
+            <p id="sorting-subtitle" class="text-xs text-slate-500 font-medium mt-1">...</p>
           </div>
-          <div id="card-stack" class="relative w-full max-w-[360px] aspect-[3/4] sm:max-w-[400px]"></div>
-          <div class="flex items-center gap-10 mt-8 mb-4 z-50">
+          <!-- 카드 크기 15% 축소 조정: max-width 360->310, 400->340 -->
+          <div id="card-stack" class="relative w-full max-w-[310px] aspect-[3/4] sm:max-w-[340px]"></div>
+          <div class="flex items-center gap-8 mt-6 mb-2 z-50">
             <button id="btn-swipe-left" class="sorting-btn btn-nope" title="Nope">
-               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
             <button id="btn-swipe-up" class="sorting-btn btn-pass" title="Pass (Hold)">
                <span class="text-xs font-black">HOLD</span>
             </button>
             <button id="btn-swipe-right" class="sorting-btn btn-like" title="Like">
-               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
             </button>
           </div>
         </div>
@@ -260,7 +261,7 @@
                   <div class="w-16 h-16 border-[6px] border-white/20 border-t-white rounded-full animate-spin"></div>
                   <p id="text-ai-loading" class="text-lg font-bold text-blue-100 animate-pulse">심층 분석 결과를 정리하고 있습니다...</p>
                 </div>
-                <div id="ai-result" class="hidden text-blue-50 text-xl leading-relaxed space-y-10 font-medium bg-white/5 p-12 rounded-[4rem]"></div>
+                <div id="ai-result" class="hidden text-blue-50 text-xl leading-relaxed space-y-10 font-medium bg-white/5 p-12 rounded-[4rem]\"></div>
               </div>
               <div class="bg-white p-16 rounded-[5rem] border border-slate-100 shadow-sm space-y-10">
                 <div>
