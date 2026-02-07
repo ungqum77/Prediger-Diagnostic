@@ -354,7 +354,7 @@
         "desc": "Providing services or support to improve the welfare of others."
       },
       "child": {
-        "img": "card_27_P_teaching.png",
+        "img": "card_27_P_helping.png",
         "desc": "Helping a friend who fell down. Does helping others make you happy?"
       }
     },
@@ -367,7 +367,7 @@
         "desc": "Imparting knowledge or skills to help others learn and grow."
       },
       "child": {
-        "img": "card_28_P_counseling.png",
+        "img": "card_28_p_teaching.png",
         "desc": "Teaching the ABCs to baby ducks. Do you like teaching things to others?"
       }
     },
@@ -380,7 +380,7 @@
         "desc": "Communicating to influence the thoughts or actions of others."
       },
       "child": {
-        "img": "card_29_P_helping.png",
+        "img": "card_29_P_persuading.png",
         "desc": "Explaining why your toy is fun. Can you change your friend's mind?"
       }
     },
@@ -393,7 +393,7 @@
         "desc": "Leading and directing others to achieve organizational goals."
       },
       "child": {
-        "img": "card_30_P_persuading.png",
+        "img": "card_30_P_socializing.png",
         "desc": "Leading friends on an adventure. Do you like being the leader?"
       }
     },
@@ -406,7 +406,7 @@
         "desc": "Attending to the needs of people and providing comfort or service."
       },
       "child": {
-        "img": "card_31_P_leadership.png",
+        "img": "card_31_P_saving.png",
         "desc": "Serving delicious tea to guests. Do you like making people feel welcome?"
       }
     },
@@ -419,7 +419,7 @@
         "desc": "Planning and directing group activities to guide people toward a goal."
       },
       "child": {
-        "img": "card_32_P_teamwork.png",
+        "img": "card_32_P_leadership.png",
         "desc": "Conducting an orchestra. Do you dream of leading a big group?"
       }
     },
@@ -445,7 +445,7 @@
         "desc": "Listening to others' problems and providing psychological support."
       },
       "child": {
-        "img": "card_34_P_selling.png",
+        "img": "card_34_P_counseling.png",
         "desc": "Listening to a friend's worry. Are you a good listener?"
       }
     },
@@ -458,7 +458,7 @@
         "desc": "Performing to bring joy, amusement, or emotion to an audience."
       },
       "child": {
-        "img": "card_35_P_caregiving.png",
+        "img": "card_35_P_entertaining.png",
         "desc": "Doing magic tricks on stage. Do you like making people laugh?"
       }
     },
@@ -471,7 +471,7 @@
         "desc": "Collaborating and communicating with colleagues for a common goal."
       },
       "child": {
-        "img": "card_36_P_entertaining.png",
+        "img": "card_36_P_teamwork.png",
         "desc": "Working together like ants. Do you like doing things with a team?"
       }
     },
@@ -484,7 +484,7 @@
         "desc": "Promoting products or services and persuading others to buy them."
       },
       "child": {
-        "img": "card_37_P_socializing.png",
+        "img": "card_37_P_selling.png",
         "desc": "Selling things at a market. Is playing shopkeeper fun for you?"
       }
     },
@@ -510,7 +510,7 @@
         "desc": "Treating the sick and helping people recover their health."
       },
       "child": {
-        "img": "card_39_P_hospitality.png",
+        "img": "card_39_P_caregiving.png",
         "desc": "Nursing a sick baby bear. Do you want to be a doctor or nurse?"
       }
     },
@@ -523,7 +523,7 @@
         "desc": "Using hands or tools to build or repair physical objects."
       },
       "child": {
-        "img": "card_40_T_operating.png",
+        "img": "card_40_T_repairing.png",
         "desc": "Fixing a broken toy car. Do you like fixing things that are broken?"
       }
     },
@@ -536,7 +536,7 @@
         "desc": "Controlling heavy machinery or complex equipment."
       },
       "child": {
-        "img": "card_41_T_using_tools.png",
+        "img": "card_41_T_operating.png",
         "desc": "Driving a big excavator. Do big machines look cool to you?"
       }
     },
@@ -549,7 +549,7 @@
         "desc": "Skillfully handling hand tools or power tools for a task."
       },
       "child": {
-        "img": "card_42_T_building.png",
+        "img": "card_42_T_using_tools.png",
         "desc": "Building a birdhouse with a hammer. Are you good with tools?"
       }
     },
@@ -562,7 +562,7 @@
         "desc": "Using the body to exert strength or move actively."
       },
       "child": {
-        "img": "card_43_T_repairing.png",
+        "img": "card_43_T_physical.png",
         "desc": "Kicking a soccer ball hard. Do you love moving your body?"
       }
     },
@@ -575,7 +575,7 @@
         "desc": "Working outdoors, dealing with nature and the weather."
       },
       "child": {
-        "img": "card_44_T_precision.png",
+        "img": "card_44_T_driving.png",
         "desc": "Camping in the forest. Do you like being outdoors?"
       }
     },
@@ -588,7 +588,7 @@
         "desc": "Growing plants or caring for animals."
       },
       "child": {
-        "img": "card_45_T_quality.png",
+        "img": "card_45_T_growing.png",
         "desc": "Watering flowers in the garden. Do you like taking care of plants or animals?"
       }
     },
@@ -601,7 +601,7 @@
         "desc": "Processing materials like wood, metal, or food."
       },
       "child": {
-        "img": "card_46_T_driving.png",
+        "img": "card_46_T_measuring.png",
         "desc": "Kneading dough to make bread. Do you like touching and making things?"
       }
     },
@@ -614,7 +614,7 @@
         "desc": "Applying technical principles to install or maintain systems."
       },
       "child": {
-        "img": "card_47_T_growing.png",
+        "img": "card_47_T_precision.png",
         "desc": "Assembling a robot arm. Are you curious about how machines work?"
       }
     },
@@ -640,7 +640,7 @@
         "desc": "Building structures or maintaining facilities."
       },
       "child": {
-        "img": "card_49_T_measuring.png",
+        "img": "card_49_T_building.png",
         "desc": "Building a strong brick house. Do you like building big things?"
       }
     },
@@ -653,7 +653,7 @@
         "desc": "Working with small objects requiring high dexterity."
       },
       "child": {
-        "img": "card_50_T_resource.png",
+        "img": "card_50_T_precision.png",
         "desc": "Fixing tiny watch parts. Are you good with small details?"
       }
     },
@@ -666,7 +666,7 @@
         "desc": "Working directly at production or industrial sites."
       },
       "child": {
-        "img": "card_51_T_cleaning.png",
+        "img": "card_51_T_resource.png",
         "desc": "Harvesting corn on a farm. Do you like working in the field?"
       }
     },
@@ -679,7 +679,7 @@
         "desc": "Protecting people or property and controlling physical environments."
       },
       "child": {
-        "img": "card_52_T_physical.png",
+        "img": "card_52_T_security.png",
         "desc": "Guarding the village like a police officer. Is keeping things safe cool?"
       }
     }
