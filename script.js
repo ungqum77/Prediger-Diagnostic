@@ -161,36 +161,40 @@ function downloadPDF() {
   if (!element) return;
   
   const originalText = btn.innerHTML;
-  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Generating...`;
+  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> PDF 생성 중...`;
   btn.disabled = true;
 
-  // Optimized options for a clean PDF scaling
+  // Add a class for fixed width during export to ensure A4 proportions
+  element.classList.add('pdf-export-mode');
+
   const opt = {
-    margin: [0.1, 0.1, 0.1, 0.1],
+    margin: [0.3, 0.3, 0.3, 0.3],
     filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
       scale: 2, 
-      useCORS: true, 
-      letterRendering: true,
-      windowWidth: 1200 // Force a desktop-like width for generation to avoid mobile layout compression
+      useCORS: true,
+      scrollY: 0,
+      windowWidth: 850 
     },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
   
   if (typeof html2pdf !== 'undefined') {
-    // Temporarily adjust element for clean capture if needed
     html2pdf().set(opt).from(element).save().then(() => {
+       element.classList.remove('pdf-export-mode');
        btn.innerHTML = originalText;
        btn.disabled = false;
     }).catch(err => {
        console.error(err);
+       element.classList.remove('pdf-export-mode');
        btn.innerHTML = originalText;
        btn.disabled = false;
-       alert("PDF Generation Failed");
+       alert("PDF 생성 실패");
     });
   } else {
-    alert("PDF generator not loaded. Please refresh.");
+    alert("PDF 생성기를 불러올 수 없습니다.");
+    element.classList.remove('pdf-export-mode');
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
@@ -596,8 +600,8 @@ async function showResult() {
 
   const getResultKey = (cx, cy) => {
     if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
-    if (cy >= 0) return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
-    else return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
+    if (cy >= 0) return cx >= 0 ? "DATA_THINGS" : "DATA_PEOPLE";
+    else return cx >= 0 ? "IDEAS_THINGS" : "IDEAS_PEOPLE";
   };
 
   const key = getResultKey(x, y);
@@ -700,7 +704,7 @@ async function generateAIReport() {
       gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
     }
   } catch (err) { 
-    el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">Report generation paused.</p>`; 
+    el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">분석 결과를 불러올 수 없습니다.</p>`; 
   }
 }
 
@@ -715,19 +719,19 @@ function transition(from, to, display = 'block') {
   to.style.display = display;
   
   // IMMEDIATELY FORCE SCROLL TO TOP
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  // Use behavior 'auto' or 'instant' to avoid conflicts with scroll-behavior: smooth
+  window.scrollTo(0, 0);
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
   
-  setTimeout(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, 10);
+  // Re-enable overflow if it was locked
+  document.body.style.overflowY = 'auto';
 
   if (window.gsap) {
     gsap.set(to, { clearProps: "all" });
     gsap.fromTo(to, 
       { opacity: 0, y: 0 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", clearProps: "all" }
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", clearProps: "all" }
     );
   } else {
     to.style.opacity = '1';

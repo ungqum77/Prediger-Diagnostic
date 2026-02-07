@@ -6,43 +6,53 @@
   --card-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.12);
 }
 
-html, body {
-  height: auto;
-  min-height: 100%;
-  overflow-x: hidden;
-  /* Allow natural scrolling */
-  overflow-y: visible !important;
-  scroll-behavior: smooth;
+html {
+  height: -webkit-fill-available;
 }
 
 body {
-  overscroll-behavior: none;
-  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  margin: 0;
+  padding: 0;
   background-color: var(--bg-main);
   color: #1E293B;
+  font-family: 'Noto Sans KR', sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto !important; /* Force enable vertical scrolling */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start !important; 
   align-items: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #app {
+  width: 100%;
+  max-width: 1550px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start !important;
   align-items: center;
-  width: 100%;
   min-height: 100vh;
   padding-bottom: 50px;
 }
 
 section {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 1550px;
-  /* Ensure sections don't lock scroll */
+  transition: opacity 0.3s ease;
+}
+
+/* Specific section height fixes */
+#sorting-section {
+  height: 90vh;
+  max-height: 800px;
+  overflow: hidden;
+}
+
+#select9-section, #rank3-section, #result-section {
+  height: auto !important; /* Ensure height is determined by content */
+  min-height: unset;
   overflow: visible !important;
 }
 
@@ -263,6 +273,15 @@ section {
   transform: translate(-50%, -50%);
   color: #F59E0B;
   border-color: #F59E0B;
+}
+
+/* PDF Export Special Styling */
+.pdf-export-mode {
+  width: 800px !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 40px !important;
+  box-shadow: none !important;
 }
 
 @keyframes fadeInUp {
