@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Career Diagnosis</title>
+  <title>프레디저 적성 검사 | Prediger Diagnosis</title>
   
-  <!-- Tailwind CSS (Utility) -->
+  <!-- Tailwind CSS for utility styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   
-  <!-- GSAP & Plugins -->
+  <!-- GSAP for smooth animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
   
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- Module Map for Gemini SDK -->
   <script type="importmap">
 {
   "imports": {
@@ -32,257 +30,218 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-[#F5F7FA] text-gray-900 w-full min-h-screen overflow-x-hidden selection:bg-blue-100 selection:text-blue-900 font-inter">
+<body class="bg-[#F8FAFC] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen">
 
-  <!-- Main App Container -->
-  <main id="app" class="relative w-full h-full max-w-7xl mx-auto min-h-screen sm:min-h-[600px] bg-[#F5F7FA] sm:p-6 lg:p-10 flex flex-col items-center justify-center">
+  <!-- Main Container: Max 1200px for Desktop -->
+  <main id="app" class="max-w-[1200px] mx-auto min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
     
-    <!-- SECTION 1: INTRO -->
-    <section id="intro-section" class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-8 sm:p-12 z-50 transition-all duration-500">
-      <div class="intro-content">
-        <div class="mb-8 text-center intro-anim">
-          <div class="inline-block p-4 mb-4 rounded-2xl bg-blue-50 text-4xl shadow-sm">✨</div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Prediger<br>Diagnosis</h1>
-          <p class="text-gray-500 font-medium">Discover your potential.</p>
-        </div>
+    <!-- Language Toggle (Fixed Top Right) -->
+    <div class="fixed top-4 right-4 z-[100]">
+      <button id="lang-toggle" class="bg-white/80 backdrop-blur border border-slate-200 px-4 py-2 rounded-full text-xs font-bold shadow-sm hover:bg-white transition-all">
+        English
+      </button>
+    </div>
 
-        <form id="intro-form" class="space-y-6 intro-anim">
-          <div class="group">
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Name</label>
-            <input type="text" id="username" required placeholder="Enter your name" 
-              class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800 placeholder-gray-400">
-          </div>
-          <div class="group">
-            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Birth Date</label>
-            <input type="date" id="birthdate" required 
-              class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-gray-800">
-          </div>
-          <button type="submit" 
-            class="w-full py-4 bg-[#1E88E5] text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
-            Start Diagnosis <span class="text-lg">&rarr;</span>
-          </button>
-        </form>
-        
-        <div class="mt-8 text-center intro-anim">
-          <button id="lang-toggle" class="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors">
-            Switch to Korean
-          </button>
-        </div>
+    <!-- 1. INTRO SECTION -->
+    <section id="intro-section" class="w-full max-w-lg bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 p-8 sm:p-12 text-center transition-all duration-500">
+      <div class="mb-8 intro-anim">
+        <div class="inline-block p-4 mb-6 rounded-2xl bg-blue-50 text-4xl">✨</div>
+        <h1 id="hero-title" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mb-2 leading-tight">
+          프레디저<br>적성 검사
+        </h1>
+        <p id="hero-subtitle" class="text-slate-500 font-medium">Prediger Career Diagnosis</p>
       </div>
+
+      <form id="intro-form" class="space-y-6 intro-anim text-left">
+        <div>
+          <label id="label-name" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">이름</label>
+          <input type="text" id="username" required placeholder="이름을 입력하세요" 
+            class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+        </div>
+        <div>
+          <label id="label-birth" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">생년월일</label>
+          <input type="date" id="birthdate" required 
+            class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+        </div>
+        <button type="submit" id="btn-start"
+          class="w-full py-5 bg-[#1E88E5] text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 hover:bg-blue-600 hover:translate-y-[-2px] active:translate-y-[0px] transition-all flex items-center justify-center gap-2">
+          진단 시작하기 <span class="text-xl">&rarr;</span>
+        </button>
+      </form>
     </section>
 
-    <!-- SECTION 2: SORTING -->
-    <section id="sorting-section" class="hidden w-full h-screen sm:h-[80vh] flex-col sm:flex-row bg-white sm:rounded-3xl sm:shadow-2xl overflow-hidden relative z-40">
-      
-      <!-- Desktop: Left / Mobile: Top -> Card Area -->
-      <div class="flex-1 relative bg-gray-50 flex items-center justify-center p-4 order-2 sm:order-1">
-        <!-- Card Stack Container -->
-        <div id="card-stack" class="relative w-[300px] h-[400px] sm:w-[360px] sm:h-[480px]"></div>
+    <!-- 2. SORTING SECTION -->
+    <section id="sorting-section" class="hidden w-full h-[90vh] sm:h-[80vh] flex flex-col sm:flex-row bg-white sm:rounded-[2.5rem] sm:shadow-2xl overflow-hidden relative">
+      <!-- Desktop Left / Mobile Top: Card Deck Area -->
+      <div class="flex-1 relative bg-slate-50 flex items-center justify-center p-4 order-2 sm:order-1 overflow-hidden">
+        <div id="card-stack" class="relative w-[300px] h-[400px] sm:w-[360px] sm:h-[480px]">
+          <!-- Dynamic Cards -->
+        </div>
+        <!-- Swipe Visual Cues -->
+        <div class="absolute bottom-10 left-10 text-slate-300 font-black text-4xl rotate-[-15deg] pointer-events-none select-none opacity-20 sm:block hidden">NOPE</div>
+        <div class="absolute bottom-10 right-10 text-blue-300 font-black text-4xl rotate-[15deg] pointer-events-none select-none opacity-20 sm:block hidden">LIKE</div>
       </div>
 
-      <!-- Desktop: Right / Mobile: Bottom -> Controls & Info -->
-      <div class="w-full sm:w-[350px] lg:w-[400px] bg-white border-t sm:border-t-0 sm:border-l border-gray-100 flex flex-col z-10 order-1 sm:order-2">
-        <div class="p-6 border-b border-gray-100">
+      <!-- Desktop Right / Mobile Bottom: Controls & Sidebar -->
+      <div class="w-full sm:w-[380px] bg-white border-t sm:border-t-0 sm:border-l border-slate-100 flex flex-col order-1 sm:order-2">
+        <div class="p-6 border-b border-slate-100">
           <div class="flex justify-between items-center mb-4">
-            <button id="back-to-intro" class="text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-1 text-sm font-bold">
-              <span>&larr;</span> <span>Exit</span>
+            <button id="btn-exit" class="text-slate-400 hover:text-slate-900 transition-colors text-sm font-bold flex items-center gap-1">
+              <span>&larr;</span> <span id="text-exit">나가기</span>
             </button>
-            <span id="progress-text" class="text-xs font-bold text-gray-400 tabular-nums">1 / 12</span>
+            <span id="progress-text" class="text-xs font-black text-slate-300 tabular-nums tracking-widest">1 / 52</span>
           </div>
-          <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-            <div id="progress-bar" class="h-full bg-[#1E88E5] w-0 transition-all duration-300"></div>
+          <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-[#1E88E5] w-0 transition-all duration-500"></div>
           </div>
-          <div class="mt-4 text-center sm:text-left">
-            <h2 class="text-lg font-bold text-gray-800" id="sorting-instruction">What do you prefer?</h2>
-            <p class="text-sm text-gray-500">Swipe right if you like it.</p>
+          <h2 id="sorting-title" class="text-xl font-black text-slate-800 mt-6 leading-tight">마음에 드는 활동인가요?</h2>
+          <p id="sorting-subtitle" class="text-sm text-slate-400 font-medium mt-1">카드를 오른쪽으로 밀면 선택됩니다.</p>
+        </div>
+
+        <!-- Liked Sidebar (Visible on PC) -->
+        <div class="hidden sm:block flex-1 p-6 overflow-y-auto custom-scrollbar">
+          <h3 id="label-liked" class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">선택한 카드 리스트</h3>
+          <div id="liked-list" class="space-y-2">
+            <!-- Liked items go here -->
           </div>
         </div>
 
-        <div class="hidden sm:block flex-1 p-6 overflow-y-auto">
-          <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Liked Cards</h3>
-          <div id="liked-list-sidebar" class="space-y-2">
-            <div class="text-sm text-gray-300 italic">No cards liked yet...</div>
-          </div>
-        </div>
-
-        <div class="p-6 sm:p-8 bg-gray-50/50 flex justify-center gap-6 mt-auto">
-          <button id="btn-dislike" class="action-btn w-16 h-16 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 hover:shadow-lg flex items-center justify-center transition-all group">
-            <svg class="group-hover:scale-110 transition-transform" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        <!-- Bottom Controls -->
+        <div class="p-6 bg-slate-50/50 flex justify-center items-center gap-6">
+          <button id="btn-swipe-left" class="w-16 h-16 rounded-full bg-white border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-200 hover:shadow-lg transition-all flex items-center justify-center group">
+            <svg class="group-hover:scale-110 transition-transform" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
-          <button id="btn-pass" class="action-btn w-12 h-12 mt-2 rounded-full bg-gray-200 text-gray-500 hover:bg-gray-300 flex items-center justify-center text-xs font-bold transition-all">
-            PASS
-          </button>
-          <button id="btn-like" class="action-btn w-16 h-16 rounded-full bg-[#1E88E5] text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600 hover:scale-110 flex items-center justify-center transition-all">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"></path></svg>
+          <button id="btn-swipe-up" class="px-6 py-2 rounded-full bg-slate-200 text-slate-500 text-[10px] font-black tracking-widest hover:bg-slate-300 transition-all">PASS</button>
+          <button id="btn-swipe-right" class="w-16 h-16 rounded-full bg-[#1E88E5] text-white shadow-xl shadow-blue-500/20 hover:bg-blue-600 hover:scale-110 transition-all flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 3: RANKING -->
-    <section id="ranking-section" class="hidden w-full max-w-6xl flex-col bg-white sm:rounded-3xl sm:shadow-xl overflow-hidden z-30 h-screen sm:h-auto sm:min-h-[80vh]">
-      <div class="p-6 sm:p-10 flex-1 overflow-y-auto">
-        <div class="text-center mb-10 max-w-2xl mx-auto">
-          <span class="inline-block px-3 py-1 bg-blue-100 text-[#1E88E5] rounded-full text-[10px] font-bold tracking-widest uppercase mb-3">Phase 2</span>
-          <h2 id="ranking-title" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Select Top 3</h2>
-          <p id="ranking-subtitle" class="text-gray-500">Tap the cards you liked most to finalize your career profile.</p>
+    <!-- 3. RANKING SECTION -->
+    <section id="ranking-section" class="hidden w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:min-h-[80vh] overflow-hidden">
+      <div class="p-8 sm:p-12 flex-1 overflow-y-auto custom-scrollbar">
+        <div class="text-center mb-12">
+          <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black tracking-[0.2em] uppercase mb-4">Phase 02</span>
+          <h2 id="ranking-title" class="text-3xl font-black text-slate-900 mb-2">가장 중요한 3가지 선택</h2>
+          <p id="ranking-subtitle" class="text-slate-500 font-medium">선택한 카드들 중 당신을 가장 잘 나타내는 3장을 순서대로 골라주세요.</p>
         </div>
-        
-        <div id="ranking-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 pb-24"></div>
+        <div id="ranking-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <!-- Selection Cards -->
+        </div>
       </div>
-
-      <div class="sticky bottom-0 left-0 right-0 p-6 bg-white border-t border-gray-100 flex justify-center items-center gap-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div class="text-sm font-bold text-gray-500 hidden sm:block">
-          <span id="rank-counter-desktop">0</span> / 3 Selected
+      <div class="p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-6">
+        <div class="text-sm font-black text-slate-400">
+          <span id="rank-count" class="text-blue-500">0</span> / 3 <span id="text-selected">Selected</span>
         </div>
-        <button id="btn-finish-ranking" disabled class="w-full max-w-md py-4 bg-gray-200 text-gray-400 font-bold rounded-2xl shadow-none transition-all flex items-center justify-center gap-3">
-          <span>View Diagnosis Report</span>
-          <span id="rank-counter" class="bg-black/10 px-2 py-0.5 rounded text-xs sm:hidden">0/3</span>
+        <button id="btn-show-result" disabled class="w-full sm:w-[300px] py-5 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all flex items-center justify-center gap-2">
+          <span id="text-view-report">분석 리포트 생성하기</span>
         </button>
       </div>
     </section>
 
-    <!-- SECTION 4: RESULT -->
-    <section id="result-section" class="hidden w-full max-w-6xl bg-white sm:rounded-3xl sm:shadow-xl overflow-y-auto z-20 h-screen sm:h-auto">
-      <div class="p-6 sm:p-10 pb-20">
+    <!-- 4. RESULT SECTION -->
+    <section id="result-section" class="hidden w-full max-w-6xl bg-white rounded-[2.5rem] shadow-2xl overflow-y-auto h-screen sm:h-auto scroll-smooth">
+      <div class="p-8 sm:p-12 pb-24">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-gray-100 pb-8">
-          <div>
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Diagnosis Report</div>
-            <h1 id="result-title" class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">...</h1>
-            <p id="result-summary" class="text-gray-600 max-w-2xl text-lg"></p>
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12 pb-12 border-b border-slate-100">
+          <div class="flex-1">
+            <span id="text-report-for" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">DIAGNOSIS REPORT</span>
+            <h1 id="result-type-title" class="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">...</h1>
+            <p id="result-type-desc" class="text-lg text-slate-500 leading-relaxed max-w-2xl">...</p>
           </div>
-          <div class="mt-4 md:mt-0 flex flex-col items-end">
-            <!-- Coordinates Text (Hidden on small screens, kept for reference) -->
-            <span id="result-coords" class="text-xs font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded hidden">X:0 / Y:0</span>
+          <div class="flex-shrink-0">
+            <div id="result-tag" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-black text-sm tracking-widest shadow-sm border border-blue-100 uppercase">...</div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          <!-- LEFT COL: Analysis & Jobs (7/12) -->
-          <div class="lg:col-span-7 space-y-8">
-            <!-- Job Recommendations -->
-            <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-50">
-              <h4 class="text-sm font-bold text-blue-800 uppercase mb-4 flex items-center gap-2">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                Recommended Careers
-              </h4>
-              <div id="result-jobs" class="flex flex-wrap gap-2"></div>
+          <!-- LEFT: Map & Visualization -->
+          <div class="lg:col-span-5 space-y-8">
+            <div class="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 flex flex-col items-center">
+              <h3 id="label-map" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8 w-full">Prediger Interest Map</h3>
+              <div class="relative w-full max-w-[300px] aspect-square bg-white rounded-full border border-slate-200 shadow-inner">
+                <!-- Axes -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="w-px h-full bg-slate-200"></div>
+                  <div class="h-px w-full bg-slate-200"></div>
+                </div>
+                <!-- Quadrant Labels -->
+                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-500 bg-white px-2">DATA (현실)</div>
+                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-green-600 bg-white px-2">IDEAS (사고)</div>
+                <div class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-500 bg-white px-2 rotate-[-90deg]">PEOPLE (사람)</div>
+                <div class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 bg-white px-2 rotate-[90deg]">THINGS (사물)</div>
+                <!-- User Pointer -->
+                <div id="result-pointer" class="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-xl z-20 transition-all duration-1000 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0"></div>
+              </div>
             </div>
 
-            <!-- AI Insight -->
-            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1E88E5] to-[#1565C0] text-white p-8 shadow-xl">
-              <div class="flex items-center gap-3 mb-6">
-                <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">✨</div>
-                <div>
-                  <h3 class="font-bold text-lg">AI Consultant Analysis</h3>
-                  <p class="text-xs text-blue-100 opacity-80">Powered by Gemini</p>
+            <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+              <h3 id="label-dimension" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Dimension Scores</h3>
+              <div class="space-y-4">
+                <div class="group">
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Data (Systematic)</span><span id="score-D" class="text-blue-500">0</span></div>
+                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-D" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div></div>
+                </div>
+                <div class="group">
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Ideas (Abstract)</span><span id="score-I" class="text-green-500">0</span></div>
+                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-I" class="h-full bg-green-500 w-0 transition-all duration-1000"></div></div>
+                </div>
+                <div class="group">
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>People (Social)</span><span id="score-P" class="text-amber-500">0</span></div>
+                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-P" class="h-full bg-amber-500 w-0 transition-all duration-1000"></div></div>
+                </div>
+                <div class="group">
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Things (Technical)</span><span id="score-T" class="text-red-500">0</span></div>
+                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-T" class="h-full bg-red-500 w-0 transition-all duration-1000"></div></div>
                 </div>
               </div>
-              
-              <div id="ai-loading" class="flex flex-col items-center py-8">
-                <div class="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
-                <span class="text-sm font-medium text-blue-100 animate-pulse">Generating personalized insights...</span>
-              </div>
-              
-              <div id="ai-content" class="hidden prose prose-invert max-w-none text-sm leading-relaxed font-medium bg-black/10 p-6 rounded-xl border border-white/10"></div>
             </div>
           </div>
 
-          <!-- RIGHT COL: Charts & MAP (5/12) -->
-          <div class="lg:col-span-5 space-y-6">
-            
-            <!-- NEW: Prediger Map -->
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center">
-              <h3 class="text-sm font-bold text-gray-800 mb-6 flex items-center gap-2 w-full">
-                <span class="w-2 h-2 bg-purple-500 rounded-full"></span> Interest Map
-              </h3>
+          <!-- RIGHT: AI Analysis & Jobs -->
+          <div class="lg:col-span-7 space-y-8">
+            <div id="ai-insight-box" class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
+              <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center text-2xl">⚡</div>
+                <div>
+                  <h3 id="label-ai" class="font-black text-xl">AI Career Insights</h3>
+                  <p class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by Gemini AI</p>
+                </div>
+              </div>
               
-              <!-- Map Container -->
-              <div class="relative w-full max-w-[260px] aspect-square bg-gray-50 rounded-full border border-gray-200">
-                <!-- Grid Lines -->
-                <div class="absolute top-0 bottom-0 left-1/2 w-px bg-gray-300 transform -translate-x-1/2"></div>
-                <div class="absolute left-0 right-0 top-1/2 h-px bg-gray-300 transform -translate-y-1/2"></div>
-                
-                <!-- Labels -->
-                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-black text-[#1E88E5] bg-white/80 px-1.5 py-0.5 rounded backdrop-blur">DATA</div>
-                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-black text-[#43A047] bg-white/80 px-1.5 py-0.5 rounded backdrop-blur">IDEAS</div>
-                <div class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-[#FDD835] bg-white/80 px-1.5 py-0.5 rounded backdrop-blur">PEOPLE</div>
-                <div class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-[#E53935] bg-white/80 px-1.5 py-0.5 rounded backdrop-blur">THINGS</div>
-
-                <!-- User Dot -->
-                <div id="map-dot" class="absolute w-5 h-5 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full border-[3px] border-white shadow-lg transition-all duration-[1500ms] cubic-bezier(0.34, 1.56, 0.64, 1) top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 z-10"></div>
+              <!-- AI Loading -->
+              <div id="ai-loader" class="flex flex-col items-center justify-center py-12 gap-4">
+                <div class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <p id="text-ai-loading" class="text-sm font-medium text-slate-400 animate-pulse">분석 리포트를 생성하고 있습니다...</p>
               </div>
-              <p class="text-[10px] text-gray-400 mt-4 text-center">Position based on your card selections.</p>
-            </div>
 
-            <!-- Chart 1 -->
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 bg-[#1E88E5] rounded-full"></span> Data vs Ideas
-              </h3>
-              <div class="space-y-4">
-                <div>
-                  <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
-                    <span>Data (Realistic)</span>
-                    <span id="score-D" class="text-[#1E88E5]">0</span>
-                  </div>
-                  <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="bar-D" class="h-full bg-[#1E88E5] w-0"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
-                    <span>Ideas (Artistic)</span>
-                    <span id="score-I" class="text-[#43A047]">0</span>
-                  </div>
-                  <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="bar-I" class="h-full bg-[#43A047] w-0"></div>
-                  </div>
-                </div>
+              <!-- AI Content -->
+              <div id="ai-result" class="hidden text-slate-300 text-sm leading-relaxed space-y-4">
+                <!-- Text Injected Here -->
               </div>
             </div>
 
-            <!-- Chart 2 -->
-            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 bg-[#E53935] rounded-full"></span> Things vs People
-              </h3>
-              <div class="space-y-4">
-                <div>
-                  <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
-                    <span>Things (Technical)</span>
-                    <span id="score-T" class="text-[#E53935]">0</span>
-                  </div>
-                  <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="bar-T" class="h-full bg-[#E53935] w-0"></div>
-                  </div>
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs font-bold text-gray-500 mb-1">
-                    <span>People (Social)</span>
-                    <span id="score-P" class="text-[#FDD835]">0</span>
-                  </div>
-                  <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div id="bar-P" class="h-full bg-[#FDD835] w-0"></div>
-                  </div>
-                </div>
+            <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+              <h3 id="label-jobs" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Recommended Careers</h3>
+              <div id="job-list" class="flex flex-wrap gap-3">
+                <!-- Badges -->
               </div>
             </div>
 
-            <button id="btn-restart" class="w-full py-4 bg-gray-50 text-gray-500 font-bold hover:bg-gray-100 hover:text-gray-900 transition-colors rounded-xl border border-gray-200 mt-4">
-              Start New Diagnosis
+            <button id="btn-restart" class="w-full py-6 bg-slate-50 border border-slate-200 text-slate-400 font-black rounded-[1.5rem] hover:bg-slate-100 hover:text-slate-900 transition-all">
+              검사 다시 시작하기
             </button>
           </div>
-
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Main Logic -->
   <script type="module" src="script.js"></script>
 <script type="module" src="/index.tsx"></script>
 </body>
