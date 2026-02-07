@@ -1,67 +1,46 @@
 import { GoogleGenAI } from "@google/genai";
 
-// --- STATE MANAGEMENT ---
+// --- APPLICATION STATE ---
 const state = {
   lang: 'KR', // 'KR' | 'EN'
-  step: 'INTRO',
-  user: { name: '', age: 0, group: 'kids' }, // kids | adult
+  mode: 'adult', // 'child' | 'adult'
   cards: [],
+  contentsDB: {},
   likedCards: [],
-  rankedCards: [], // Objects: { id, order }
-  currentIndex: 0
+  rankedCards: [], // User's top 3 selection
+  currentIndex: 0,
+  user: { name: '', age: 0 }
 };
 
-// --- STRINGS & TRANSLATIONS ---
-const STRINGS = {
+// --- TRANSLATIONS (UI TEXT) ---
+const UI_STRINGS = {
   KR: {
     heroTitle: '프레디저<br>적성 검사',
     heroSubtitle: 'Prediger Career Diagnosis',
     btnStart: '진단 시작하기',
-    labelName: '이름',
-    labelBirth: '생년월일',
-    namePlaceholder: '이름을 입력하세요',
     sortingTitle: '마음에 드는 활동인가요?',
-    sortingSubtitle: '카드를 오른쪽으로 밀면 선택됩니다.',
-    textExit: '나가기',
-    labelLiked: '선택한 카드 리스트',
+    sortingSubtitle: '좋아하는 카드는 오른쪽으로 밀어주세요.',
     rankingTitle: '가장 중요한 3가지 선택',
-    rankingSubtitle: '선택한 카드들 중 당신을 가장 잘 나타내는 3장을 순서대로 골라주세요.',
-    textSelected: '선택됨',
-    textViewReport: '분석 리포트 생성하기',
-    textReportFor: 'DIAGNOSIS REPORT',
-    labelMap: 'Prediger Interest Map',
-    labelDimension: 'Dimension Scores',
-    labelAI: 'AI 커리어 인사이트',
-    labelJobs: '추천 직업군',
-    btnRestart: '검사 다시 시작하기',
-    aiLoading: '분석 리포트를 생성하고 있습니다...',
-    errorFetch: 'JSON 파일을 찾을 수 없습니다. 경로를 확인해주세요.',
-    unknown: '균형 잡힌 탐험가'
+    rankingSubtitle: '선택한 카드 중 나를 가장 잘 나타내는 3장을 순서대로 골라주세요.',
+    resultReportFor: '커리어 진단 리포트',
+    aiLoading: '사용자의 성향을 분석하고 있습니다...',
+    btnRestart: '다시 진단하기',
+    errorFetch: '데이터 파일을 불러오지 못했습니다. 경로를 확인해주세요.',
+    unknownType: '균형 잡힌 탐험가'
   },
   EN: {
     heroTitle: 'Prediger<br>Diagnosis',
     heroSubtitle: 'Discover Your Potential',
     btnStart: 'Start Diagnosis',
-    labelName: 'Name',
-    labelBirth: 'Birth Date',
-    namePlaceholder: 'Enter your name',
-    sortingTitle: 'Is this an activity you like?',
-    sortingSubtitle: 'Swipe right to select.',
-    textExit: 'Exit',
-    labelLiked: 'Liked Cards List',
+    sortingTitle: 'Is this something you like?',
+    sortingSubtitle: 'Swipe right for activities you enjoy.',
     rankingTitle: 'Select Your Top 3',
     rankingSubtitle: 'Pick 3 cards that represent you best in order of importance.',
-    textSelected: 'Selected',
-    textViewReport: 'Generate Report',
-    textReportFor: 'DIAGNOSIS REPORT',
-    labelMap: 'Prediger Interest Map',
-    labelDimension: 'Dimension Scores',
-    labelAI: 'AI Career Insights',
-    labelJobs: 'Recommended Careers',
+    resultReportFor: 'Career Diagnosis Report',
+    aiLoading: 'Analyzing your profile...',
     btnRestart: 'Restart Diagnosis',
-    aiLoading: 'Generating professional insights...',
-    errorFetch: 'JSON file not found. Please check paths.',
-    unknown: 'Balanced Explorer'
+    errorFetch: 'Failed to load data. Please check paths.',
+    unknownType: 'Balanced Explorer'
   }
 };
 
@@ -71,8 +50,8 @@ const el = {
   sortingSection: document.getElementById('sorting-section'),
   rankingSection: document.getElementById('ranking-section'),
   resultSection: document.getElementById('result-section'),
-  langToggle: document.getElementById('lang-toggle'),
   introForm: document.getElementById('intro-form'),
+  langToggle: document.getElementById('lang-toggle'),
   cardStack: document.getElementById('card-stack'),
   likedList: document.getElementById('liked-list'),
   progressBar: document.getElementById('progress-bar'),
@@ -87,52 +66,41 @@ const el = {
 
 // --- INITIALIZATION ---
 function init() {
-  updateLanguageUI();
-  
-  el.langToggle.addEventListener('click', () => {
-    state.lang = state.lang === 'KR' ? 'EN' : 'KR';
-    el.langToggle.textContent = state.lang === 'KR' ? 'English' : '한국어';
-    updateLanguageUI();
-  });
+  updateUIStrings();
 
+  // Event Listeners
   el.introForm.addEventListener('submit', handleIntroSubmit);
-  document.getElementById('btn-exit').addEventListener('click', () => location.reload());
-  document.getElementById('btn-swipe-left').addEventListener('click', () => swipe('left'));
-  document.getElementById('btn-swipe-right').addEventListener('click', () => swipe('right'));
-  document.getElementById('btn-swipe-up').addEventListener('click', () => swipe('up'));
-  document.getElementById('btn-restart').addEventListener('click', () => location.reload());
-  el.btnShowResult.addEventListener('click', showResult);
+  el.langToggle.addEventListener('click', toggleLanguage);
+  
+  document.getElementById('btn-dislike').onclick = () => swipe('left');
+  document.getElementById('btn-like').onclick = () => swipe('right');
+  document.getElementById('btn-pass').onclick = () => swipe('up');
+  document.getElementById('btn-exit').onclick = () => location.reload();
+  document.getElementById('btn-restart').onclick = () => location.reload();
+  el.btnShowResult.onclick = showResult;
 
-  // GSAP Initial
-  gsap.from(".intro-anim", { y: 20, opacity: 0, stagger: 0.1, ease: "power3.out" });
+  // Intro animation
+  gsap.from(".intro-anim", { y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" });
 }
 
-function updateLanguageUI() {
-  const s = STRINGS[state.lang];
-  document.getElementById('hero-title').innerHTML = s.heroTitle;
-  document.getElementById('hero-subtitle').textContent = s.heroSubtitle;
-  document.getElementById('btn-start').innerHTML = `${s.btnStart} <span class="text-xl">&rarr;</span>`;
-  document.getElementById('label-name').textContent = s.labelName;
-  document.getElementById('label-birth').textContent = s.labelBirth;
-  document.getElementById('username').placeholder = s.namePlaceholder;
+function toggleLanguage() {
+  state.lang = state.lang === 'KR' ? 'EN' : 'KR';
+  el.langToggle.textContent = state.lang === 'KR' ? 'Switch to English' : '한국어 버전으로 변경';
+  updateUIStrings();
+}
+
+function updateUIStrings() {
+  const s = UI_STRINGS[state.lang];
+  document.querySelector('h1').innerHTML = s.heroTitle;
+  document.querySelector('#intro-section p').textContent = s.heroSubtitle;
+  document.querySelector('#btn-start span').textContent = s.btnStart;
   document.getElementById('sorting-title').textContent = s.sortingTitle;
   document.getElementById('sorting-subtitle').textContent = s.sortingSubtitle;
-  document.getElementById('text-exit').textContent = s.textExit;
-  document.getElementById('label-liked').textContent = s.labelLiked;
-  document.getElementById('ranking-title').textContent = s.rankingTitle;
+  document.querySelector('#ranking-section h2').textContent = s.rankingTitle;
   document.getElementById('ranking-subtitle').textContent = s.rankingSubtitle;
-  document.getElementById('text-selected').textContent = s.textSelected;
-  document.getElementById('text-view-report').textContent = s.textViewReport;
-  document.getElementById('text-report-for').textContent = s.textReportFor;
-  document.getElementById('label-map').textContent = s.labelMap;
-  document.getElementById('label-dimension').textContent = s.labelDimension;
-  document.getElementById('label-ai').textContent = s.labelAI;
-  document.getElementById('label-jobs').textContent = s.labelJobs;
-  document.getElementById('btn-restart').textContent = s.btnRestart;
-  document.getElementById('text-ai-loading').textContent = s.aiLoading;
 }
 
-// --- FLOW: STEP 1 (INTRO) ---
+// --- FLOW: STEP 1 (INTRO & DATA LOADING) ---
 async function handleIntroSubmit(e) {
   e.preventDefault();
   const name = document.getElementById('username').value;
@@ -141,34 +109,44 @@ async function handleIntroSubmit(e) {
   if (!name || !birth) return;
 
   const age = new Date().getFullYear() - new Date(birth).getFullYear();
-  state.user = { name, age, group: age < 13 ? 'kids' : 'adult' };
+  state.user = { name, age };
+  state.mode = age < 13 ? 'child' : 'adult';
 
   const btn = document.getElementById('btn-start');
   btn.disabled = true;
   btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>`;
 
   try {
-    await loadCards();
+    await loadData();
     transition(el.introSection, el.sortingSection, 'flex');
     renderStack();
   } catch (err) {
-    alert(STRINGS[state.lang].errorFetch);
+    console.error("Data Load Error:", err);
+    alert(UI_STRINGS[state.lang].errorFetch);
     btn.disabled = false;
-    btn.innerHTML = `${STRINGS[state.lang].btnStart} <span class="text-xl">&rarr;</span>`;
+    btn.innerHTML = `<span>${UI_STRINGS[state.lang].btnStart}</span> <span class="text-xl">&rarr;</span>`;
   }
 }
 
-async function loadCards() {
-  const suffix = state.lang === 'KR' ? 'kr' : 'en';
-  const res = await fetch(`./assets/data/cards_${suffix}.json`);
-  if (!res.ok) throw new Error();
-  state.cards = await res.json();
+async function loadData() {
+  const suffix = state.lang.toLowerCase();
+  
+  // 1. Load Cards
+  const cardsRes = await fetch(`./assets/data/cards_${suffix}.json`);
+  if (!cardsRes.ok) throw new Error("Cards file not found");
+  const cardsJson = await cardsRes.json();
+  state.cards = cardsJson.cards; // Structure: { meta, cards: [] }
+
+  // 2. Load Contents DB
+  const contentRes = await fetch(`./assets/data/contents_db_${suffix}.json`);
+  if (!contentRes.ok) throw new Error("Contents DB file not found");
+  state.contentsDB = await contentRes.json();
 }
 
 // --- FLOW: STEP 2 (SORTING) ---
 function renderStack() {
   el.cardStack.innerHTML = '';
-  // Show 3 cards at most for visual depth
+  // Show top 3 for the 3D depth effect
   const stack = state.cards.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
   stack.forEach((card, i) => {
@@ -176,25 +154,26 @@ function renderStack() {
     const cardEl = document.createElement('div');
     cardEl.className = 'card-item';
     
-    // Path logic
-    const imgPath = `./assets/images/${state.user.group}/${card.img}`;
+    // Logic: use state.mode (child/adult) and state.lang (KR/EN)
+    const modeData = card[state.mode];
+    const imgPath = `./assets/images/${state.mode}/${modeData.img}`;
+    const keyword = state.lang === 'KR' ? card.keyword_kr : card.keyword_en;
     
     cardEl.innerHTML = `
       <div class="relative w-full h-[70%] bg-slate-100 overflow-hidden">
-        <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${card.keyword}'">
+        <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
         <div class="stamp stamp-like">LIKE</div>
         <div class="stamp stamp-nope">NOPE</div>
       </div>
-      <div class="p-6 h-[30%] bg-white flex flex-col justify-center text-center">
-        <h3 class="text-xl font-black text-slate-800 mb-1 leading-tight">${card.keyword}</h3>
-        <p class="text-xs text-slate-400 font-medium line-clamp-2">${card.desc}</p>
+      <div class="p-8 h-[30%] bg-white flex flex-col justify-center text-center">
+        <h3 class="text-2xl font-black text-slate-800 mb-2 leading-tight">${keyword}</h3>
+        <p class="text-sm text-slate-400 font-medium line-clamp-2">${modeData.desc}</p>
       </div>
-      <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-black text-slate-300 border border-slate-100 uppercase tracking-widest">
-        ${card.type}
+      <div class="absolute top-6 right-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-300 border border-slate-100 uppercase tracking-widest">
+        ${card.dimension}
       </div>
     `;
 
-    // Positional depth
     const depth = stack.length - 1 - i;
     gsap.set(cardEl, { scale: 1 - depth * 0.05, y: depth * 15, zIndex: i });
     el.cardStack.appendChild(cardEl);
@@ -217,12 +196,12 @@ function setupDraggable(cardEl, cardData) {
       gsap.set(cardEl.querySelector('.stamp-nope'), { opacity: nopeOp });
     },
     onDragEnd: function() {
-      if (this.x > 100) handleSwipe('right', cardEl, cardData);
-      else if (this.x < -100) handleSwipe('left', cardEl, cardData);
-      else if (this.y < -100) handleSwipe('up', cardEl, cardData);
+      if (this.x > 120) handleSwipe('right', cardEl, cardData);
+      else if (this.x < -120) handleSwipe('left', cardEl, cardData);
+      else if (this.y < -120) handleSwipe('up', cardEl, cardData);
       else {
-        gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "back.out(1.7)" });
-        gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.2 });
+        gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
+        gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.3 });
       }
     }
   });
@@ -235,11 +214,15 @@ function swipe(dir) {
 
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
-  if (dir === 'right') { x = 600; rot = 30; state.likedCards.push(cardData); addToLikedList(cardData); }
-  else if (dir === 'left') { x = -600; rot = -30; }
-  else if (dir === 'up') { y = -600; }
+  if (dir === 'right') { 
+    x = 800; rot = 45; 
+    state.likedCards.push(cardData); 
+    addToLikedList(cardData); 
+  }
+  else if (dir === 'left') { x = -800; rot = -45; }
+  else if (dir === 'up') { y = -800; }
 
-  gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.4, onComplete: () => {
+  gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, ease: "power2.in", onComplete: () => {
     state.currentIndex++;
     if (state.currentIndex >= state.cards.length) finishSorting();
     else renderStack();
@@ -247,11 +230,12 @@ function handleSwipe(dir, cardEl, cardData) {
 }
 
 function addToLikedList(card) {
+  const keyword = state.lang === 'KR' ? card.keyword_kr : card.keyword_en;
   const item = document.createElement('div');
-  item.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in';
+  item.className = 'flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in shadow-sm';
   item.innerHTML = `
-    <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[10px] font-black shadow-sm text-blue-500">${card.type}</div>
-    <span class="text-xs font-bold text-slate-700">${card.keyword}</span>
+    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[10px] font-black shadow-inner text-blue-500 border border-slate-50">${card.dimension}</div>
+    <span class="text-sm font-bold text-slate-700">${keyword}</span>
   `;
   el.likedList.prepend(item);
 }
@@ -259,7 +243,7 @@ function addToLikedList(card) {
 function updateProgress() {
   const p = (state.currentIndex / state.cards.length) * 100;
   el.progressBar.style.width = `${p}%`;
-  el.progressText.textContent = `${state.currentIndex + 1} / ${state.cards.length}`;
+  el.progressText.textContent = `${state.currentIndex} / ${state.cards.length}`;
 }
 
 function finishSorting() {
@@ -275,18 +259,21 @@ function renderRankingGrid() {
   el.btnShowResult.disabled = true;
 
   if (state.likedCards.length === 0) {
-    el.rankingGrid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400 font-medium">선택된 카드가 없습니다.<br>다시 시작해주세요.</div>`;
+    el.rankingGrid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400 font-medium">선택된 카드가 없습니다.</div>`;
     return;
   }
 
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
-    cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-sm bg-white border border-slate-100 group';
+    const keyword = state.lang === 'KR' ? card.keyword_kr : card.keyword_en;
+    const imgPath = `./assets/images/${state.mode}/${card[state.mode].img}`;
+    
+    cardEl.className = 'selection-card relative rounded-3xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
-      <img src="./assets/images/${state.user.group}/${card.img}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${card.keyword}'">
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-      <div class="absolute bottom-4 left-4 right-4">
-        <h4 class="text-white font-black text-sm">${card.keyword}</h4>
+      <img src="${imgPath}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+      <div class="absolute bottom-5 left-5 right-5">
+        <h4 class="text-white font-black text-base drop-shadow-lg">${keyword}</h4>
       </div>
       <div class="badge-container"></div>
     `;
@@ -340,43 +327,39 @@ function updateRankUI() {
 async function showResult() {
   transition(el.rankingSection, el.resultSection, 'block');
 
-  // Load Content DB
-  let contentDB = {};
-  try {
-    const suffix = state.lang === 'KR' ? 'kr' : 'en';
-    const res = await fetch(`./assets/data/contents_db_${suffix}.json`);
-    contentDB = await res.json();
-  } catch(e) {}
-
-  // 1. Prediger Calculation
-  // Scoring: Liked + Ranked Bonus (Rank 1=+3, Rank 2=+2, Rank 3=+1)
+  // 1. Prediger Scoring Algorithm
+  // Count dimension frequency from liked cards + ranked bonus (Rank 1=+3, 2=+2, 3=+1)
   const scores = { D: 0, I: 0, P: 0, T: 0 };
-  state.likedCards.forEach(c => scores[c.type]++);
-  state.rankedCards.forEach((c, i) => scores[c.type] += (3 - i));
+  state.likedCards.forEach(c => scores[c.dimension]++);
+  state.rankedCards.forEach((c, i) => scores[c.dimension] += (3 - i));
 
-  // Coordinates: X = Things - People, Y = Data - Ideas
+  // Axes: X = Things(T) - People(P), Y = Data(D) - Ideas(I)
   const x = scores.T - scores.P;
   const y = scores.D - scores.I;
 
-  // Determine Quadrant
+  // 2. Determine Quadrant Key
   let typeKey = "UNKNOWN";
   if (y >= 0 && x >= 0) typeKey = "DATA_THINGS";
   if (y >= 0 && x < 0) typeKey = "DATA_PEOPLE";
   if (y < 0 && x >= 0) typeKey = "IDEAS_THINGS";
   if (y < 0 && x < 0) typeKey = "IDEAS_PEOPLE";
 
-  const data = contentDB[typeKey] || { title: STRINGS[state.lang].unknown, summary: "", jobs: [] };
+  const data = state.contentsDB[typeKey] || { 
+    title: UI_STRINGS[state.lang].unknownType, 
+    summary: "다양한 분야를 아우르는 조화로운 성향입니다.", 
+    jobs: ["창의 기획자", "전략 컨설턴트"] 
+  };
 
-  // UI Updates
+  // 3. UI Updates
   document.getElementById('result-type-title').textContent = data.title;
   document.getElementById('result-type-desc').textContent = data.summary;
   document.getElementById('result-tag').textContent = typeKey.replace('_', ' ');
   
   el.jobList.innerHTML = (data.jobs || []).map(j => 
-    `<span class="px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold text-slate-700">${j}</span>`
+    `<span class="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-slate-700 shadow-sm">${j}</span>`
   ).join('');
 
-  // Dimensions & Map
+  // Dimensions & Map Pointer
   const max = Math.max(scores.D, scores.I, scores.P, scores.T, 10);
   ['D','I','P','T'].forEach(k => {
     document.getElementById(`score-${k}`).textContent = scores[k];
@@ -385,19 +368,19 @@ async function showResult() {
 
   const MAX_AXIS = 15;
   const mapX = Math.max(-1, Math.min(1, x / MAX_AXIS)) * 50; 
-  const mapY = -Math.max(-1, Math.min(1, y / MAX_AXIS)) * 50; // CSS top is inverted
+  const mapY = -Math.max(-1, Math.min(1, y / MAX_AXIS)) * 50;
 
   const pointer = document.getElementById('result-pointer');
   gsap.to(pointer, {
     left: `calc(50% + ${mapX}%)`,
     top: `calc(50% + ${mapY}%)`,
     opacity: 1,
-    duration: 1.5,
-    ease: "elastic.out(1, 0.5)",
+    duration: 1.8,
+    ease: "elastic.out(1, 0.4)",
     delay: 0.5
   });
 
-  // AI Analysis
+  // 4. Gemini AI Professional Report
   generateAIReport(state.rankedCards);
 }
 
@@ -407,34 +390,37 @@ async function generateAIReport(topCards) {
 
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const keywords = topCards.map(c => c.keyword).join(", ");
+    const keywordKey = state.lang === 'KR' ? 'keyword_kr' : 'keyword_en';
+    const keywords = topCards.map(c => c[keywordKey]).join(", ");
     
     const prompt = state.lang === 'KR' 
-      ? `사용자 선호 키워드: ${keywords}. 이 사용자의 프레디저(Prediger) 흥미 유형을 분석하고, ${state.user.group === 'kids' ? '어린이' : '성인'}에게 적합한 진로 조언을 3문장으로 따뜻하고 전문적으로 해주세요.`
-      : `User preferred keywords: ${keywords}. Analyze this user's Prediger interest type and provide professional career advice in 3 sentences, tailored for a ${state.user.group === 'kids' ? 'child' : 'adult'}.`;
+      ? `상위 키워드: ${keywords}. 이 사용자의 프레디저(Prediger) 흥미 유형을 분석하고, ${state.mode === 'child' ? '어린이' : '성인'} 눈높이에서 미래를 위한 조언을 4문장으로 따뜻하게 해주세요.`
+      : `Top keywords: ${keywords}. Analyze this user's Prediger type and provide career advice in 4 sentences, specifically for a ${state.mode === 'child' ? 'child' : 'adult'}.`;
 
     const res = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: prompt
+      contents: prompt,
+      config: { temperature: 0.7 }
     });
 
     el.aiLoader.classList.add('hidden');
-    el.aiResult.innerHTML = `<p>${res.text}</p>`;
+    el.aiResult.innerHTML = `<p class="whitespace-pre-wrap">${res.text}</p>`;
     el.aiResult.classList.remove('hidden');
-    gsap.from(el.aiResult, { opacity: 0, y: 10, duration: 0.5 });
+    gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8, ease: "power2.out" });
   } catch (err) {
-    el.aiLoader.innerHTML = `<p class="text-xs text-slate-500">AI 분석을 일시적으로 사용할 수 없습니다.</p>`;
+    el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">현재 분석 리포트를 생성할 수 없습니다.</p>`;
   }
 }
 
 // --- UTILS ---
 function transition(from, to, display = 'block') {
-  gsap.to(from, { opacity: 0, y: -20, duration: 0.3, onComplete: () => {
+  gsap.to(from, { opacity: 0, y: -30, duration: 0.4, onComplete: () => {
     from.classList.add('hidden');
     to.classList.remove('hidden');
     to.style.display = display;
-    gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4 });
+    gsap.fromTo(to, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
   }});
 }
 
+// Start App
 init();

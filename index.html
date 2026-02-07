@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>프레디저 적성 검사 | Prediger Diagnosis</title>
   
-  <!-- Tailwind CSS for utility styles -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts -->
@@ -13,12 +13,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   
-  <!-- GSAP for smooth animations -->
+  <!-- GSAP & Plugins -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
   
   <link rel="stylesheet" href="style.css">
 
+  <!-- Module Map for Gemini SDK (Vanilla ES6 support) -->
   <script type="importmap">
 {
   "imports": {
@@ -30,210 +31,212 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-[#F8FAFC] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen">
+<body class="bg-[#F8FAFC] text-slate-900 font-['Noto_Sans_KR',_sans-serif] min-h-screen selection:bg-blue-100 selection:text-blue-900">
 
-  <!-- Main Container: Max 1200px for Desktop -->
+  <!-- App Wrapper -->
   <main id="app" class="max-w-[1200px] mx-auto min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
     
-    <!-- Language Toggle (Fixed Top Right) -->
-    <div class="fixed top-4 right-4 z-[100]">
-      <button id="lang-toggle" class="bg-white/80 backdrop-blur border border-slate-200 px-4 py-2 rounded-full text-xs font-bold shadow-sm hover:bg-white transition-all">
-        English
-      </button>
-    </div>
-
     <!-- 1. INTRO SECTION -->
-    <section id="intro-section" class="w-full max-w-lg bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 p-8 sm:p-12 text-center transition-all duration-500">
-      <div class="mb-8 intro-anim">
-        <div class="inline-block p-4 mb-6 rounded-2xl bg-blue-50 text-4xl">✨</div>
-        <h1 id="hero-title" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mb-2 leading-tight">
+    <section id="intro-section" class="w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 sm:p-12 text-center transition-all duration-500">
+      <div class="mb-10 intro-anim">
+        <div class="inline-block p-5 mb-6 rounded-3xl bg-blue-50 text-5xl shadow-sm">✨</div>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mb-2 leading-tight">
           프레디저<br>적성 검사
         </h1>
-        <p id="hero-subtitle" class="text-slate-500 font-medium">Prediger Career Diagnosis</p>
+        <p class="text-slate-400 font-medium text-lg">Prediger Career Diagnosis</p>
       </div>
 
       <form id="intro-form" class="space-y-6 intro-anim text-left">
-        <div>
-          <label id="label-name" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">이름</label>
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">이름 (Name)</label>
           <input type="text" id="username" required placeholder="이름을 입력하세요" 
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+            class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-lg">
         </div>
-        <div>
-          <label id="label-birth" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">생년월일</label>
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">생년월일 (Birth Date)</label>
           <input type="date" id="birthdate" required 
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+            class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-lg">
         </div>
         <button type="submit" id="btn-start"
-          class="w-full py-5 bg-[#1E88E5] text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 hover:bg-blue-600 hover:translate-y-[-2px] active:translate-y-[0px] transition-all flex items-center justify-center gap-2">
-          진단 시작하기 <span class="text-xl">&rarr;</span>
+          class="w-full py-5 bg-[#1E88E5] text-white font-black rounded-2xl shadow-xl shadow-blue-500/30 hover:bg-blue-600 hover:translate-y-[-2px] active:translate-y-[0px] transition-all flex items-center justify-center gap-2 mt-8">
+          <span>진단 시작하기</span> <span class="text-xl">&rarr;</span>
         </button>
       </form>
+      
+      <div class="mt-8 intro-anim">
+        <button id="lang-toggle" class="text-xs font-bold text-slate-300 hover:text-slate-500 transition-colors tracking-widest uppercase">
+          Switch to English
+        </button>
+      </div>
     </section>
 
-    <!-- 2. SORTING SECTION -->
-    <section id="sorting-section" class="hidden w-full h-[90vh] sm:h-[80vh] flex flex-col sm:flex-row bg-white sm:rounded-[2.5rem] sm:shadow-2xl overflow-hidden relative">
-      <!-- Desktop Left / Mobile Top: Card Deck Area -->
+    <!-- 2. SORTING SECTION (Responsive Split View) -->
+    <section id="sorting-section" class="hidden w-full h-[90vh] sm:h-[80vh] flex flex-col sm:flex-row bg-white sm:rounded-[3rem] sm:shadow-2xl overflow-hidden relative">
+      
+      <!-- Card Deck (Left on Desktop) -->
       <div class="flex-1 relative bg-slate-50 flex items-center justify-center p-4 order-2 sm:order-1 overflow-hidden">
         <div id="card-stack" class="relative w-[300px] h-[400px] sm:w-[360px] sm:h-[480px]">
-          <!-- Dynamic Cards -->
+          <!-- Cards go here via JS -->
         </div>
-        <!-- Swipe Visual Cues -->
-        <div class="absolute bottom-10 left-10 text-slate-300 font-black text-4xl rotate-[-15deg] pointer-events-none select-none opacity-20 sm:block hidden">NOPE</div>
-        <div class="absolute bottom-10 right-10 text-blue-300 font-black text-4xl rotate-[15deg] pointer-events-none select-none opacity-20 sm:block hidden">LIKE</div>
+        <div class="absolute bottom-10 left-10 text-slate-200 font-black text-4xl rotate-[-15deg] pointer-events-none select-none opacity-20 sm:block hidden">NOPE</div>
+        <div class="absolute bottom-10 right-10 text-blue-200 font-black text-4xl rotate-[15deg] pointer-events-none select-none opacity-20 sm:block hidden">LIKE</div>
       </div>
 
-      <!-- Desktop Right / Mobile Bottom: Controls & Sidebar -->
-      <div class="w-full sm:w-[380px] bg-white border-t sm:border-t-0 sm:border-l border-slate-100 flex flex-col order-1 sm:order-2">
-        <div class="p-6 border-b border-slate-100">
-          <div class="flex justify-between items-center mb-4">
+      <!-- Controls & Progress (Right on Desktop) -->
+      <div class="w-full sm:w-[400px] bg-white border-t sm:border-t-0 sm:border-l border-slate-100 flex flex-col order-1 sm:order-2 z-10">
+        <div class="p-8 border-b border-slate-100 bg-white/50 backdrop-blur">
+          <div class="flex justify-between items-center mb-6">
             <button id="btn-exit" class="text-slate-400 hover:text-slate-900 transition-colors text-sm font-bold flex items-center gap-1">
-              <span>&larr;</span> <span id="text-exit">나가기</span>
+              <span>&larr;</span> <span>나가기</span>
             </button>
-            <span id="progress-text" class="text-xs font-black text-slate-300 tabular-nums tracking-widest">1 / 52</span>
+            <span id="progress-text" class="text-xs font-black text-slate-300 tabular-nums tracking-[0.2em]">0 / 52</span>
           </div>
           <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
             <div id="progress-bar" class="h-full bg-[#1E88E5] w-0 transition-all duration-500"></div>
           </div>
-          <h2 id="sorting-title" class="text-xl font-black text-slate-800 mt-6 leading-tight">마음에 드는 활동인가요?</h2>
-          <p id="sorting-subtitle" class="text-sm text-slate-400 font-medium mt-1">카드를 오른쪽으로 밀면 선택됩니다.</p>
+          <h2 id="sorting-title" class="text-2xl font-black text-slate-800 mt-8 leading-tight">마음에 드는 활동인가요?</h2>
+          <p id="sorting-subtitle" class="text-sm text-slate-400 font-medium mt-2">좋아하는 카드는 오른쪽으로 밀어주세요.</p>
         </div>
 
-        <!-- Liked Sidebar (Visible on PC) -->
-        <div class="hidden sm:block flex-1 p-6 overflow-y-auto custom-scrollbar">
-          <h3 id="label-liked" class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">선택한 카드 리스트</h3>
-          <div id="liked-list" class="space-y-2">
-            <!-- Liked items go here -->
+        <!-- Liked Items Scroll Area -->
+        <div class="hidden sm:block flex-1 p-8 overflow-y-auto custom-scrollbar">
+          <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-4">선택한 카드 (LIKED)</h3>
+          <div id="liked-list" class="space-y-3">
+            <!-- List updates here -->
           </div>
         </div>
 
-        <!-- Bottom Controls -->
-        <div class="p-6 bg-slate-50/50 flex justify-center items-center gap-6">
-          <button id="btn-swipe-left" class="w-16 h-16 rounded-full bg-white border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-200 hover:shadow-lg transition-all flex items-center justify-center group">
-            <svg class="group-hover:scale-110 transition-transform" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <!-- Control Buttons -->
+        <div class="p-8 bg-slate-50 flex justify-center items-center gap-8">
+          <button id="btn-dislike" class="w-16 h-16 rounded-full bg-white border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-200 hover:shadow-xl transition-all flex items-center justify-center group shadow-sm">
+            <svg class="group-hover:scale-110 transition-transform" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
-          <button id="btn-swipe-up" class="px-6 py-2 rounded-full bg-slate-200 text-slate-500 text-[10px] font-black tracking-widest hover:bg-slate-300 transition-all">PASS</button>
-          <button id="btn-swipe-right" class="w-16 h-16 rounded-full bg-[#1E88E5] text-white shadow-xl shadow-blue-500/20 hover:bg-blue-600 hover:scale-110 transition-all flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg>
+          <button id="btn-pass" class="px-6 py-2 rounded-full bg-slate-200 text-slate-500 text-[10px] font-black tracking-widest hover:bg-slate-300 transition-all shadow-sm">PASS</button>
+          <button id="btn-like" class="w-20 h-20 rounded-full bg-[#1E88E5] text-white shadow-2xl shadow-blue-500/30 hover:bg-blue-600 hover:scale-110 transition-all flex items-center justify-center">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 13l4 4L19 7"/></svg>
           </button>
         </div>
       </div>
     </section>
 
     <!-- 3. RANKING SECTION -->
-    <section id="ranking-section" class="hidden w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:min-h-[80vh] overflow-hidden">
-      <div class="p-8 sm:p-12 flex-1 overflow-y-auto custom-scrollbar">
-        <div class="text-center mb-12">
-          <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black tracking-[0.2em] uppercase mb-4">Phase 02</span>
-          <h2 id="ranking-title" class="text-3xl font-black text-slate-900 mb-2">가장 중요한 3가지 선택</h2>
-          <p id="ranking-subtitle" class="text-slate-500 font-medium">선택한 카드들 중 당신을 가장 잘 나타내는 3장을 순서대로 골라주세요.</p>
+    <section id="ranking-section" class="hidden w-full max-w-5xl bg-white rounded-[3rem] shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:min-h-[80vh] overflow-hidden">
+      <div class="p-8 sm:p-14 flex-1 overflow-y-auto custom-scrollbar">
+        <div class="text-center mb-14">
+          <span class="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black tracking-[0.3em] uppercase mb-4">Phase 02</span>
+          <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mb-3">가장 중요한 3가지 선택</h2>
+          <p id="ranking-subtitle" class="text-slate-500 font-medium text-lg">선택한 카드 중 나를 가장 잘 나타내는 3장을 순서대로 골라주세요.</p>
         </div>
-        <div id="ranking-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          <!-- Selection Cards -->
+        <div id="ranking-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-8">
+          <!-- Selection Cards populate here -->
         </div>
       </div>
-      <div class="p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-6">
-        <div class="text-sm font-black text-slate-400">
-          <span id="rank-count" class="text-blue-500">0</span> / 3 <span id="text-selected">Selected</span>
+      <div class="p-10 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-8">
+        <div class="text-lg font-black text-slate-400">
+          <span id="rank-count" class="text-blue-500">0</span> / 3 Selected
         </div>
-        <button id="btn-show-result" disabled class="w-full sm:w-[300px] py-5 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all flex items-center justify-center gap-2">
-          <span id="text-view-report">분석 리포트 생성하기</span>
+        <button id="btn-show-result" disabled class="w-full sm:w-[350px] py-5 bg-slate-200 text-slate-400 font-black rounded-3xl transition-all shadow-lg shadow-slate-200/50 flex items-center justify-center gap-3">
+          <span>분석 리포트 확인하기</span>
         </button>
       </div>
     </section>
 
     <!-- 4. RESULT SECTION -->
-    <section id="result-section" class="hidden w-full max-w-6xl bg-white rounded-[2.5rem] shadow-2xl overflow-y-auto h-screen sm:h-auto scroll-smooth">
-      <div class="p-8 sm:p-12 pb-24">
+    <section id="result-section" class="hidden w-full max-w-6xl bg-white rounded-[3rem] shadow-2xl overflow-y-auto h-screen sm:h-auto pb-10">
+      <div class="p-8 sm:p-14">
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12 pb-12 border-b border-slate-100">
+        <!-- Result Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 pb-16 border-b border-slate-100">
           <div class="flex-1">
-            <span id="text-report-for" class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">DIAGNOSIS REPORT</span>
-            <h1 id="result-type-title" class="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">...</h1>
-            <p id="result-type-desc" class="text-lg text-slate-500 leading-relaxed max-w-2xl">...</p>
+            <span class="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-6 block">Career Diagnosis Report</span>
+            <h1 id="result-type-title" class="text-4xl sm:text-6xl font-black text-slate-900 mb-6 leading-tight">...</h1>
+            <p id="result-type-desc" class="text-xl text-slate-500 leading-relaxed max-w-3xl">...</p>
           </div>
           <div class="flex-shrink-0">
-            <div id="result-tag" class="bg-blue-50 text-blue-600 px-6 py-3 rounded-2xl font-black text-sm tracking-widest shadow-sm border border-blue-100 uppercase">...</div>
+            <div id="result-tag" class="bg-slate-900 text-white px-8 py-4 rounded-[2rem] font-black text-sm tracking-widest shadow-xl border border-slate-800 uppercase">...</div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           <!-- LEFT: Map & Visualization -->
-          <div class="lg:col-span-5 space-y-8">
-            <div class="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100 flex flex-col items-center">
-              <h3 id="label-map" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8 w-full">Prediger Interest Map</h3>
-              <div class="relative w-full max-w-[300px] aspect-square bg-white rounded-full border border-slate-200 shadow-inner">
+          <div class="lg:col-span-5 space-y-10">
+            <!-- Prediger Map UI -->
+            <div class="bg-slate-50/50 p-10 rounded-[3rem] border border-slate-100 flex flex-col items-center">
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-10 w-full text-center">Prediger Interest Map</h3>
+              <div class="relative w-full max-w-[320px] aspect-square bg-white rounded-full border border-slate-200 shadow-inner">
                 <!-- Axes -->
                 <div class="absolute inset-0 flex items-center justify-center">
-                  <div class="w-px h-full bg-slate-200"></div>
-                  <div class="h-px w-full bg-slate-200"></div>
+                  <div class="w-px h-full bg-slate-100"></div>
+                  <div class="h-px w-full bg-slate-100"></div>
                 </div>
-                <!-- Quadrant Labels -->
-                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-500 bg-white px-2">DATA (현실)</div>
-                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-black text-green-600 bg-white px-2">IDEAS (사고)</div>
-                <div class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-500 bg-white px-2 rotate-[-90deg]">PEOPLE (사람)</div>
-                <div class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 bg-white px-2 rotate-[90deg]">THINGS (사물)</div>
-                <!-- User Pointer -->
-                <div id="result-pointer" class="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-xl z-20 transition-all duration-1000 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0"></div>
+                <!-- Labels -->
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-500 tracking-tighter">DATA (현실)</div>
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-black text-green-600 tracking-tighter">IDEAS (사고)</div>
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-500 tracking-tighter rotate-[-90deg]">PEOPLE (사람)</div>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-red-500 tracking-tighter rotate-[90deg]">THINGS (사물)</div>
+                
+                <!-- Pointer Dot -->
+                <div id="result-pointer" class="absolute w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-2xl z-20 transition-all duration-1000 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0"></div>
               </div>
             </div>
 
-            <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
-              <h3 id="label-dimension" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Dimension Scores</h3>
-              <div class="space-y-4">
+            <!-- Dimension Bars -->
+            <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-8">
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Dimension Scores</h3>
+              <div class="space-y-6">
                 <div class="group">
-                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Data (Systematic)</span><span id="score-D" class="text-blue-500">0</span></div>
-                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-D" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div></div>
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase"><span>Data</span><span id="score-D" class="text-blue-500">0</span></div>
+                  <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div id="bar-D" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div></div>
                 </div>
                 <div class="group">
-                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Ideas (Abstract)</span><span id="score-I" class="text-green-500">0</span></div>
-                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-I" class="h-full bg-green-500 w-0 transition-all duration-1000"></div></div>
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase"><span>Ideas</span><span id="score-I" class="text-green-600">0</span></div>
+                  <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div id="bar-I" class="h-full bg-green-600 w-0 transition-all duration-1000"></div></div>
                 </div>
                 <div class="group">
-                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>People (Social)</span><span id="score-P" class="text-amber-500">0</span></div>
-                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-P" class="h-full bg-amber-500 w-0 transition-all duration-1000"></div></div>
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase"><span>People</span><span id="score-P" class="text-amber-500">0</span></div>
+                  <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div id="bar-P" class="h-full bg-amber-500 w-0 transition-all duration-1000"></div></div>
                 </div>
                 <div class="group">
-                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>Things (Technical)</span><span id="score-T" class="text-red-500">0</span></div>
-                  <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div id="bar-T" class="h-full bg-red-500 w-0 transition-all duration-1000"></div></div>
+                  <div class="flex justify-between text-xs font-bold text-slate-400 mb-3 uppercase"><span>Things</span><span id="score-T" class="text-red-500">0</span></div>
+                  <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div id="bar-T" class="h-full bg-red-500 w-0 transition-all duration-1000"></div></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- RIGHT: AI Analysis & Jobs -->
-          <div class="lg:col-span-7 space-y-8">
-            <div id="ai-insight-box" class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
-              <div class="flex items-center gap-4 mb-8">
-                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center text-2xl">⚡</div>
+          <!-- RIGHT: Analysis & Jobs -->
+          <div class="lg:col-span-7 space-y-10">
+            <!-- AI Box -->
+            <div class="bg-gradient-to-br from-[#1E88E5] to-[#1565C0] rounded-[3rem] p-10 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+              <div class="flex items-center gap-5 mb-10">
+                <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-inner">⚡</div>
                 <div>
-                  <h3 id="label-ai" class="font-black text-xl">AI Career Insights</h3>
-                  <p class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by Gemini AI</p>
+                  <h3 class="font-black text-2xl tracking-tight">AI 커리어 리포트</h3>
+                  <p class="text-[10px] text-blue-100 uppercase font-bold tracking-[0.4em] opacity-80">Personalized Insights</p>
                 </div>
               </div>
               
-              <!-- AI Loading -->
-              <div id="ai-loader" class="flex flex-col items-center justify-center py-12 gap-4">
-                <div class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                <p id="text-ai-loading" class="text-sm font-medium text-slate-400 animate-pulse">분석 리포트를 생성하고 있습니다...</p>
+              <div id="ai-loader" class="flex flex-col items-center justify-center py-10 gap-5">
+                <div class="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <p class="text-sm font-bold text-blue-100 animate-pulse tracking-wide">사용자의 성향을 분석하고 있습니다...</p>
               </div>
 
-              <!-- AI Content -->
-              <div id="ai-result" class="hidden text-slate-300 text-sm leading-relaxed space-y-4">
-                <!-- Text Injected Here -->
+              <div id="ai-result" class="hidden text-blue-50 text-base leading-relaxed space-y-6 font-medium bg-black/5 p-8 rounded-[2rem] border border-white/5">
+                <!-- Text here -->
               </div>
             </div>
 
-            <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-              <h3 id="label-jobs" class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Recommended Careers</h3>
-              <div id="job-list" class="flex flex-wrap gap-3">
+            <!-- Job List -->
+            <div class="bg-white p-12 rounded-[3rem] border border-slate-100 shadow-sm">
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">추천 직업군 (Job Recommendations)</h3>
+              <div id="job-list" class="flex flex-wrap gap-4">
                 <!-- Badges -->
               </div>
             </div>
 
-            <button id="btn-restart" class="w-full py-6 bg-slate-50 border border-slate-200 text-slate-400 font-black rounded-[1.5rem] hover:bg-slate-100 hover:text-slate-900 transition-all">
-              검사 다시 시작하기
+            <button id="btn-restart" class="w-full py-8 bg-slate-50 border border-slate-200 text-slate-400 font-black rounded-[2rem] hover:bg-slate-100 hover:text-slate-900 transition-all text-lg tracking-widest uppercase">
+              다시 진단하기 (Restart)
             </button>
           </div>
         </div>
