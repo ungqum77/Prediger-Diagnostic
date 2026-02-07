@@ -75,49 +75,91 @@ const el = {
 function init() {
   updateUIStrings();
 
-  el.introForm.addEventListener('submit', handleIntroSubmit);
-  el.langToggle.addEventListener('click', toggleLanguage);
+  if (el.introForm) el.introForm.addEventListener('submit', handleIntroSubmit);
+  if (el.langToggle) el.langToggle.addEventListener('click', toggleLanguage);
   
-  document.getElementById('btn-swipe-left').onclick = () => swipe('left');
-  document.getElementById('btn-swipe-right').onclick = () => swipe('right');
-  document.getElementById('btn-swipe-up').onclick = () => swipe('up');
-  document.getElementById('btn-exit').onclick = () => location.reload();
-  document.getElementById('btn-restart').onclick = () => location.reload();
-  el.btnShowResult.onclick = showResult;
+  const btnLeft = document.getElementById('btn-swipe-left');
+  if (btnLeft) btnLeft.onclick = () => swipe('left');
+  
+  const btnRight = document.getElementById('btn-swipe-right');
+  if (btnRight) btnRight.onclick = () => swipe('right');
+  
+  const btnUp = document.getElementById('btn-swipe-up');
+  if (btnUp) btnUp.onclick = () => swipe('up');
+  
+  const btnExit = document.getElementById('btn-exit');
+  if (btnExit) btnExit.onclick = () => location.reload();
+  
+  const btnRestart = document.getElementById('btn-restart');
+  if (btnRestart) btnRestart.onclick = () => location.reload();
+  
+  if (el.btnShowResult) el.btnShowResult.onclick = showResult;
 
-  gsap.from(".intro-anim", { y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" });
+  if (typeof gsap !== 'undefined') {
+    gsap.from(".intro-anim", { y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out" });
+  }
 }
 
 function toggleLanguage() {
   state.lang = state.lang === 'KR' ? 'EN' : 'KR';
-  el.langToggle.textContent = state.lang === 'KR' ? 'Switch to English' : '한국어 버전으로 변경';
+  if (el.langToggle) el.langToggle.textContent = state.lang === 'KR' ? 'Switch to English' : '한국어 버전으로 변경';
   updateUIStrings();
 }
 
 function updateUIStrings() {
   const s = STRINGS[state.lang];
-  document.querySelector('h1').innerHTML = s.heroTitle;
-  document.getElementById('btn-start').querySelector('span').textContent = s.btnStart;
-  document.getElementById('sorting-title').textContent = s.sortingTitle;
-  document.getElementById('sorting-subtitle').textContent = s.sortingSubtitle;
-  document.getElementById('text-exit').textContent = s.textExit;
-  document.getElementById('text-liked-label').textContent = s.likedLabel;
-  document.getElementById('ranking-title').textContent = s.rankingTitle;
-  document.getElementById('ranking-subtitle').textContent = s.rankingSubtitle;
-  document.getElementById('text-selected').textContent = s.textSelected;
-  document.getElementById('text-gen-report').textContent = s.textGenReport;
-  document.getElementById('text-report-for').textContent = s.textReportFor;
-  document.getElementById('label-ai').textContent = s.labelAi;
-  document.getElementById('label-jobs').textContent = s.labelJobs;
-  document.getElementById('btn-restart').textContent = s.btnRestart;
-  document.getElementById('text-ai-loading').textContent = s.aiLoading;
+  const h1 = document.querySelector('h1');
+  if (h1) h1.innerHTML = s.heroTitle;
+  
+  const startBtnSpan = document.getElementById('btn-start')?.querySelector('span');
+  if (startBtnSpan) startBtnSpan.textContent = s.btnStart;
+  
+  if (el.sortingTitle) el.sortingTitle.textContent = s.sortingTitle;
+  if (el.sortingSubtitle) el.sortingSubtitle.textContent = s.sortingSubtitle;
+  
+  const textExit = document.getElementById('text-exit');
+  if (textExit) textExit.textContent = s.textExit;
+  
+  const likedLabel = document.getElementById('text-liked-label');
+  if (likedLabel) likedLabel.textContent = s.likedLabel;
+  
+  const rankingTitle = document.getElementById('ranking-title');
+  if (rankingTitle) rankingTitle.textContent = s.rankingTitle;
+  
+  const rankingSubtitle = document.getElementById('ranking-subtitle');
+  if (rankingSubtitle) rankingSubtitle.textContent = s.rankingSubtitle;
+  
+  const textSelected = document.getElementById('text-selected');
+  if (textSelected) textSelected.textContent = s.textSelected;
+  
+  const textGenReport = document.getElementById('text-gen-report');
+  if (textGenReport) textGenReport.textContent = s.textGenReport;
+  
+  const textReportFor = document.getElementById('text-report-for');
+  if (textReportFor) textReportFor.textContent = s.textReportFor;
+  
+  const labelAi = document.getElementById('label-ai');
+  if (labelAi) labelAi.textContent = s.labelAi;
+  
+  const labelJobs = document.getElementById('label-jobs');
+  if (labelJobs) labelJobs.textContent = s.labelJobs;
+  
+  const btnRestart = document.getElementById('btn-restart');
+  if (btnRestart) btnRestart.textContent = s.btnRestart;
+  
+  const textAiLoading = document.getElementById('text-ai-loading');
+  if (textAiLoading) textAiLoading.textContent = s.aiLoading;
 }
 
 // --- DATA ---
 async function handleIntroSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById('username').value;
-  const birth = document.getElementById('birthdate').value;
+  const nameInput = document.getElementById('username');
+  const birthInput = document.getElementById('birthdate');
+  if (!nameInput || !birthInput) return;
+  
+  const name = nameInput.value;
+  const birth = birthInput.value;
   if (!name || !birth) return;
 
   const age = new Date().getFullYear() - new Date(birth).getFullYear();
@@ -125,43 +167,52 @@ async function handleIntroSubmit(e) {
   state.mode = age < 13 ? 'child' : 'adult';
 
   const btn = document.getElementById('btn-start');
-  btn.disabled = true;
-  btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>`;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>`;
+  }
 
   try {
     await loadData();
     transition(el.introSection, el.sortingSection, 'flex');
     renderStack();
   } catch (err) {
-    // Improved error message for debugging
+    console.error("LoadData Error:", err);
     alert(`${STRINGS[state.lang].errorFetch}\n\n[Debug Info]\n${err.message}`);
-    btn.disabled = false;
-    btn.innerHTML = `<span>${STRINGS[state.lang].btnStart}</span> <span class="text-xl">&rarr;</span>`;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>${STRINGS[state.lang].btnStart}</span> <span class="text-xl">&rarr;</span>`;
+    }
   }
 }
 
 async function loadData() {
   const suffix = state.lang.toLowerCase();
   
+  // Use relative paths carefully for hosting
   const cardsPath = `./assets/data/cards_${suffix}.json`;
   const contentPath = `./assets/data/contents_db_${suffix}.json`;
 
   const cardsRes = await fetch(cardsPath);
   if (!cardsRes.ok) {
-    throw new Error(`Failed to fetch cards data from path: ${cardsPath} (Status: ${cardsRes.status})`);
+    throw new Error(`Failed to fetch cards data: ${cardsPath} (Status: ${cardsRes.status})`);
   }
   const cardsJson = await cardsRes.json();
+  if (!cardsJson || !cardsJson.cards) {
+    throw new Error(`Invalid JSON structure in ${cardsPath}`);
+  }
   state.cards = cardsJson.cards;
 
   const contentRes = await fetch(contentPath);
   if (!contentRes.ok) {
-    throw new Error(`Failed to fetch contents DB from path: ${contentPath} (Status: ${contentRes.status})`);
+    throw new Error(`Failed to fetch contents DB: ${contentPath} (Status: ${contentRes.status})`);
   }
   state.contentsDB = await contentRes.json();
 }
 
 // --- SORTING ---
 function renderStack() {
+  if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   const stack = state.cards.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
@@ -172,7 +223,10 @@ function renderStack() {
     
     const modeData = card[state.mode];
     const keyword = card['keyword_' + state.lang.toLowerCase()];
-    const imgPath = `./assets/images/${state.mode}/${modeData.img}`;
+    
+    // Logic: Map 'child' mode to 'kids' folder as requested by user
+    const folderName = state.mode === 'child' ? 'kids' : 'adult';
+    const imgPath = `./assets/images/${folderName}/${modeData.img}`;
     
     cardEl.innerHTML = `
       <div class="relative w-full h-[70%] bg-slate-100 overflow-hidden">
@@ -190,7 +244,9 @@ function renderStack() {
     `;
 
     const depth = stack.length - 1 - i;
-    gsap.set(cardEl, { scale: 1 - depth * 0.05, y: depth * 15, zIndex: i });
+    if (typeof gsap !== 'undefined') {
+      gsap.set(cardEl, { scale: 1 - depth * 0.05, y: depth * 15, zIndex: i });
+    }
     el.cardStack.appendChild(cardEl);
     if (isTop) setupDraggable(cardEl, card);
   });
@@ -198,44 +254,60 @@ function renderStack() {
 }
 
 function setupDraggable(cardEl, cardData) {
+  if (typeof Draggable === 'undefined') return;
   Draggable.create(cardEl, {
     type: "x,y",
     onDrag: function() {
-      gsap.set(cardEl, { rotation: this.x * 0.05 });
-      gsap.set(cardEl.querySelector('.stamp-like'), { opacity: Math.max(0, Math.min(1, this.x / 100)) });
-      gsap.set(cardEl.querySelector('.stamp-nope'), { opacity: Math.max(0, Math.min(1, -this.x / 100)) });
+      if (typeof gsap !== 'undefined') {
+        gsap.set(cardEl, { rotation: this.x * 0.05 });
+        gsap.set(cardEl.querySelector('.stamp-like'), { opacity: Math.max(0, Math.min(1, this.x / 100)) });
+        gsap.set(cardEl.querySelector('.stamp-nope'), { opacity: Math.max(0, Math.min(1, -this.x / 100)) });
+      }
     },
     onDragEnd: function() {
       if (this.x > 120) handleSwipe('right', cardEl, cardData);
       else if (this.x < -120) handleSwipe('left', cardEl, cardData);
       else if (this.y < -120) handleSwipe('up', cardEl, cardData);
       else {
-        gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
-        gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.3 });
+        if (typeof gsap !== 'undefined') {
+          gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
+          gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.3 });
+        }
       }
     }
   });
 }
 
 function swipe(dir) {
-  const top = el.cardStack.querySelector('.card-item:last-child');
+  const top = el.cardStack?.querySelector('.card-item:last-child');
   if (top) handleSwipe(dir, top, state.cards[state.currentIndex]);
 }
 
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
-  if (dir === 'right') { x = 800; rot = 45; state.likedCards.push(cardData); addToLikedList(cardData); }
+  if (dir === 'right') { 
+    x = 800; rot = 45; 
+    state.likedCards.push(cardData); 
+    addToLikedList(cardData); 
+  }
   else if (dir === 'left') { x = -800; rot = -45; }
   else if (dir === 'up') { y = -800; }
 
-  gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, onComplete: () => {
+  if (typeof gsap !== 'undefined') {
+    gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, onComplete: () => {
+      state.currentIndex++;
+      if (state.currentIndex >= state.cards.length) finishSorting();
+      else renderStack();
+    }});
+  } else {
     state.currentIndex++;
     if (state.currentIndex >= state.cards.length) finishSorting();
     else renderStack();
-  }});
+  }
 }
 
 function addToLikedList(card) {
+  if (!el.likedList) return;
   const keyword = card['keyword_' + state.lang.toLowerCase()];
   const item = document.createElement('div');
   item.className = 'flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in shadow-sm';
@@ -248,8 +320,8 @@ function addToLikedList(card) {
 
 function updateProgress() {
   const p = (state.currentIndex / state.cards.length) * 100;
-  el.progressBar.style.width = `${p}%`;
-  el.progressText.textContent = `${state.currentIndex} / ${state.cards.length}`;
+  if (el.progressBar) el.progressBar.style.width = `${p}%`;
+  if (el.progressText) el.progressText.textContent = `${state.currentIndex} / ${state.cards.length}`;
 }
 
 function finishSorting() {
@@ -259,10 +331,11 @@ function finishSorting() {
 
 // --- RANKING ---
 function renderRankingGrid() {
+  if (!el.rankingGrid) return;
   el.rankingGrid.innerHTML = '';
   state.rankedCards = [];
-  el.rankCount.textContent = '0';
-  el.btnShowResult.disabled = true;
+  if (el.rankCount) el.rankCount.textContent = '0';
+  if (el.btnShowResult) el.btnShowResult.disabled = true;
 
   if (state.likedCards.length === 0) {
     el.rankingGrid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400">선택된 카드가 없습니다.</div>`;
@@ -272,9 +345,11 @@ function renderRankingGrid() {
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
     const keyword = card['keyword_' + state.lang.toLowerCase()];
+    const folderName = state.mode === 'child' ? 'kids' : 'adult';
+    
     cardEl.className = 'selection-card relative rounded-3xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
     cardEl.innerHTML = `
-      <img src="./assets/images/${state.mode}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
+      <img src="./assets/images/${folderName}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
       <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
       <div class="absolute bottom-5 left-5 right-5"><h4 class="text-white font-black text-base">${keyword}</h4></div>
       <div class="badge-container"></div>
@@ -290,15 +365,19 @@ function renderRankingGrid() {
 }
 
 function updateRankUI() {
+  if (!el.rankingGrid) return;
   Array.from(el.rankingGrid.children).forEach((cardEl, i) => {
     const cardData = state.likedCards[i];
     const rankIdx = state.rankedCards.findIndex(c => c.id === cardData.id);
     cardEl.classList.toggle('selected', rankIdx > -1);
-    cardEl.querySelector('.badge-container').innerHTML = rankIdx > -1 ? `<div class="rank-badge">${rankIdx + 1}</div>` : '';
+    const badge = cardEl.querySelector('.badge-container');
+    if (badge) badge.innerHTML = rankIdx > -1 ? `<div class="rank-badge">${rankIdx + 1}</div>` : '';
   });
-  el.rankCount.textContent = state.rankedCards.length;
-  el.btnShowResult.disabled = state.rankedCards.length < 3;
-  el.btnShowResult.className = `w-full sm:w-[350px] py-5 font-black rounded-3xl transition-all shadow-lg flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+  if (el.rankCount) el.rankCount.textContent = state.rankedCards.length;
+  if (el.btnShowResult) {
+    el.btnShowResult.disabled = state.rankedCards.length < 3;
+    el.btnShowResult.className = `w-full sm:w-[350px] py-5 font-black rounded-3xl transition-all shadow-lg flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
+  }
 }
 
 // --- RESULT ---
@@ -313,43 +392,63 @@ async function showResult() {
 
   const getResultKey = (x, y, s) => {
     const threshold = 3;
+    // Balanced check
     if (Math.abs(x) <= threshold && Math.abs(y) <= threshold) return "CENTER";
+    
+    // Single dominance check (if one score is clearly higher than others by 5+)
     const sorted = Object.entries(s).sort((a,b) => b[1] - a[1]);
     if (sorted[0][1] > sorted[1][1] + 5) {
       const map = { D: 'DATA', I: 'IDEA', P: 'PEOPLE', T: 'THING' };
       return map[sorted[0][0]];
     }
+    
+    // Quadrant logic with exact requested keys
     if (y >= 0 && x >= 0) return "DATA_THING";
     if (y >= 0 && x < 0) return "DATA_PEOPLE";
     if (y < 0 && x >= 0) return "IDEA_THING";
     if (y < 0 && x < 0) return "IDEA_PEOPLE";
+    
     return "CENTER";
   };
 
   const key = getResultKey(x, y, scores);
-  const data = state.contentsDB[key] || { title: STRINGS[state.lang].heroTitle, summary: "...", jobs: [] };
+  const data = state.contentsDB[key] || { title: STRINGS[state.lang].heroTitle, summary: "성향 분석 결과가 로드되지 않았습니다.", jobs: [] };
 
-  document.getElementById('result-type-title').textContent = data.title;
-  document.getElementById('result-type-desc').textContent = data.summary;
-  document.getElementById('result-tag').textContent = key;
-  el.jobList.innerHTML = (data.jobs || []).map(j => `<span class="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black">${j}</span>`).join('');
+  const typeTitle = document.getElementById('result-type-title');
+  if (typeTitle) typeTitle.textContent = data.title;
+  
+  const typeDesc = document.getElementById('result-type-desc');
+  if (typeDesc) typeDesc.textContent = data.summary;
+  
+  const resTag = document.getElementById('result-tag');
+  if (resTag) resTag.textContent = key;
+  
+  if (el.jobList) {
+    el.jobList.innerHTML = (data.jobs || []).map(j => `<span class="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black">${j}</span>`).join('');
+  }
 
   const max = Math.max(scores.D, scores.I, scores.P, scores.T, 10);
   ['D','I','P','T'].forEach(k => {
-    document.getElementById(`score-${k}`).textContent = scores[k];
-    document.getElementById(`bar-${k}`).style.width = `${(scores[k]/max)*100}%`;
+    const scoreEl = document.getElementById(`score-${k}`);
+    if (scoreEl) scoreEl.textContent = scores[k];
+    const barEl = document.getElementById(`bar-${k}`);
+    if (barEl) barEl.style.width = `${(scores[k]/max)*100}%`;
   });
 
-  gsap.to(document.getElementById('result-pointer'), {
-    left: `calc(50% + ${Math.max(-1, Math.min(1, x/15))*50}%)`,
-    top: `calc(50% + ${-Math.max(-1, Math.min(1, y/15))*50}%)`,
-    opacity: 1, duration: 1.8, ease: "elastic.out(1, 0.4)", delay: 0.5
-  });
+  const pointer = document.getElementById('result-pointer');
+  if (pointer && typeof gsap !== 'undefined') {
+    gsap.to(pointer, {
+      left: `calc(50% + ${Math.max(-1, Math.min(1, x/15))*50}%)`,
+      top: `calc(50% + ${-Math.max(-1, Math.min(1, y/15))*50}%)`,
+      opacity: 1, duration: 1.8, ease: "elastic.out(1, 0.4)", delay: 0.5
+    });
+  }
 
   generateAIReport();
 }
 
 async function generateAIReport() {
+  if (!el.aiLoader || !el.aiResult) return;
   el.aiLoader.classList.remove('hidden');
   el.aiResult.classList.add('hidden');
   try {
@@ -363,17 +462,29 @@ async function generateAIReport() {
     el.aiLoader.classList.add('hidden');
     el.aiResult.innerHTML = `<p>${res.text}</p>`;
     el.aiResult.classList.remove('hidden');
-    gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
-  } catch (err) { el.aiLoader.innerHTML = `<p>Error generating AI insights.</p>`; }
+    if (typeof gsap !== 'undefined') {
+      gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
+    }
+  } catch (err) { 
+    console.error("AI Generation Error:", err);
+    el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">현재 분석 리포트를 생성할 수 없습니다.</p>`; 
+  }
 }
 
 function transition(from, to, display = 'block') {
-  gsap.to(from, { opacity: 0, y: -30, duration: 0.4, onComplete: () => {
+  if (!from || !to) return;
+  if (typeof gsap !== 'undefined') {
+    gsap.to(from, { opacity: 0, y: -30, duration: 0.4, onComplete: () => {
+      from.classList.add('hidden');
+      to.classList.remove('hidden');
+      to.style.display = display;
+      gsap.fromTo(to, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5 });
+    }});
+  } else {
     from.classList.add('hidden');
     to.classList.remove('hidden');
     to.style.display = display;
-    gsap.fromTo(to, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5 });
-  }});
+  }
 }
 
-init();
+document.addEventListener('DOMContentLoaded', init);
