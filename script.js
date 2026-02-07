@@ -226,6 +226,10 @@ function renderStack() {
     ind.classList.toggle('done', !isMain && idx === 0);
   });
 
+  // Toggle HOLD button visibility based on phase
+  const btnPass = document.getElementById('btn-swipe-up');
+  if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
+
   const stack = currentPool.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
   stack.forEach((card, i) => {
@@ -239,17 +243,17 @@ function renderStack() {
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
     cardEl.innerHTML = `
-      <div class="relative w-full h-[65%] bg-slate-100 overflow-hidden">
+      <div class="relative w-full h-[60%] bg-slate-100 overflow-hidden">
         <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
         <div class="stamp stamp-like">LIKE</div>
         <div class="stamp stamp-nope">NOPE</div>
-        <div class="stamp stamp-hold">HELD</div>
+        ${isMain ? '<div class="stamp stamp-hold">HELD</div>' : ''}
       </div>
-      <div class="p-10 h-[35%] bg-white flex flex-col justify-center text-center">
-        <h3 class="leading-tight">${keyword}</h3>
-        <p class="mt-4">${modeData.desc}</p>
+      <div class="px-6 py-4 h-[40%] bg-white flex flex-col items-center justify-center text-center overflow-hidden">
+        <h3 class="leading-tight shrink-0">${keyword}</h3>
+        <p class="mt-2 text-slate-500 overflow-hidden line-clamp-3">${modeData.desc}</p>
       </div>
-      <div class="absolute top-8 right-8 bg-white/95 backdrop-blur-xl px-4 py-2 rounded-2xl text-[12px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
+      <div class="absolute top-6 right-6 bg-white/95 backdrop-blur-xl px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
         ${card.dimension}
       </div>
     `;
@@ -266,8 +270,10 @@ function renderStack() {
 
 function setupDraggable(cardEl, cardData) {
   if (typeof Draggable === 'undefined') return;
+  const isMain = state.currentSortingStep === 'main';
+
   Draggable.create(cardEl, {
-    type: "x,y",
+    type: isMain ? "x,y" : "x", // Vertical hold disabled in phase 2
     onDrag: function() {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');
@@ -276,12 +282,12 @@ function setupDraggable(cardEl, cardData) {
       
       if (likeStamp) gsap.set(likeStamp, { opacity: Math.max(0, Math.min(1, this.x / 100)) });
       if (nopeStamp) gsap.set(nopeStamp, { opacity: Math.max(0, Math.min(1, -this.x / 100)) });
-      if (holdStamp) gsap.set(holdStamp, { opacity: Math.max(0, Math.min(1, Math.abs(this.y) / 100)) });
+      if (isMain && holdStamp) gsap.set(holdStamp, { opacity: Math.max(0, Math.min(1, Math.abs(this.y) / 100)) });
     },
     onDragEnd: function() {
       if (this.x > 120) handleSwipe('right', cardEl, cardData);
       else if (this.x < -120) handleSwipe('left', cardEl, cardData);
-      else if (Math.abs(this.y) > 120) handleSwipe(this.y < 0 ? 'up' : 'down', cardEl, cardData); // Both up and down send to held
+      else if (isMain && Math.abs(this.y) > 120) handleSwipe(this.y < 0 ? 'up' : 'down', cardEl, cardData);
       else {
         gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
         gsap.to(cardEl.querySelectorAll('.stamp'), { opacity: 0, duration: 0.3 });
@@ -291,6 +297,7 @@ function setupDraggable(cardEl, cardData) {
 }
 
 function swipe(dir) {
+  if (state.currentSortingStep === 'hold' && (dir === 'up' || dir === 'down')) return;
   const currentPool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
   const top = el.cardStack?.querySelector('.card-item:last-child');
   if (top) handleSwipe(dir, top, currentPool[state.currentIndex]);
@@ -298,6 +305,8 @@ function swipe(dir) {
 
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
+  const isMain = state.currentSortingStep === 'main';
+
   if (dir === 'right') { 
     x = 800; rot = 45; 
     state.likedCards.push(cardData); 
@@ -307,10 +316,16 @@ function handleSwipe(dir, cardEl, cardData) {
     x = -800; rot = -45; 
     state.rejectedCards.push(cardData); 
   }
-  else if (dir === 'up' || dir === 'down') { 
+  else if (isMain && (dir === 'up' || dir === 'down')) { 
     y = dir === 'up' ? -800 : 800; 
     state.heldCards.push(cardData); 
     addToThumbnailList(cardData, 'held');
+  } else {
+    // If not valid, spring back
+    if (window.gsap) {
+       gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
+       return;
+    }
   }
 
   if (window.gsap) {
@@ -604,8 +619,9 @@ function transition(from, to, display = 'block') {
       to.classList.remove('hidden');
       to.style.display = display;
       
-      // Ensure scroll is at absolute top again after container is revealed
+      // Secondary safety scroll reset
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
       
       gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
     }});
