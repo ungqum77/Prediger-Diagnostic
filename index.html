@@ -119,8 +119,7 @@
 
       <!-- Main Content Layout -->
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        
-        <!-- Left Sidebar: HELD LIST (Requested) -->
+        <!-- Left Sidebar: HELD LIST -->
         <div class="hidden lg:flex w-[320px] bg-amber-50/20 border-r border-slate-100 flex-col shadow-inner">
           <div class="p-8 pb-4">
              <h2 class="text-xl font-black text-amber-600 leading-tight">보류 카드 목록</h2>
@@ -137,10 +136,7 @@
             <h2 id="sorting-title" class="text-2xl font-black text-slate-800 leading-tight">...</h2>
             <p id="sorting-subtitle" class="text-sm text-slate-500 font-medium mt-1">...</p>
           </div>
-
           <div id="card-stack" class="relative w-full max-w-[360px] aspect-[3/4] sm:max-w-[400px]"></div>
-          
-          <!-- Controls (Moved up slightly) -->
           <div class="flex items-center gap-10 mt-8 mb-4 z-50">
             <button id="btn-swipe-left" class="sorting-btn btn-nope" title="Nope">
                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -154,7 +150,7 @@
           </div>
         </div>
 
-        <!-- Right Sidebar: LIKED LIST (Requested) -->
+        <!-- Right Sidebar: LIKED LIST -->
         <div class="hidden lg:flex w-[320px] bg-blue-50/20 border-l border-slate-100 flex-col shadow-inner">
           <div class="p-8 pb-4">
              <h2 class="text-xl font-black text-blue-600 leading-tight">선택한 카드 목록</h2>
@@ -164,7 +160,6 @@
             <div id="liked-list" class="grid grid-cols-2 gap-3"></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -180,7 +175,6 @@
           <h2 id="s9-title" class="text-3xl font-black text-slate-900 mb-4">나를 가장 잘 설명하는 9장 선택</h2>
           <p id="s9-subtitle" class="text-slate-500 font-medium text-lg">좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.</p>
         </div>
-        <!-- Grid adjusted for more visible cards at once -->
         <div id="s9-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-4 max-w-full"></div>
       </div>
       <div class="p-10 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-10">
@@ -206,7 +200,6 @@
           <h2 id="r3-title" class="text-3xl font-black text-slate-900 mb-4">최종 핵심 3장 순위 결정</h2>
           <p id="r3-subtitle" class="text-slate-500 font-medium text-lg">선택한 9장 중 가장 나다운 3장을 순서대로 클릭하세요.</p>
         </div>
-        <!-- Center aligned grid for ranking -->
         <div id="r3-grid" class="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto"></div>
       </div>
       <div class="p-10 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-10">
@@ -225,8 +218,8 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-14 mb-20 pb-20 border-b border-slate-100">
           <div class="flex-1">
             <span id="text-report-for" class="text-[12px] font-black text-slate-300 uppercase tracking-[0.5em] mb-10 block">THE FINAL DIAGNOSIS</span>
-            <h1 id="result-type-title" class="text-5xl sm:text-7xl font-black text-slate-900 mb-10 leading-tight">...</h1>
-            <p id="result-type-desc" class="text-2xl text-slate-600 leading-relaxed max-w-4xl font-medium">...</p>
+            <h1 id="result-title" class="text-5xl sm:text-7xl font-black text-slate-900 mb-10 leading-tight">...</h1>
+            <p id="result-summary" class="text-2xl text-slate-600 leading-relaxed max-w-4xl font-medium">...</p>
           </div>
           <div id="result-tag" class="bg-slate-900 text-white px-12 py-6 rounded-[3rem] font-black text-sm tracking-[0.4em] border border-slate-800 uppercase shadow-2xl">...</div>
         </div>
@@ -269,9 +262,19 @@
                 </div>
                 <div id="ai-result" class="hidden text-blue-50 text-xl leading-relaxed space-y-10 font-medium bg-white/5 p-12 rounded-[4rem]"></div>
               </div>
-              <div class="bg-white p-16 rounded-[5rem] border border-slate-100 shadow-sm">
-                <h3 id="label-jobs" class="text-[12px] font-black text-slate-400 uppercase tracking-[0.5em] mb-12">Recommended Careers</h3>
-                <div id="job-list" class="flex flex-wrap gap-6"></div>
+              <div class="bg-white p-16 rounded-[5rem] border border-slate-100 shadow-sm space-y-10">
+                <div>
+                   <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6">Traits Analysis</h3>
+                   <p id="result-traits" class="text-slate-700 font-medium leading-relaxed">...</p>
+                </div>
+                <div>
+                   <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.5em] mb-8">Recommended Jobs</h3>
+                   <div id="result-jobs" class="flex flex-wrap gap-4"></div>
+                </div>
+                <div>
+                   <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[0.5em] mb-6">Potential Role Models</h3>
+                   <div id="result-role-models" class="text-slate-700 font-medium leading-relaxed"></div>
+                </div>
               </div>
               <button id="btn-restart" class="w-full py-12 bg-slate-50 border border-slate-100 text-slate-400 font-black rounded-[4rem] hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all text-xl uppercase tracking-[0.3em] shadow-sm">다시 진단하기</button>
            </div>

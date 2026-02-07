@@ -106,7 +106,14 @@ const el = {
   
   aiResult: document.getElementById('ai-result'),
   aiLoader: document.getElementById('ai-loader'),
-  jobList: document.getElementById('job-list')
+  
+  // Results Injection
+  resTitle: document.getElementById('result-title'),
+  resSummary: document.getElementById('result-summary'),
+  resTraits: document.getElementById('result-traits'),
+  resJobs: document.getElementById('result-jobs'),
+  resRoleModels: document.getElementById('result-role-models'),
+  resTag: document.getElementById('result-tag')
 };
 
 // --- INITIALIZATION ---
@@ -207,6 +214,7 @@ async function loadData() {
 
 // --- STEP 2 & 3: SORTING ---
 function renderStack() {
+  window.scrollTo(0, 0);
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
   
@@ -219,16 +227,11 @@ function renderStack() {
   if (titleEl) titleEl.textContent = isMain ? s.sortingTitleMain : s.sortingTitleHold;
   if (subtitleEl) subtitleEl.textContent = isMain ? s.sortingSubtitleMain : s.sortingSubtitleHold;
   
-  // Phase Indicator Update
   const indicators = document.querySelectorAll('#phase-indicator .phase-badge');
   indicators.forEach((ind, idx) => {
     ind.classList.toggle('active', (isMain && idx === 0) || (!isMain && idx === 1));
     ind.classList.toggle('done', !isMain && idx === 0);
   });
-
-  // Toggle HOLD button visibility based on phase
-  const btnPass = document.getElementById('btn-swipe-up');
-  if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
 
   const stack = currentPool.slice(state.currentIndex, state.currentIndex + 3).reverse();
   
@@ -273,7 +276,7 @@ function setupDraggable(cardEl, cardData) {
   const isMain = state.currentSortingStep === 'main';
 
   Draggable.create(cardEl, {
-    type: isMain ? "x,y" : "x", // Vertical hold disabled in phase 2
+    type: isMain ? "x,y" : "x",
     onDrag: function() {
       gsap.set(cardEl, { rotation: this.x * 0.05 });
       const likeStamp = cardEl.querySelector('.stamp-like');
@@ -321,7 +324,6 @@ function handleSwipe(dir, cardEl, cardData) {
     state.heldCards.push(cardData); 
     addToThumbnailList(cardData, 'held');
   } else {
-    // If not valid, spring back
     if (window.gsap) {
        gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
        return;
@@ -388,6 +390,7 @@ function finishSorting() {
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
+  window.scrollTo(0, 0);
   if (!el.s9Grid) return;
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
@@ -446,6 +449,7 @@ function startRanking() {
 }
 
 function renderRank3Grid() {
+  window.scrollTo(0, 0);
   if (!el.r3Grid) return;
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
@@ -502,8 +506,6 @@ function updateR3UI() {
 // --- STEP 6: ANALYSIS & ADS ---
 function startAnalysis() {
   transition(el.rank3Section, el.adsOverlay, 'flex');
-
-  // Analysis simulation
   setTimeout(() => {
     if (el.btnSkipAd) el.btnSkipAd.classList.remove('hidden');
   }, 4000);
@@ -512,16 +514,22 @@ function startAnalysis() {
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
   transition(el.adsOverlay, el.resultSection, 'block');
+  window.scrollTo(0, 0);
 
-  // 1. SCORING LOGIC
+  // 1. SCORING LOGIC (REWRITTEN)
+  // Top 1 = 5pts, Top 2 = 4pts, Top 3 = 3pts, Others in Top 9 = 1pt each.
   const scores = { D: 0, I: 0, P: 0, T: 0 };
   
   state.rankedCards.forEach((card, idx) => {
-    scores[card.dimension] += (5 - idx);
+    const pts = 5 - idx;
+    if (card.dimension && scores[card.dimension] !== undefined) {
+       scores[card.dimension] += pts;
+    }
   });
   
   state.top9Cards.forEach(card => {
-    if (!state.rankedCards.some(r => r.id === card.id)) {
+    const isRanked = state.rankedCards.some(rc => rc.id === card.id);
+    if (!isRanked && card.dimension && scores[card.dimension] !== undefined) {
       scores[card.dimension] += 1;
     }
   });
@@ -529,46 +537,60 @@ async function showResult() {
   const x = scores.T - scores.P;
   const y = scores.D - scores.I;
 
-  const getResultKey = (x, y, s) => {
-    const threshold = 3;
-    if (Math.abs(x) <= threshold && Math.abs(y) <= threshold) return "CENTER";
+  // 2. COORDINATE CALCULATION & KEY MAPPING
+  const getResultKey = (cx, cy) => {
+    // Check CENTER threshold first (Strict matching logic)
+    if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
     
-    const sorted = Object.entries(s).sort((a,b) => b[1] - a[1]);
-    if (sorted[0][1] > sorted[1][1] + 6) {
-      const map = { D: 'DATA', I: 'IDEA', P: 'PEOPLE', T: 'THING' };
-      return map[sorted[0][0]];
+    // Key mapping based on quadrants (Singular THING, IDEA)
+    if (cy >= 0) {
+      return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
+    } else {
+      return cx >= 0 ? "IDEA_THING" : "IDEA_PEOPLE";
     }
-    
-    if (y >= 0 && x >= 0) return "DATA_THING";
-    if (y >= 0 && x < 0) return "DATA_PEOPLE";
-    if (y < 0 && x >= 0) return "IDEA_THING";
-    if (y < 0 && x < 0) return "IDEA_PEOPLE";
-    return "CENTER";
   };
 
-  const key = getResultKey(x, y, scores);
-  const data = state.contentsDB[key] || { title: "Balanced Type", summary: "Exploring all possibilities.", jobs: [] };
+  const key = getResultKey(x, y);
+  renderReport(key, scores, x, y);
+  generateAIReport();
+}
 
-  const resTitle = document.getElementById('result-type-title');
-  const resDesc = document.getElementById('result-type-desc');
-  const resTag = document.getElementById('result-tag');
+function renderReport(key, scores, x, y) {
+  const data = state.contentsDB[key] || state.contentsDB["CENTER"] || { 
+    title: "Balanced Type", 
+    summary: "Exploring all possibilities.", 
+    traits: { desc: "Flexible interests." },
+    job_families: [],
+    role_models: []
+  };
+
+  if (el.resTitle) el.resTitle.textContent = data.title;
+  if (el.resSummary) el.resSummary.textContent = data.summary;
+  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || data.traits || "";
+  if (el.resTag) el.resTag.textContent = key;
   
-  if (resTitle) resTitle.textContent = data.title;
-  if (resDesc) resDesc.textContent = data.summary;
-  if (resTag) resTag.textContent = key;
-  
-  if (el.jobList) {
-    el.jobList.innerHTML = (data.jobs || []).map(j => `<span class="px-8 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] text-sm font-black">${j}</span>`).join('');
+  if (el.resJobs) {
+    const jobs = data.job_families || data.jobs || [];
+    el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
-  const max = Math.max(scores.D, scores.I, scores.P, scores.T, 10);
+  if (el.resRoleModels) {
+    const rmodels = data.role_models || [];
+    el.resRoleModels.textContent = rmodels.join(", ");
+  }
+
+  // Animate Propensity Bars
+  const max = Math.max(scores.D, scores.I, scores.P, scores.T, 1);
   ['D','I','P','T'].forEach(k => {
     const sEl = document.getElementById(`score-${k}`);
     const bEl = document.getElementById(`bar-${k}`);
     if (sEl) sEl.textContent = scores[k];
-    if (bEl) bEl.style.width = `${(scores[k]/max)*100}%`;
+    if (bEl && window.gsap) {
+       gsap.to(bEl, { width: `${(scores[k]/max)*100}%`, duration: 1.5, ease: "power4.out" });
+    }
   });
 
+  // Interpersonal Map Pointer
   const pointer = document.getElementById('result-pointer');
   if (pointer && window.gsap) {
     gsap.to(pointer, {
@@ -577,8 +599,6 @@ async function showResult() {
       opacity: 1, duration: 2, ease: "elastic.out(1, 0.4)", delay: 0.5
     });
   }
-
-  generateAIReport();
 }
 
 async function generateAIReport() {
@@ -594,7 +614,7 @@ async function generateAIReport() {
       : `Keywords: ${keywords}. Analyze this Prediger profile and give career advice in 4 sentences.`;
     const res = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
     el.aiLoader.classList.add('hidden');
-    el.aiResult.innerHTML = `<p>${res.text}</p>`;
+    el.aiResult.innerHTML = `<div class="text-blue-50 font-medium leading-relaxed">${res.text}</div>`;
     el.aiResult.classList.remove('hidden');
     if (window.gsap) {
       gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
@@ -608,7 +628,7 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // Instant jump to top
+  // CRITICAL: Ensure scroll to top on every transition
   window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -619,9 +639,8 @@ function transition(from, to, display = 'block') {
       to.classList.remove('hidden');
       to.style.display = display;
       
-      // Secondary safety scroll reset
+      // Secondary safety reset
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = 0;
       
       gsap.fromTo(to, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 });
     }});
