@@ -164,15 +164,22 @@ function downloadPDF() {
   btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Generating...`;
   btn.disabled = true;
 
+  // Optimized options for a clean PDF scaling
   const opt = {
-    margin: [0.2, 0.2, 0.2, 0.2],
+    margin: [0.1, 0.1, 0.1, 0.1],
     filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      letterRendering: true,
+      windowWidth: 1200 // Force a desktop-like width for generation to avoid mobile layout compression
+    },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
   };
   
   if (typeof html2pdf !== 'undefined') {
+    // Temporarily adjust element for clean capture if needed
     html2pdf().set(opt).from(element).save().then(() => {
        btn.innerHTML = originalText;
        btn.disabled = false;
@@ -288,9 +295,8 @@ function renderStack() {
     cardEl.className = 'card-item';
     
     const modeData = card[state.mode];
-    // NOTE: Using 'keyword_kr' or 'keyword_en' based on lang
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
-    const keyword = card[keywordKey] || card.keyword; // fallback
+    const keyword = card[keywordKey] || card.keyword;
     const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
     
@@ -438,7 +444,7 @@ function updateProgress() {
 }
 
 function finishSorting() {
-  renderSelect9Grid(); // Pre-render content to establish layout
+  renderSelect9Grid();
   transition(el.sortingSection, el.select9Section, 'flex');
 }
 
@@ -498,7 +504,7 @@ function updateS9UI() {
 
 // --- STEP 5: RANK TOP 3 ---
 function startRanking() {
-  renderRank3Grid(); // Pre-render content
+  renderRank3Grid();
   transition(el.select9Section, el.rank3Section, 'flex');
 }
 
@@ -569,8 +575,6 @@ function startAnalysis() {
 
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
-  // 1. SCORING LOGIC
-  // Top 1 = +5, Top 2 = +4, Top 3 = +3, Others in Top 9 = +1
   const scores = { D: 0, I: 0, P: 0, T: 0 };
   
   state.rankedCards.forEach((card, idx) => {
@@ -587,11 +591,9 @@ async function showResult() {
     }
   });
 
-  // Calculate Coordinates
   const x = scores.T - scores.P;
   const y = scores.D - scores.I;
 
-  // 2. COORDINATE CALCULATION & KEY MAPPING (SINGULAR KEYS)
   const getResultKey = (cx, cy) => {
     if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
     if (cy >= 0) return cx >= 0 ? "DATA_THING" : "DATA_PEOPLE";
@@ -600,8 +602,8 @@ async function showResult() {
 
   const key = getResultKey(x, y);
   
-  renderReport(key, scores, x, y); // Render first
-  transition(el.adsOverlay, el.resultSection, 'block'); // Then show
+  renderReport(key, scores, x, y); 
+  transition(el.adsOverlay, el.resultSection, 'block'); 
   generateAIReport();
 }
 
@@ -621,7 +623,6 @@ function renderReport(key, scores, x, y) {
   if (el.resSummary) el.resSummary.textContent = data.summary;
   if (el.resTag) el.resTag.textContent = key;
   
-  // TRAITS & ENERGY
   if (el.resTraits) {
     el.resTraits.textContent = data.traits?.desc || (typeof data.traits === 'string' ? data.traits : "");
     if(el.resEnergy && el.resEnergyContainer) {
@@ -630,32 +631,27 @@ function renderReport(key, scores, x, y) {
     }
   }
   
-  // JOBS
   if (el.resJobs) {
     const jobs = data.job_families || data.jobs || [];
     el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
   }
 
-  // MAJORS
   if (el.resMajors) {
     const majors = data.majors || [];
     el.resMajors.innerHTML = majors.map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
   }
 
-  // NCS CODES
   if (el.resNCS && el.resNCSContainer) {
     const ncs = data.ncs_codes || [];
     el.resNCS.innerHTML = ncs.map(c => `<li>${c}</li>`).join('');
     el.resNCSContainer.style.display = ncs.length > 0 ? 'block' : 'none';
   }
 
-  // GUIDE
   if (el.resGuide && el.resGuideContainer) {
     el.resGuide.textContent = data.activity_guide || "";
     el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none';
   }
 
-  // ROLE MODELS
   if (el.resRoleModels) {
     const rmodels = data.role_models || [];
     el.resRoleModels.innerHTML = rmodels.map(m => {
@@ -665,7 +661,6 @@ function renderReport(key, scores, x, y) {
     }).join('');
   }
 
-  // Animate Propensity Bars
   const max = Math.max(scores.D, scores.I, scores.P, scores.T, 1);
   ['D','I','P','T'].forEach(k => {
     const sEl = document.getElementById(`score-${k}`);
@@ -676,7 +671,6 @@ function renderReport(key, scores, x, y) {
     }
   });
 
-  // Interpersonal Map Pointer
   const pointer = document.getElementById('result-pointer');
   if (pointer && window.gsap) {
     gsap.to(pointer, {
@@ -714,30 +708,23 @@ async function generateAIReport() {
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
   
-  // 1. Hide previous
   from.classList.add('hidden');
   from.style.display = 'none';
 
-  // 2. Prepare new
   to.classList.remove('hidden');
   to.style.display = display;
   
-  // 3. FORCE SCROLL TO TOP IMMEDIATELY
-  window.scrollTo(0, 0);
+  // IMMEDIATELY FORCE SCROLL TO TOP
+  window.scrollTo({ top: 0, behavior: 'instant' });
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
   
-  // Extra safety for some browsers/devices
   setTimeout(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, 10);
 
-  // 4. ANIMATION (CLEAN FADE IN)
   if (window.gsap) {
-    // Reset any previous transforms first
     gsap.set(to, { clearProps: "all" });
-    
-    // Animate opacity only, start at y:0 to ensure it renders at top
     gsap.fromTo(to, 
       { opacity: 0, y: 0 },
       { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", clearProps: "all" }

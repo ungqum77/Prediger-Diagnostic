@@ -10,15 +10,16 @@ html, body {
   height: auto;
   min-height: 100%;
   overflow-x: hidden;
-  scroll-behavior: auto !important; 
+  /* Allow natural scrolling */
+  overflow-y: visible !important;
+  scroll-behavior: smooth;
 }
 
 body {
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   background-color: var(--bg-main);
   color: #1E293B;
-  /* CRITICAL: Enforce top alignment flow */
   display: flex;
   flex-direction: column;
   justify-content: flex-start !important; 
@@ -26,13 +27,13 @@ body {
 }
 
 #app {
-  /* Ensure app container starts from top */
   display: flex;
   flex-direction: column;
   justify-content: flex-start !important;
   align-items: center;
   width: 100%;
   min-height: 100vh;
+  padding-bottom: 50px;
 }
 
 section {
@@ -41,6 +42,8 @@ section {
   justify-content: flex-start;
   width: 100%;
   max-width: 1550px;
+  /* Ensure sections don't lock scroll */
+  overflow: visible !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
