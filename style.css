@@ -123,7 +123,6 @@ section {
 }
 
 .pdf-export-mode * {
-  /* Prevent cutting off text */
   page-break-inside: avoid;
 }
 

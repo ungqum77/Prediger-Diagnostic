@@ -39,7 +39,7 @@ const STRINGS = {
     r3TextSelected: '순위 결정됨',
     btnR3Next: '분석 리포트 생성하기',
     anaStatusText: '심층 분석을 진행 중입니다...',
-    textReportFor: '최종 분석 결과',
+    textReportFor: '최종 분석 결과 리포트',
     labelAi: 'AI 종합 분석 리포트',
     labelAiSub: '핵심 흥미 분석',
     labelMap: '흥미 유형 맵 (Interpersonal Map)',
@@ -55,6 +55,8 @@ const STRINGS = {
     labelAxisIdeas: '사고 (Ideas)',
     labelAxisPeople: '사람 (People)',
     labelAxisThings: '사물 (Things)',
+    labelInterestTitle: '당신의 핵심 흥미 발견',
+    labelGalleryTitle: '당신이 선택한 9장의 키워드',
     btnRestart: '다시 진단하기',
     btnDownload: 'PDF 리포트 저장하기',
     aiLoading: '분석 결과를 정리하고 있습니다...',
@@ -96,6 +98,8 @@ const STRINGS = {
     labelAxisIdeas: 'Ideas',
     labelAxisPeople: 'People',
     labelAxisThings: 'Things',
+    labelInterestTitle: 'Discovery of Your Core Interests',
+    labelGalleryTitle: 'Your Top 9 Keywords',
     btnRestart: 'Restart Diagnosis',
     btnDownload: 'Download PDF Report',
     aiLoading: 'Generating insights...',
@@ -139,7 +143,6 @@ const el = {
   aiResult: document.getElementById('ai-result'),
   aiLoader: document.getElementById('ai-loader'),
   
-  // Results Injection
   resTitle: document.getElementById('result-title'),
   resSummary: document.getElementById('result-summary'),
   resTraits: document.getElementById('result-traits'),
@@ -153,6 +156,7 @@ const el = {
   resGuideContainer: document.getElementById('guide-container'),
   resRoleModels: document.getElementById('result-role-models'),
   resTag: document.getElementById('result-tag'),
+  resGallery: document.getElementById('result-gallery-grid'),
   
   btnDownloadPdf: document.getElementById('btn-download-pdf')
 };
@@ -189,14 +193,12 @@ function init() {
 function downloadPDF() {
   const element = document.getElementById('result-content-container');
   const btn = el.btnDownloadPdf;
-  
   if (!element) return;
   
   const originalText = btn.innerHTML;
   btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> PDF 리포트 생성 중...`;
   btn.disabled = true;
 
-  // Optimized class for export to avoid cut-off and ensure centering
   element.classList.add('pdf-export-mode');
 
   const opt = {
@@ -243,8 +245,6 @@ function toggleLanguage() {
 
 function updateUIStrings() {
   const s = STRINGS[state.lang];
-  
-  // Mapping labels to IDs
   const idMap = {
     'heroTitle': 'hero-title',
     'heldListTitle': 'held-list-title',
@@ -274,6 +274,8 @@ function updateUIStrings() {
     'labelAxisIdeas': 'label-axis-ideas',
     'labelAxisPeople': 'label-axis-people',
     'labelAxisThings': 'label-axis-things',
+    'labelInterestTitle': 'label-interest-title',
+    'labelGalleryTitle': 'label-gallery-title',
     'btnRestart': 'btn-restart-text',
     'btnDownload': 'btn-download-text',
     'anaStatusText': 'ana-status-text'
@@ -290,19 +292,10 @@ function updateUIStrings() {
     }
   });
 
-  // Overrides for button spans not matching ID pattern
   const startBtn = document.getElementById('btn-start');
   if (startBtn) {
     const span = startBtn.querySelector('span');
     if (span) span.textContent = s.btnStart;
-  }
-  
-  const downloadBtn = document.getElementById('btn-download-pdf');
-  if (downloadBtn) {
-    const textSpan = downloadBtn.lastChild;
-    if (textSpan && textSpan.nodeType === 3) {
-      textSpan.textContent = " " + s.btnDownload;
-    }
   }
 }
 
@@ -351,38 +344,30 @@ async function loadData() {
 function renderStack() {
   if (!el.cardStack) return;
   el.cardStack.innerHTML = '';
-  
   const isMain = state.currentSortingStep === 'main';
   const currentPool = isMain ? state.cards : state.heldCards;
   const s = STRINGS[state.lang];
-  
   const titleEl = document.getElementById('sorting-title');
   const subtitleEl = document.getElementById('sorting-subtitle');
   if (titleEl) titleEl.textContent = isMain ? s.sortingTitleMain : s.sortingTitleHold;
   if (subtitleEl) subtitleEl.textContent = isMain ? s.sortingSubtitleMain : s.sortingSubtitleHold;
-  
   const indicators = document.querySelectorAll('#phase-indicator .phase-badge');
   indicators.forEach((ind, idx) => {
     ind.classList.toggle('active', (isMain && idx === 0) || (!isMain && idx === 1));
     ind.classList.toggle('done', !isMain && idx === 0);
   });
-
   const btnPass = document.getElementById('btn-swipe-up');
   if (btnPass) btnPass.style.display = isMain ? 'flex' : 'none';
-
   const stack = currentPool.slice(state.currentIndex, state.currentIndex + 3).reverse();
-  
   stack.forEach((card, i) => {
     const isTop = i === stack.length - 1;
     const cardEl = document.createElement('div');
     cardEl.className = 'card-item';
-    
     const modeData = card[state.mode];
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
     const keyword = card[keywordKey] || card.keyword;
     const imgFolder = state.mode === 'child' ? 'kids' : 'adult';
     const imgPath = `/assets/images/${imgFolder}/${modeData.img}`;
-    
     cardEl.innerHTML = `
       <div class="relative w-full h-[55%] bg-slate-100 overflow-hidden">
         <img src="${imgPath}" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
@@ -391,18 +376,15 @@ function renderStack() {
         ${isMain ? '<div class="stamp stamp-hold">HELD</div>' : ''}
       </div>
       <div class="px-6 py-4 h-[45%] bg-white flex flex-col items-center justify-center text-center overflow-hidden">
-        <h3 class="leading-tight shrink-0">${keyword}</h3>
-        <p class="mt-1 text-slate-500 overflow-hidden line-clamp-3">${modeData.desc}</p>
+        <h3 class="leading-tight shrink-0 text-xl font-black">${keyword}</h3>
+        <p class="mt-1 text-slate-500 overflow-hidden line-clamp-3 font-medium">${modeData.desc}</p>
       </div>
       <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-xl px-2 py-1 rounded-lg text-[8px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest shadow-sm">
         ${card.dimension}
       </div>
     `;
-
     const depth = stack.length - 1 - i;
-    if (window.gsap) {
-      gsap.set(cardEl, { scale: 1 - depth * 0.05, y: depth * 15, zIndex: i });
-    }
+    if (window.gsap) gsap.set(cardEl, { scale: 1 - depth * 0.05, y: depth * 15, zIndex: i });
     el.cardStack.appendChild(cardEl);
     if (isTop) setupDraggable(cardEl, card);
   });
@@ -412,7 +394,6 @@ function renderStack() {
 function setupDraggable(cardEl, cardData) {
   if (typeof Draggable === 'undefined') return;
   const isMain = state.currentSortingStep === 'main';
-
   Draggable.create(cardEl, {
     type: isMain ? "x,y" : "x",
     onDrag: function() {
@@ -420,7 +401,6 @@ function setupDraggable(cardEl, cardData) {
       const likeStamp = cardEl.querySelector('.stamp-like');
       const nopeStamp = cardEl.querySelector('.stamp-nope');
       const holdStamp = cardEl.querySelector('.stamp-hold');
-      
       if (likeStamp) gsap.set(likeStamp, { opacity: Math.max(0, Math.min(1, this.x / 100)) });
       if (nopeStamp) gsap.set(nopeStamp, { opacity: Math.max(0, Math.min(1, -this.x / 100)) });
       if (isMain && holdStamp) gsap.set(holdStamp, { opacity: Math.max(0, Math.min(1, Math.abs(this.y) / 100)) });
@@ -447,51 +427,20 @@ function swipe(dir) {
 function handleSwipe(dir, cardEl, cardData) {
   let x = 0, y = 0, rot = 0;
   const isMain = state.currentSortingStep === 'main';
-
-  if (dir === 'right') { 
-    x = 800; rot = 45; 
-    state.likedCards.push(cardData); 
-    addToThumbnailList(cardData, 'liked'); 
-  }
-  else if (dir === 'left') { 
-    x = -800; rot = -45; 
-    state.rejectedCards.push(cardData); 
-  }
-  else if (isMain && (dir === 'up' || dir === 'down')) { 
-    y = dir === 'up' ? -800 : 800; 
-    state.heldCards.push(cardData); 
-    addToThumbnailList(cardData, 'held');
-  } else {
-    if (window.gsap) {
-       gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" });
-       return;
-    }
-  }
-
-  if (window.gsap) {
-    gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, onComplete: () => {
-      state.currentIndex++;
-      checkSortingCompletion();
-    }});
-  } else {
-    state.currentIndex++;
-    checkSortingCompletion();
-  }
+  if (dir === 'right') { x = 800; rot = 45; state.likedCards.push(cardData); addToThumbnailList(cardData, 'liked'); }
+  else if (dir === 'left') { x = -800; rot = -45; state.rejectedCards.push(cardData); }
+  else if (isMain && (dir === 'up' || dir === 'down')) { y = dir === 'up' ? -800 : 800; state.heldCards.push(cardData); addToThumbnailList(cardData, 'held'); }
+  else { if (window.gsap) gsap.to(cardEl, { x: 0, y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.7)" }); return; }
+  if (window.gsap) gsap.to(cardEl, { x, y, rotation: rot, opacity: 0, duration: 0.5, onComplete: () => { state.currentIndex++; checkSortingCompletion(); }});
+  else { state.currentIndex++; checkSortingCompletion(); }
 }
 
 function checkSortingCompletion() {
   const currentPool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
   if (state.currentIndex >= currentPool.length) {
-    if (state.currentSortingStep === 'main' && state.heldCards.length > 0) {
-      state.currentSortingStep = 'hold';
-      state.currentIndex = 0;
-      renderStack();
-    } else {
-      finishSorting();
-    }
-  } else {
-    renderStack();
-  }
+    if (state.currentSortingStep === 'main' && state.heldCards.length > 0) { state.currentSortingStep = 'hold'; state.currentIndex = 0; renderStack(); }
+    else { finishSorting(); }
+  } else { renderStack(); }
 }
 
 function addToThumbnailList(card, target) {
@@ -501,13 +450,9 @@ function addToThumbnailList(card, target) {
   const imgPath = `/assets/images/${imgFolder}/${card[state.mode].img}`;
   const keywordKey = 'keyword_' + state.lang.toLowerCase();
   const keyword = card[keywordKey] || card.keyword;
-  
   const item = document.createElement('div');
   item.className = 'liked-thumb';
-  item.innerHTML = `
-    <img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
-    <div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>
-  `;
+  item.innerHTML = `<img src="${imgPath}" class="w-full h-full object-cover" title="${keyword}" onerror="this.src='https://placehold.co/100x130?text=${keyword}'"><div class="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-[8px] text-white font-black text-center">${keyword}</div>`;
   listEl.appendChild(item);
 }
 
@@ -517,19 +462,12 @@ function updateProgress() {
   const p = (state.currentIndex / currentPool.length) * 100;
   if (el.progressBar) el.progressBar.style.width = `${p}%`;
   if (el.progressText) el.progressText.textContent = `${state.currentIndex} / ${currentPool.length}`;
-  
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
-  if (el.countHold) {
-    const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex);
-    el.countHold.textContent = Math.max(0, heldCount);
-  }
+  if (el.countHold) { const heldCount = isMain ? state.heldCards.length : (state.heldCards.length - state.currentIndex); el.countHold.textContent = Math.max(0, heldCount); }
   if (el.countNope) el.countNope.textContent = state.rejectedCards.length;
 }
 
-function finishSorting() {
-  renderSelect9Grid();
-  transition(el.sortingSection, el.select9Section, 'flex');
-}
+function finishSorting() { renderSelect9Grid(); transition(el.sortingSection, el.select9Section, 'flex'); }
 
 // --- STEP 4: SELECT TOP 9 ---
 function renderSelect9Grid() {
@@ -537,204 +475,186 @@ function renderSelect9Grid() {
   el.s9Grid.innerHTML = '';
   state.top9Cards = [];
   updateS9UI();
-  
-  const s = STRINGS[state.lang];
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
     const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
-    
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group';
-    cardEl.innerHTML = `
-      <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
-      <div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div>
-      <div class="badge-container"></div>
-    `;
-    cardEl.onclick = () => {
-      const idx = state.top9Cards.findIndex(c => c.id === card.id);
-      if (idx > -1) state.top9Cards.splice(idx, 1);
-      else if (state.top9Cards.length < 9) state.top9Cards.push(card);
-      updateS9UI();
-    };
+    cardEl.innerHTML = `<img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://placehold.co/400x500?text=${keyword}'"><div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div><div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div><div class="badge-container"></div>`;
+    cardEl.onclick = () => { const idx = state.top9Cards.findIndex(c => c.id === card.id); if (idx > -1) state.top9Cards.splice(idx, 1); else if (state.top9Cards.length < 9) state.top9Cards.push(card); updateS9UI(); };
     el.s9Grid.appendChild(cardEl);
   });
 }
 
 function updateS9UI() {
   if (!el.s9Grid) return;
-  Array.from(el.s9Grid.children).forEach((cardEl, i) => {
-    const cardData = state.likedCards[i];
-    const isSelected = state.top9Cards.some(c => c.id === cardData.id);
-    cardEl.classList.toggle('selected', isSelected);
-  });
+  Array.from(el.s9Grid.children).forEach((cardEl, i) => { const cardData = state.likedCards[i]; const isSelected = state.top9Cards.some(c => c.id === cardData.id); cardEl.classList.toggle('selected', isSelected); });
   if (el.s9Count) el.s9Count.textContent = state.top9Cards.length;
-  if (el.btnS9Next) {
-    el.btnS9Next.disabled = state.top9Cards.length !== 9;
-    el.btnS9Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
-  }
+  if (el.btnS9Next) { el.btnS9Next.disabled = state.top9Cards.length !== 9; el.btnS9Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.top9Cards.length === 9 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`; }
 }
 
 // --- STEP 5: RANK TOP 3 ---
-function startRanking() {
-  renderRank3Grid();
-  transition(el.select9Section, el.rank3Section, 'flex');
-}
+function startRanking() { renderRank3Grid(); transition(el.select9Section, el.rank3Section, 'flex'); }
 
 function renderRank3Grid() {
   if (!el.r3Grid) return;
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
   updateR3UI();
-
   state.top9Cards.forEach(card => {
     const cardEl = document.createElement('div');
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
     const keyword = card[keywordKey] || card.keyword;
     const folder = state.mode === 'child' ? 'kids' : 'adult';
-    
     cardEl.className = 'selection-card relative rounded-2xl overflow-hidden cursor-pointer aspect-[3/4] shadow-md bg-white border border-slate-100 group w-full';
-    cardEl.innerHTML = `
-      <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div>
-      <div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div>
-      <div class="badge-container"></div>
-    `;
-    cardEl.onclick = () => {
-      const idx = state.rankedCards.findIndex(c => c.id === card.id);
-      if (idx > -1) state.rankedCards.splice(idx, 1);
-      else if (state.rankedCards.length < 3) state.rankedCards.push(card);
-      updateR3UI();
-    };
+    cardEl.innerHTML = `<img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=${keyword}'"><div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent"></div><div class="absolute bottom-3 left-3 right-3"><h4 class="text-white font-black text-[10px] truncate">${keyword}</h4></div><div class="badge-container"></div>`;
+    cardEl.onclick = () => { const idx = state.rankedCards.findIndex(c => c.id === card.id); if (idx > -1) state.rankedCards.splice(idx, 1); else if (state.rankedCards.length < 3) state.rankedCards.push(card); updateR3UI(); };
     el.r3Grid.appendChild(cardEl);
   });
 }
 
 function updateR3UI() {
   if (!el.r3Grid) return;
-  Array.from(el.r3Grid.children).forEach((cardEl, i) => {
-    const cardData = state.top9Cards[i];
-    const rankIdx = state.rankedCards.findIndex(c => c.id === cardData.id);
-    cardEl.classList.toggle('selected', rankIdx > -1);
-    const badge = cardEl.querySelector('.badge-container');
-    if (badge) badge.innerHTML = rankIdx > -1 ? `<div class="rank-badge">${rankIdx + 1}</div>` : '';
-  });
+  Array.from(el.r3Grid.children).forEach((cardEl, i) => { const cardData = state.top9Cards[i]; const rankIdx = state.rankedCards.findIndex(c => c.id === cardData.id); cardEl.classList.toggle('selected', rankIdx > -1); const badge = cardEl.querySelector('.badge-container'); if (badge) badge.innerHTML = rankIdx > -1 ? `<div class="rank-badge">${rankIdx + 1}</div>` : ''; });
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
-  if (el.btnR3Next) {
-    el.btnR3Next.disabled = state.rankedCards.length !== 3;
-    el.btnR3Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`;
-  }
+  if (el.btnR3Next) { el.btnR3Next.disabled = state.rankedCards.length !== 3; el.btnR3Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`; }
 }
 
 // --- STEP 6: ANALYSIS & ADS ---
-function startAnalysis() {
-  transition(el.rank3Section, el.adsOverlay, 'flex');
-  setTimeout(() => {
-    if (el.btnSkipAd) el.btnSkipAd.classList.remove('hidden');
-  }, 4000);
+function startAnalysis() { transition(el.rank3Section, el.adsOverlay, 'flex'); setTimeout(() => { if (el.btnSkipAd) el.btnSkipAd.classList.remove('hidden'); }, 4000); }
+
+// --- STEP 7: FINAL RESULT & ALGORITHM ---
+
+/**
+ * 프레디저(Prediger) 이론 '일의 세계 지도' 원리에 따른 결과 산출 알고리즘
+ * 1. 점수 집계 (D, I, P, T)
+ * 2. CENTER(미분화) 판별 (1순위-4순위 차이 <= 2)
+ * 3. 단일 vs 복합 유형 판별 (1순위-2순위 차이 >= 3 이면 단일)
+ * 4. Bipolar(반대성향) 예외 처리 (D-I, P-T는 섞일 수 없음)
+ */
+function calculateResultKey(scores) {
+  // 점수 객체를 배열로 변환하여 내림차순 정렬
+  const ranks = Object.entries(scores)
+    .map(([key, score]) => ({ key, score }))
+    .sort((a, b) => b.score - a.score);
+
+  const r1 = ranks[0]; // 1순위
+  const r2 = ranks[1]; // 2순위
+  const r3 = ranks[2]; // 3순위
+  const r4 = ranks[3]; // 4순위 (꼴찌)
+
+  // 1. CENTER 판별: 가장 높은 점수와 가장 낮은 점수의 차이가 2 이하일 때
+  if (r1.score - r4.score <= 2) {
+    return "CENTER";
+  }
+
+  // 2. 단일 유형 판별: 1순위와 2순위의 차이가 3 이상일 때
+  if (r1.score - r2.score >= 3) {
+    return r1.key;
+  }
+
+  // 3. Bipolar(반대 성향) 체크: D-I 혹은 P-T 조합은 복합 유형이 될 수 없음
+  const isBipolar = (
+    (r1.key === 'D' && r2.key === 'I') || (r1.key === 'I' && r2.key === 'D') ||
+    (r1.key === 'P' && r2.key === 'T') || (r1.key === 'T' && r2.key === 'P')
+  );
+
+  if (isBipolar) {
+    // 반대 성향이면 1순위 단일 유형으로 결정
+    return r1.key;
+  }
+
+  // 4. 복합 유형 결정: 1순위와 2순위 결합 (알파벳 순서가 아닌 점수 순서로 결합)
+  // contentsDB의 키값 규약에 따라 정렬 (예: DT, DP 등)
+  return r1.key + r2.key;
 }
 
-// --- STEP 7: FINAL RESULT ---
 async function showResult() {
   const scores = { D: 0, I: 0, P: 0, T: 0 };
+  
+  // 1. 모든 선택된 카드(liked) 기본 1점
+  state.likedCards.forEach(card => {
+    if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += 1;
+  });
+
+  // 2. 핵심 Top 3 가중치 부여 (1등 +5, 2등 +4, 3등 +3)
   state.rankedCards.forEach((card, idx) => {
-    const pts = 5 - idx;
-    if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += pts;
-  });
-  state.top9Cards.forEach(card => {
-    const isRanked = state.rankedCards.some(rc => rc.id === card.id);
-    if (!isRanked && card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += 1;
+    const bonus = 5 - idx;
+    if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += bonus;
   });
 
-  const x = scores.T - scores.P;
-  const y = scores.D - scores.I;
-
-  const getResultKey = (cx, cy) => {
-    if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2) return "CENTER";
-    if (cy >= 0) return cx >= 0 ? "DATA_THINGS" : "DATA_PEOPLE";
-    else return cx >= 0 ? "IDEAS_THINGS" : "IDEAS_PEOPLE";
-  };
-
-  const key = getResultKey(x, y);
-  renderReport(key, scores, x, y); 
+  // 새 알고리즘 적용
+  const finalKey = calculateResultKey(scores);
+  
+  // 결과 데이터 기반 렌더링
+  renderReport(finalKey, scores); 
   transition(el.adsOverlay, el.resultSection, 'block'); 
   generateAIReport();
 }
 
-function renderReport(key, scores, x, y) {
+function renderReport(key, scores) {
   const data = state.contentsDB[key] || state.contentsDB["CENTER"] || { 
     title: "균형 잡힌 탐험가", 
     summary: "다양한 분야에 고루 흥미를 가지고 있습니다.", 
     traits: { desc: "유연한 관심사.", energy: "상황에 적응함." },
     job_families: [],
     majors: [],
-    ncs_codes: [],
-    role_models: [],
     activity_guide: "다양한 활동을 시도해보세요."
   };
 
-  if (el.resTitle) el.resTitle.textContent = data.title;
+  if (el.resTitle) el.resTitle.innerHTML = `<span class="text-blue-600">${data.title}</span> 타입입니다.`;
   if (el.resSummary) el.resSummary.textContent = data.summary;
   if (el.resTag) el.resTag.textContent = key;
-  
-  if (el.resTraits) {
-    el.resTraits.textContent = data.traits?.desc || (typeof data.traits === 'string' ? data.traits : "");
-    if(el.resEnergy && el.resEnergyContainer) {
-        el.resEnergy.textContent = data.traits?.energy || "";
-        el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
-    }
+  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || (typeof data.traits === 'string' ? data.traits : "");
+  if (el.resEnergy && el.resEnergyContainer) {
+    el.resEnergy.textContent = data.traits?.energy || "";
+    el.resEnergyContainer.style.display = data.traits?.energy ? 'block' : 'none';
   }
-  
-  if (el.resJobs) {
-    const jobs = data.job_families || data.jobs || [];
-    el.resJobs.innerHTML = jobs.map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
+  if (el.resJobs) el.resJobs.innerHTML = (data.job_families || []).map(j => `<span class="px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl text-sm font-black border border-blue-100">${j}</span>`).join('');
+  if (el.resMajors) el.resMajors.innerHTML = (data.majors || []).map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
+  if (el.resGuide && el.resGuideContainer) { el.resGuide.textContent = data.activity_guide || ""; el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none'; }
+
+  if (el.resGallery) {
+      el.resGallery.innerHTML = '';
+      state.top9Cards.forEach(card => {
+          const cardEl = document.createElement('div');
+          const rankIdx = state.rankedCards.findIndex(rc => rc.id === card.id);
+          const folder = state.mode === 'child' ? 'kids' : 'adult';
+          const keywordKey = 'keyword_' + state.lang.toLowerCase();
+          const keyword = card[keywordKey] || card.keyword;
+          cardEl.className = 'relative rounded-xl overflow-hidden aspect-[3/4] shadow-sm border border-slate-100 bg-white group';
+          cardEl.innerHTML = `
+              <img src="/assets/images/${folder}/${card[state.mode].img}" class="w-full h-full object-cover grayscale-[0.2]" onerror="this.src='https://placehold.co/400x500?text=${keyword}'">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
+              <div class="absolute bottom-2 left-2 right-2 text-center text-white text-[9px] font-black uppercase truncate">${keyword}</div>
+              ${rankIdx > -1 ? `<div class="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white shadow-lg ${getRankColorClass(rankIdx)} text-white">${rankIdx + 1}</div>` : ''}
+          `;
+          el.resGallery.appendChild(cardEl);
+      });
   }
 
-  if (el.resMajors) {
-    const majors = data.majors || [];
-    el.resMajors.innerHTML = majors.map(m => `<span class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-100">${m}</span>`).join('');
-  }
-
-  if (el.resNCS && el.resNCSContainer) {
-    const ncs = data.ncs_codes || [];
-    el.resNCS.innerHTML = ncs.map(c => `<li>${c}</li>`).join('');
-    el.resNCSContainer.style.display = ncs.length > 0 ? 'block' : 'none';
-  }
-
-  if (el.resGuide && el.resGuideContainer) {
-    el.resGuide.textContent = data.activity_guide || "";
-    el.resGuideContainer.style.display = data.activity_guide ? 'block' : 'none';
-  }
-
-  if (el.resRoleModels) {
-    const rmodels = data.role_models || [];
-    el.resRoleModels.innerHTML = rmodels.map(m => {
-       const name = typeof m === 'object' ? m.name : m;
-       const desc = typeof m === 'object' ? m.desc : '';
-       return `<span class="inline-flex flex-col bg-slate-50 px-4 py-2 rounded-xl border border-slate-100"><strong class="text-slate-800 text-sm">${name}</strong><small class="text-slate-500 text-xs">${desc}</small></span>`;
-    }).join('');
-  }
-
-  const max = Math.max(scores.D, scores.I, scores.P, scores.T, 1);
+  const max = Math.max(...Object.values(scores), 1);
   ['D','I','P','T'].forEach(k => {
     const sEl = document.getElementById(`score-${k}`);
     const bEl = document.getElementById(`bar-${k}`);
     if (sEl) sEl.textContent = scores[k];
-    if (bEl && window.gsap) {
-       gsap.to(bEl, { width: `${(scores[k]/max)*100}%`, duration: 1.5, ease: "power4.out" });
-    }
+    if (bEl && window.gsap) gsap.to(bEl, { width: `${(scores[k]/max)*100}%`, duration: 1.5, ease: "power4.out" });
   });
 
   const pointer = document.getElementById('result-pointer');
   if (pointer && window.gsap) {
+    const xCoord = scores.T - scores.P;
+    const yCoord = scores.D - scores.I;
     gsap.to(pointer, {
-      left: `calc(50% + ${Math.max(-1, Math.min(1, x/15))*50}%)`,
-      top: `calc(50% + ${-Math.max(-1, Math.min(1, y/15))*50}%)`,
+      left: `calc(50% + ${Math.max(-1, Math.min(1, xCoord/15))*50}%)`,
+      top: `calc(50% + ${-Math.max(-1, Math.min(1, yCoord/15))*50}%)`,
       opacity: 1, duration: 2, ease: "elastic.out(1, 0.4)", delay: 0.5
     });
   }
 }
+
+function getRankColorClass(rank) { if (rank === 0) return 'bg-amber-400'; if (rank === 1) return 'bg-slate-400'; if (rank === 2) return 'bg-orange-400'; return 'bg-blue-600'; }
 
 async function generateAIReport() {
   if (!el.aiLoader || !el.aiResult) return;
@@ -744,48 +664,27 @@ async function generateAIReport() {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
     const keywords = state.rankedCards.map(c => c[keywordKey]).join(", ");
-    const prompt = state.lang === 'KR' 
-      ? `상위 키워드: ${keywords}. 이 사용자의 프레디저 흥미 유형을 분석하고, 조언을 4문장으로 따뜻하게 해주세요.`
-      : `Keywords: ${keywords}. Analyze this Prediger profile and give career advice in 4 sentences.`;
+    const prompt = state.lang === 'KR' ? `상위 키워드: ${keywords}. 이 사용자의 프레디저 흥미 유형을 분석하고, 조언을 4문장으로 따뜻하게 해주세요.` : `Keywords: ${keywords}. Analyze this Prediger profile and give career advice in 4 sentences.`;
     const res = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
     el.aiLoader.classList.add('hidden');
-    el.aiResult.innerHTML = `<div class="text-blue-50 font-medium leading-relaxed">${res.text}</div>`;
+    el.aiResult.innerHTML = `<div class="text-slate-50 font-medium leading-relaxed">${res.text}</div>`;
     el.aiResult.classList.remove('hidden');
-    if (window.gsap) {
-      gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
-    }
-  } catch (err) { 
-    el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">분석 결과를 불러올 수 없습니다.</p>`; 
-  }
+    if (window.gsap) gsap.from(el.aiResult, { opacity: 0, y: 20, duration: 0.8 });
+  } catch (err) { el.aiLoader.innerHTML = `<p class="text-xs text-blue-100/50">분석 결과를 불러올 수 없습니다.</p>`; }
 }
 
-// --- UTILS ---
 function transition(from, to, display = 'block') {
   if (!from || !to) return;
-  
   from.classList.add('hidden');
   from.style.display = 'none';
-
   to.classList.remove('hidden');
   to.style.display = display;
-  
-  // RESET SCROLL
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
-  
   setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
-
-  if (window.gsap) {
-    gsap.set(to, { clearProps: "all" });
-    gsap.fromTo(to, 
-      { opacity: 0, y: 0 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", clearProps: "all" }
-    );
-  } else {
-    to.style.opacity = '1';
-    to.style.transform = 'none';
-  }
+  if (window.gsap) { gsap.set(to, { clearProps: "all" }); gsap.fromTo(to, { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", clearProps: "all" }); }
+  else { to.style.opacity = '1'; to.style.transform = 'none'; }
 }
 
 document.addEventListener('DOMContentLoaded', init);
