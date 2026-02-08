@@ -516,7 +516,7 @@ function renderRank3Grid() {
 
 function updateR3UI() {
   if (!el.r3Grid) return;
-  Array.from(el.r3Grid.children).forEach((cardEl, i) => { const cardData = state.top9Cards[i]; const rankIdx = state.rankedCards.findIndex(c => c.id === cardData.id); cardEl.classList.toggle('selected', rankIdx > -1); const badge = cardEl.querySelector('.badge-container'); if (badge) badge.innerHTML = rankIdx > -1 ? `<div class="rank-badge">${rankIdx + 1}</div>` : ''; });
+  Array.from(el.r3Grid.children).forEach((cardEl, i) => { const cardData = state.top9Cards[i]; const rankIdx = state.rankedCards.findIndex(c => c.id === cardData.id); cardEl.classList.toggle('selected', rankIdx > -1); const badge = cardEl.querySelector('.badge-container'); if (badge) badge.innerHTML = rankIdx > -1 ? `<div class=\"rank-badge\">${rankIdx + 1}</div>` : ''; });
   if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
   if (el.btnR3Next) { el.btnR3Next.disabled = state.rankedCards.length !== 3; el.btnR3Next.className = `w-full sm:w-[320px] py-4 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3 ${state.rankedCards.length === 3 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-400'}`; }
 }
@@ -527,67 +527,68 @@ function startAnalysis() { transition(el.rank3Section, el.adsOverlay, 'flex'); s
 // --- STEP 7: FINAL RESULT & ALGORITHM ---
 
 /**
- * 프레디저(Prediger) 이론 '일의 세계 지도' 원리에 따른 결과 산출 알고리즘
- * 1. 점수 집계 (D, I, P, T)
- * 2. CENTER(미분화) 판별 (1순위-4순위 차이 <= 2)
- * 3. 단일 vs 복합 유형 판별 (1순위-2순위 차이 >= 3 이면 단일)
- * 4. Bipolar(반대성향) 예외 처리 (D-I, P-T는 섞일 수 없음)
+ * 프레디저(Prediger) 진단 결과 산출 [순위 및 격차 기반 알고리즘]
+ * 로직 담당: 시니어 백엔드 개발자
  */
 function calculateResultKey(scores) {
-  // 점수 객체를 배열로 변환하여 내림차순 정렬
+  // 1. 점수 정렬 (Sorting): D, I, P, T를 내림차순 정렬
   const ranks = Object.entries(scores)
     .map(([key, score]) => ({ key, score }))
     .sort((a, b) => b.score - a.score);
 
-  const r1 = ranks[0]; // 1순위
-  const r2 = ranks[1]; // 2순위
-  const r3 = ranks[2]; // 3순위
-  const r4 = ranks[3]; // 4순위 (꼴찌)
+  const r1 = ranks[0]; // 1위 (1st)
+  const r2 = ranks[1]; // 2위 (2nd)
+  const r3 = ranks[2]; // 3위 (3rd)
+  const r4 = ranks[3]; // 4위 (4th)
 
-  // 1. CENTER 판별: 가장 높은 점수와 가장 낮은 점수의 차이가 2 이하일 때
+  console.log(`[Algorithm Debug] Ranks: 1st(${r1.key}:${r1.score}), 2nd(${r2.key}:${r2.score}), 4th(${r4.key}:${r4.score})`);
+
+  // 2. CENTER(미분화) 판별 조건: (1st 점수) - (4th 점수) <= 2 일 때만 판정
+  // 예: I:19, D:1 사례의 경우 19-1=18 이므로 절대 CENTER가 아님.
   if (r1.score - r4.score <= 2) {
     return "CENTER";
   }
 
-  // 2. 단일 유형 판별: 1순위와 2순위의 차이가 3 이상일 때
+  // 3. 단일 유형(Dominant Type) 판별: (1st 점수) - (2nd 점수) >= 3 일 경우
+  // 예: I:19, P:4 사례의 경우 19-4=15 이므로 3 이상 격차 발생 -> 단일 유형 "I" 확정.
   if (r1.score - r2.score >= 3) {
     return r1.key;
   }
 
-  // 3. Bipolar(반대 성향) 체크: D-I 혹은 P-T 조합은 복합 유형이 될 수 없음
+  // 4. 복합 유형(Combination Type) 판별: (1st 점수) - (2nd 점수) <= 2 일 경우 (1, 2위가 비등)
+  // 반대 성향(Bipolar) 체크: (D와 I) 또는 (T와 P)는 섞일 수 없음
   const isBipolar = (
     (r1.key === 'D' && r2.key === 'I') || (r1.key === 'I' && r2.key === 'D') ||
-    (r1.key === 'P' && r2.key === 'T') || (r1.key === 'T' && r2.key === 'P')
+    (r1.key === 'T' && r2.key === 'P') || (r1.key === 'P' && r2.key === 'T')
   );
 
   if (isBipolar) {
-    // 반대 성향이면 1순위 단일 유형으로 결정
+    // 반대 성향이면 섞지 않고 1위 단일 유형으로 반환
     return r1.key;
   }
 
-  // 4. 복합 유형 결정: 1순위와 2순위 결합 (알파벳 순서가 아닌 점수 순서로 결합)
-  // contentsDB의 키값 규약에 따라 정렬 (예: DT, DP 등)
+  // 그 외의 조합은 1st + 2nd 복합 코드로 반환
   return r1.key + r2.key;
 }
 
 async function showResult() {
   const scores = { D: 0, I: 0, P: 0, T: 0 };
   
-  // 1. 모든 선택된 카드(liked) 기본 1점
+  // 가중치 산정 로직:
+  // 1. 좋아요한 모든 카드 기본 1점
   state.likedCards.forEach(card => {
     if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += 1;
   });
 
-  // 2. 핵심 Top 3 가중치 부여 (1등 +5, 2등 +4, 3등 +3)
+  // 2. 핵심 Top 3 가중치 (1위 +5, 2위 +4, 3위 +3)
   state.rankedCards.forEach((card, idx) => {
     const bonus = 5 - idx;
     if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += bonus;
   });
 
-  // 새 알고리즘 적용
+  // [Bug Fix] 순위 및 격차 기반 알고리즘 적용
   const finalKey = calculateResultKey(scores);
   
-  // 결과 데이터 기반 렌더링
   renderReport(finalKey, scores); 
   transition(el.adsOverlay, el.resultSection, 'block'); 
   generateAIReport();
