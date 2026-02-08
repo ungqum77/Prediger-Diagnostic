@@ -111,13 +111,20 @@ section {
 
 /* PDF Export mode specifically for alignment */
 .pdf-export-mode {
-  width: 1000px !important;
-  max-width: 1000px !important;
+  width: 800px !important;
+  max-width: 800px !important;
   margin: 0 auto !important;
-  padding: 60px !important;
+  padding: 40px !important;
   box-shadow: none !important;
   background: white !important;
   display: block !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+.pdf-export-mode * {
+  /* Prevent cutting off text */
+  page-break-inside: avoid;
 }
 
 .selection-card {

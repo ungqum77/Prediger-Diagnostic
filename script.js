@@ -36,25 +36,25 @@ const STRINGS = {
     btnS9Next: '다음 단계로 이동',
     r3Title: '최종 핵심 3장 순위 결정',
     r3Subtitle: '선택한 9장 중 가장 나다운 3장을 순서대로 클릭하세요.',
-    r3TextSelected: 'Ranked',
+    r3TextSelected: '순위 결정됨',
     btnR3Next: '분석 리포트 생성하기',
     anaStatusText: '심층 분석을 진행 중입니다...',
     textReportFor: '최종 분석 결과',
     labelAi: 'AI 종합 분석 리포트',
     labelAiSub: '핵심 흥미 분석',
-    labelMap: '흥미 유형 맵',
-    labelScores: '성향 점수',
-    labelTraits: '특성 분석',
-    labelEnergy: '에너지 흐름',
-    labelJobs: '추천 직업군',
-    labelMajors: '추천 학과',
-    labelNcs: 'NCS 코드',
-    labelGuide: '활동 가이드',
-    labelRoleModels: '추천 롤모델',
-    labelAxisData: 'Data (현실)',
-    labelAxisIdeas: 'Ideas (사고)',
-    labelAxisPeople: 'People (사람)',
-    labelAxisThings: 'Things (사물)',
+    labelMap: '흥미 유형 맵 (Interpersonal Map)',
+    labelScores: '성향 점수 분석 (Propensity Scores)',
+    labelTraits: '특성 분석 (Traits)',
+    labelEnergy: '에너지 흐름 (Energy Flow)',
+    labelJobs: '추천 직업군 (Careers)',
+    labelMajors: '추천 학과 (Majors)',
+    labelNcs: 'NCS 직무 코드',
+    labelGuide: '활동 가이드 (Guide)',
+    labelRoleModels: '추천 롤모델 (Role Models)',
+    labelAxisData: '현실 (Data)',
+    labelAxisIdeas: '사고 (Ideas)',
+    labelAxisPeople: '사람 (People)',
+    labelAxisThings: '사물 (Things)',
     btnRestart: '다시 진단하기',
     btnDownload: 'PDF 리포트 저장하기',
     aiLoading: '분석 결과를 정리하고 있습니다...',
@@ -193,23 +193,25 @@ function downloadPDF() {
   if (!element) return;
   
   const originalText = btn.innerHTML;
-  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> 리포트 생성 중...`;
+  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> PDF 리포트 생성 중...`;
   btn.disabled = true;
 
-  // Optimized class for export centering
+  // Optimized class for export to avoid cut-off and ensure centering
   element.classList.add('pdf-export-mode');
 
   const opt = {
-    margin: [0, 0, 0, 0],
+    margin: [20, 20, 20, 20],
     filename: `프레디저_진단리포트_${state.user.name || '사용자'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
       scale: 2, 
       useCORS: true,
       scrollY: 0,
-      windowWidth: 1000 // Desktop width for standard layout
+      windowWidth: 1024,
+      backgroundColor: '#ffffff'
     },
-    jsPDF: { unit: 'px', format: [1000, 1414], orientation: 'portrait', hotfixes: ['px_scaling'] }
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
   
   if (typeof html2pdf !== 'undefined') {
@@ -242,21 +244,43 @@ function toggleLanguage() {
 function updateUIStrings() {
   const s = STRINGS[state.lang];
   
-  // Header IDs
-  const headerKeys = [
-    'heroTitle', 'heldListTitle', 'likedListTitle', 'textExit', 
-    's9Title', 's9Subtitle', 's9TextSelected', 'btnS9Next', 
-    'r3Title', 'r3Subtitle', 'r3TextSelected', 'btnR3Next',
-    'textReportFor', 'labelAi', 'labelAiSub', 'labelMap', 
-    'labelScores', 'labelTraits', 'labelEnergy', 'labelJobs', 
-    'labelMajors', 'labelNcs', 'labelGuide', 'labelRoleModels', 
-    'labelAxisData', 'labelAxisIdeas', 'labelAxisPeople', 'labelAxisThings',
-    'btnRestart', 'btnDownload', 'anaStatusText'
-  ];
+  // Mapping labels to IDs
+  const idMap = {
+    'heroTitle': 'hero-title',
+    'heldListTitle': 'held-list-title',
+    'likedListTitle': 'liked-list-title',
+    'textExit': 'text-exit',
+    's9Title': 's9-title',
+    's9Subtitle': 's9-subtitle',
+    's9TextSelected': 's9-text-selected',
+    'btnS9Next': 'btn-s9-next-text',
+    'r3Title': 'r3-title',
+    'r3Subtitle': 'r3-subtitle',
+    'r3TextSelected': 'r3-text-selected',
+    'btnR3Next': 'btn-r3-next-text',
+    'textReportFor': 'text-report-for',
+    'labelAi': 'label-ai',
+    'labelAiSub': 'label-ai-sub',
+    'labelMap': 'label-map',
+    'labelScores': 'label-scores',
+    'labelTraits': 'label-traits',
+    'labelEnergy': 'label-energy',
+    'labelJobs': 'label-jobs',
+    'labelMajors': 'label-majors',
+    'labelNcs': 'label-ncs',
+    'labelGuide': 'label-guide',
+    'labelRoleModels': 'label-rolemodels',
+    'labelAxisData': 'label-axis-data',
+    'labelAxisIdeas': 'label-axis-ideas',
+    'labelAxisPeople': 'label-axis-people',
+    'labelAxisThings': 'label-axis-things',
+    'btnRestart': 'btn-restart-text',
+    'btnDownload': 'btn-download-text',
+    'anaStatusText': 'ana-status-text'
+  };
 
-  headerKeys.forEach(key => {
-    const targetId = key.replace('label', 'label-').replace('btn', 'btn-').replace('text', 'text-').toLowerCase();
-    const elTarget = document.getElementById(targetId);
+  Object.keys(idMap).forEach(key => {
+    const elTarget = document.getElementById(idMap[key]);
     if (elTarget) {
       if (elTarget.tagName === 'SPAN' || elTarget.tagName === 'H1' || elTarget.tagName === 'H2' || elTarget.tagName === 'H3' || elTarget.tagName === 'P') {
         elTarget.innerHTML = s[key];
@@ -266,11 +290,19 @@ function updateUIStrings() {
     }
   });
 
-  // Explicit overrides for button spans
+  // Overrides for button spans not matching ID pattern
   const startBtn = document.getElementById('btn-start');
   if (startBtn) {
     const span = startBtn.querySelector('span');
     if (span) span.textContent = s.btnStart;
+  }
+  
+  const downloadBtn = document.getElementById('btn-download-pdf');
+  if (downloadBtn) {
+    const textSpan = downloadBtn.lastChild;
+    if (textSpan && textSpan.nodeType === 3) {
+      textSpan.textContent = " " + s.btnDownload;
+    }
   }
 }
 

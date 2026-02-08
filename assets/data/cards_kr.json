@@ -127,7 +127,7 @@
     {
       "id": 10,
       "dimension": "D",
-      "keyword_kr": "설계도안",
+      "keyword_kr": "설계/도안",
       "adult": {
         "img": "card_10_D_systematic_adult.png",
         "desc": "구조물이나 제품의 형태를 구상하고 도면으로 그려내는 활동."
@@ -140,7 +140,7 @@
     {
       "id": 11,
       "dimension": "D",
-      "keyword_kr": "단서수집탐색",
+      "keyword_kr": "단서/수집/탐색",
       "adult": {
         "img": "card_11_D_storage_adult.png",
         "desc": "문제 해결을 위해 필요한 정보나 증거를 찾고 모으는 활동"
@@ -153,7 +153,7 @@
     {
       "id": 12,
       "dimension": "D",
-      "keyword_kr": "요약통계",
+      "keyword_kr": "요약/통계",
       "adult": {
         "img": "card_12_D_info_adult.png",
         "desc": "복잡한 자료를 분석하여 핵심적인 수치나 정보로 정리하는 활동"
@@ -283,7 +283,7 @@
     {
       "id": 22,
       "dimension": "I",
-      "keyword_kr": "전략개발",
+      "keyword_kr": "전략/개발",
       "adult": {
         "img": "card_22_I_planning_adult.png",
         "desc": "미래의 목표를 달성하기 위해 새로운 전략이나 디자인을 구상합니다."
@@ -367,7 +367,7 @@
         "desc": "지식이나 기술을 타인에게 전달하고 성장하도록 돕습니다."
       },
       "child": {
-        "img": "card_28_P_teaching.png",
+        "img": "card_28_p_teaching.png",
         "desc": "칠판 앞에서 아기들에게 글자를 가르쳐요. 알려주는 게 좋나요?"
       }
     },
@@ -380,7 +380,7 @@
         "desc": "타인의 생각이나 행동을 변화시키기 위해 소통하고 영향을 미칩니다."
       },
       "child": {
-        "img": "card_29_P_persuading",
+        "img": "card_29_P_persuading.png",
         "desc": "내 장난감이 왜 재미있는지 설명해요. 친구 마음을 잘 움직이나요?"
       }
     },
