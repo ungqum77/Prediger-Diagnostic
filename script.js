@@ -27,6 +27,8 @@ const STRINGS = {
     sortingSubtitleMain: '좋아하는 카드는 오른쪽으로 밀어주세요.',
     sortingTitleHold: '보류한 카드를 다시 확인해볼까요?',
     sortingSubtitleHold: '마음에 들면 오른쪽, 아니면 왼쪽으로 밀어주세요.',
+    heldListTitle: '보류한 카드 목록',
+    likedListTitle: '선택한 카드 목록',
     textExit: '나가기',
     s9Title: '나를 가장 잘 설명하는 9장 선택',
     s9Subtitle: '좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.',
@@ -37,13 +39,27 @@ const STRINGS = {
     r3TextSelected: 'Ranked',
     btnR3Next: '분석 리포트 생성하기',
     anaStatusText: '심층 분석을 진행 중입니다...',
-    textReportFor: 'DIAGNOSIS REPORT',
+    textReportFor: '최종 분석 결과',
     labelAi: 'AI 종합 분석 리포트',
+    labelAiSub: '핵심 흥미 분석',
+    labelMap: '흥미 유형 맵',
+    labelScores: '성향 점수',
+    labelTraits: '특성 분석',
+    labelEnergy: '에너지 흐름',
     labelJobs: '추천 직업군',
+    labelMajors: '추천 학과',
+    labelNcs: 'NCS 코드',
+    labelGuide: '활동 가이드',
+    labelRoleModels: '추천 롤모델',
+    labelAxisData: 'Data (현실)',
+    labelAxisIdeas: 'Ideas (사고)',
+    labelAxisPeople: 'People (사람)',
+    labelAxisThings: 'Things (사물)',
     btnRestart: '다시 진단하기',
+    btnDownload: 'PDF 리포트 저장하기',
     aiLoading: '분석 결과를 정리하고 있습니다...',
     errorFetch: '데이터 파일을 불러오지 못했습니다.',
-    birthPlaceholder: '' // Browser default
+    birthPlaceholder: ''
   },
   EN: {
     heroTitle: 'Prediger<br>Diagnosis',
@@ -52,6 +68,8 @@ const STRINGS = {
     sortingSubtitleMain: 'Swipe right for things you enjoy.',
     sortingTitleHold: 'Review your held cards',
     sortingSubtitleHold: 'Swipe right to like, left to reject.',
+    heldListTitle: 'Saved for Review',
+    likedListTitle: 'Realtime Selections',
     textExit: 'Exit',
     s9Title: 'Select Exactly 9 Cards',
     s9Subtitle: 'Pick 9 cards that describe you best from your liked list.',
@@ -64,8 +82,22 @@ const STRINGS = {
     anaStatusText: 'Deep analysis in progress...',
     textReportFor: 'DIAGNOSIS REPORT',
     labelAi: 'AI Analysis Report',
+    labelAiSub: 'Core Interest Analysis',
+    labelMap: 'Interpersonal Map',
+    labelScores: 'Propensity Scores',
+    labelTraits: 'Traits Analysis',
+    labelEnergy: 'Energy Flow',
     labelJobs: 'Recommended Careers',
+    labelMajors: 'Recommended Majors',
+    labelNcs: 'NCS Codes',
+    labelGuide: 'Activity Guide',
+    labelRoleModels: 'Potential Role Models',
+    labelAxisData: 'Data',
+    labelAxisIdeas: 'Ideas',
+    labelAxisPeople: 'People',
+    labelAxisThings: 'Things',
     btnRestart: 'Restart Diagnosis',
+    btnDownload: 'Download PDF Report',
     aiLoading: 'Generating insights...',
     errorFetch: 'Failed to load data.',
     birthPlaceholder: 'YYYY-MM-DD'
@@ -161,23 +193,23 @@ function downloadPDF() {
   if (!element) return;
   
   const originalText = btn.innerHTML;
-  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> PDF 생성 중...`;
+  btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> 리포트 생성 중...`;
   btn.disabled = true;
 
-  // Add a class for fixed width during export to ensure A4 proportions
+  // Optimized class for export centering
   element.classList.add('pdf-export-mode');
 
   const opt = {
-    margin: [0.3, 0.3, 0.3, 0.3],
-    filename: `Prediger_Report_${state.user.name || 'User'}.pdf`,
+    margin: [0, 0, 0, 0],
+    filename: `프레디저_진단리포트_${state.user.name || '사용자'}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
       scale: 2, 
       useCORS: true,
       scrollY: 0,
-      windowWidth: 850 
+      windowWidth: 1000 // Desktop width for standard layout
     },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    jsPDF: { unit: 'px', format: [1000, 1414], orientation: 'portrait', hotfixes: ['px_scaling'] }
   };
   
   if (typeof html2pdf !== 'undefined') {
@@ -190,10 +222,10 @@ function downloadPDF() {
        element.classList.remove('pdf-export-mode');
        btn.innerHTML = originalText;
        btn.disabled = false;
-       alert("PDF 생성 실패");
+       alert("PDF 생성에 실패했습니다.");
     });
   } else {
-    alert("PDF 생성기를 불러올 수 없습니다.");
+    alert("PDF 라이브러리를 찾을 수 없습니다.");
     element.classList.remove('pdf-export-mode');
     btn.innerHTML = originalText;
     btn.disabled = false;
@@ -209,22 +241,37 @@ function toggleLanguage() {
 
 function updateUIStrings() {
   const s = STRINGS[state.lang];
-  const h1 = document.querySelector('h1');
-  if (h1) h1.innerHTML = s.heroTitle;
   
+  // Header IDs
+  const headerKeys = [
+    'heroTitle', 'heldListTitle', 'likedListTitle', 'textExit', 
+    's9Title', 's9Subtitle', 's9TextSelected', 'btnS9Next', 
+    'r3Title', 'r3Subtitle', 'r3TextSelected', 'btnR3Next',
+    'textReportFor', 'labelAi', 'labelAiSub', 'labelMap', 
+    'labelScores', 'labelTraits', 'labelEnergy', 'labelJobs', 
+    'labelMajors', 'labelNcs', 'labelGuide', 'labelRoleModels', 
+    'labelAxisData', 'labelAxisIdeas', 'labelAxisPeople', 'labelAxisThings',
+    'btnRestart', 'btnDownload', 'anaStatusText'
+  ];
+
+  headerKeys.forEach(key => {
+    const targetId = key.replace('label', 'label-').replace('btn', 'btn-').replace('text', 'text-').toLowerCase();
+    const elTarget = document.getElementById(targetId);
+    if (elTarget) {
+      if (elTarget.tagName === 'SPAN' || elTarget.tagName === 'H1' || elTarget.tagName === 'H2' || elTarget.tagName === 'H3' || elTarget.tagName === 'P') {
+        elTarget.innerHTML = s[key];
+      } else {
+        elTarget.textContent = s[key];
+      }
+    }
+  });
+
+  // Explicit overrides for button spans
   const startBtn = document.getElementById('btn-start');
   if (startBtn) {
     const span = startBtn.querySelector('span');
     if (span) span.textContent = s.btnStart;
   }
-  
-  const birthInput = document.getElementById('birthdate');
-  if (birthInput) birthInput.placeholder = s.birthPlaceholder;
-  
-  const textExit = document.getElementById('text-exit');
-  if (textExit) textExit.textContent = s.textExit;
-
-  if (el.anaStatusText) el.anaStatusText.textContent = s.anaStatusText;
 }
 
 // --- FLOW CONTROL ---
@@ -460,15 +507,6 @@ function renderSelect9Grid() {
   updateS9UI();
   
   const s = STRINGS[state.lang];
-  const s9Title = document.getElementById('s9-title');
-  const s9Subtitle = document.getElementById('s9-subtitle');
-  const s9SelectedText = document.getElementById('s9-text-selected');
-  
-  if (s9Title) s9Title.textContent = s.s9Title;
-  if (s9Subtitle) s9Subtitle.textContent = s.s9Subtitle;
-  if (s9SelectedText) s9SelectedText.textContent = s.s9TextSelected;
-  if (el.btnS9Next) el.btnS9Next.querySelector('span').textContent = s.btnS9Next;
-
   state.likedCards.forEach(card => {
     const cardEl = document.createElement('div');
     const keywordKey = 'keyword_' + state.lang.toLowerCase();
@@ -514,21 +552,9 @@ function startRanking() {
 
 function renderRank3Grid() {
   if (!el.r3Grid) return;
-  
-  el.r3Grid.className = 'grid grid-cols-3 gap-3 w-full max-w-[500px]';
   el.r3Grid.innerHTML = '';
   state.rankedCards = [];
   updateR3UI();
-
-  const s = STRINGS[state.lang];
-  const r3Title = document.getElementById('r3-title');
-  const r3Subtitle = document.getElementById('r3-subtitle');
-  const r3SelectedText = document.getElementById('r3-text-selected');
-  
-  if (r3Title) r3Title.textContent = s.r3Title;
-  if (r3Subtitle) r3Subtitle.textContent = s.r3Subtitle;
-  if (r3SelectedText) r3SelectedText.textContent = s.r3TextSelected;
-  if (el.btnR3Next) el.btnR3Next.querySelector('span').textContent = s.btnR3Next;
 
   state.top9Cards.forEach(card => {
     const cardEl = document.createElement('div');
@@ -580,19 +606,13 @@ function startAnalysis() {
 // --- STEP 7: FINAL RESULT ---
 async function showResult() {
   const scores = { D: 0, I: 0, P: 0, T: 0 };
-  
   state.rankedCards.forEach((card, idx) => {
     const pts = 5 - idx;
-    if (card.dimension && scores[card.dimension] !== undefined) {
-       scores[card.dimension] += pts;
-    }
+    if (card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += pts;
   });
-  
   state.top9Cards.forEach(card => {
     const isRanked = state.rankedCards.some(rc => rc.id === card.id);
-    if (!isRanked && card.dimension && scores[card.dimension] !== undefined) {
-      scores[card.dimension] += 1;
-    }
+    if (!isRanked && card.dimension && scores[card.dimension] !== undefined) scores[card.dimension] += 1;
   });
 
   const x = scores.T - scores.P;
@@ -605,7 +625,6 @@ async function showResult() {
   };
 
   const key = getResultKey(x, y);
-  
   renderReport(key, scores, x, y); 
   transition(el.adsOverlay, el.resultSection, 'block'); 
   generateAIReport();
@@ -613,14 +632,14 @@ async function showResult() {
 
 function renderReport(key, scores, x, y) {
   const data = state.contentsDB[key] || state.contentsDB["CENTER"] || { 
-    title: "Balanced Type", 
-    summary: "Exploring all possibilities.", 
-    traits: { desc: "Flexible interests.", energy: "Adapts to surroundings." },
+    title: "균형 잡힌 탐험가", 
+    summary: "다양한 분야에 고루 흥미를 가지고 있습니다.", 
+    traits: { desc: "유연한 관심사.", energy: "상황에 적응함." },
     job_families: [],
     majors: [],
     ncs_codes: [],
     role_models: [],
-    activity_guide: "Try various things."
+    activity_guide: "다양한 활동을 시도해보세요."
   };
 
   if (el.resTitle) el.resTitle.textContent = data.title;
@@ -718,14 +737,12 @@ function transition(from, to, display = 'block') {
   to.classList.remove('hidden');
   to.style.display = display;
   
-  // IMMEDIATELY FORCE SCROLL TO TOP
-  // Use behavior 'auto' or 'instant' to avoid conflicts with scroll-behavior: smooth
-  window.scrollTo(0, 0);
+  // RESET SCROLL
+  window.scrollTo({ top: 0, behavior: 'instant' });
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
   
-  // Re-enable overflow if it was locked
-  document.body.style.overflowY = 'auto';
+  setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 10);
 
   if (window.gsap) {
     gsap.set(to, { clearProps: "all" });
