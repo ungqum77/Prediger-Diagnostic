@@ -25,22 +25,6 @@ const TYPE_THEMES = {
   DEFAULT: { color: "CBD5E1", label: "General" }
 };
 
-// --- 정교화된 52장 전체 카드 데이터 (파일명 매칭) ---
-const MOCK_CARDS = [
-  { id: 1, type: "D", keyword: "기록하기", desc: "자료를 기록하고 정리하는 것을 좋아합니다.", img: "card_01_D_records.png" },
-  { id: 2, type: "I", keyword: "아이디어", desc: "새로운 생각을 떠올리고 상상하는 것을 좋아합니다.", img: "card_02_I_ideas.png" },
-  { id: 3, type: "P", keyword: "도와주기", desc: "친구들의 고민을 들어주고 돕는 것을 좋아합니다.", img: "card_03_P_help.png" },
-  { id: 4, type: "T", keyword: "만들기", desc: "손으로 물건을 조립하거나 만드는 것을 좋아합니다.", img: "card_04_T_make.png" },
-  { id: 5, type: "D", keyword: "분석하기", desc: "숫자나 정보를 꼼꼼하게 따져보는 것을 좋아합니다.", img: "card_05_D_analyze.png" },
-  { id: 6, type: "T", keyword: "기계 다루기", desc: "도구나 기계를 사용하여 작업하는 것을 좋아합니다.", img: "card_06_T_machine.png" },
-  { id: 7, type: "I", keyword: "연구하기", desc: "궁금한 것을 깊이 파고들어 연구하는 것을 좋아합니다.", img: "card_07_I_research.png" },
-  { id: 8, type: "P", keyword: "가르치기", desc: "다른 사람에게 지식을 알려주는 것을 좋아합니다.", img: "card_08_P_teach.png" },
-  { id: 9, type: "D", keyword: "계산하기", desc: "돈이나 수치를 정확하게 계산하는 것을 좋아합니다.", img: "card_09_D_calc.png" },
-  { id: 10, type: "T", keyword: "운전/조종", desc: "자동차나 드론 등을 조종하는 것을 좋아합니다.", img: "card_10_T_drive.png" },
-  { id: 11, type: "I", keyword: "관찰하기", desc: "사물이나 자연을 자세히 관찰하는 것을 좋아합니다.", img: "card_11_I_observe.png" },
-  { id: 12, type: "P", keyword: "상담하기", desc: "사람들의 마음을 위로하고 대화하는 것을 좋아합니다.", img: "card_12_P_counsel.png" }
-];
-
 const state = {
   cards: [],
   likedCards: [],
@@ -63,32 +47,38 @@ const populateElements = () => {
     'liked-list', 'held-list', 'progress-bar', 'progress-text-display', 
     'count-like', 'count-hold', 'ana-status-text'
   ];
-  ids.forEach(id => { el[id.replace(/-([a-z])/g, g => g[1].toUpperCase())] = document.getElementById(id); });
+  ids.forEach(id => { 
+    const found = document.getElementById(id);
+    if (found) el[id.replace(/-([a-z])/g, g => g[1].toUpperCase())] = found; 
+  });
 };
 
 async function loadData() {
   try {
     const res = await fetch(`assets/data/cards_kr.json`);
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error("JSON 파일을 찾을 수 없습니다.");
     const data = await res.json();
-    state.cards = data.cards || data;
+    // 데이터 구조에 따른 유연한 처리 (data.cards 혹은 data 배열 자체)
+    state.cards = data.cards || (Array.isArray(data) ? data : []);
+    if (state.cards.length === 0) throw new Error("카드가 비어있습니다.");
   } catch (e) {
-    state.cards = [...MOCK_CARDS];
+    console.error("데이터 로드 실패:", e);
+    alert("카드 데이터를 불러오지 못했습니다. 경로를 확인해주세요.");
   }
 }
 
-// 동적 이미지 경로 생성 함수
+// 동적 이미지 경로 생성 함수 (사용자 요청: adult / child 폴더 구분)
 function getImgSrc(card) {
   if (!card || !card.img) return "";
   return `assets/images/${state.targetGroup}/${card.img}`;
 }
 
-// 플레이스홀더 생성 함수 (이미지 로드 실패 시)
+// 플레이스홀더 생성 함수 (이미지 로드 실패 시 보완책)
 function getFallbackImg(card) {
   const type = card.type || 'DEFAULT';
   const theme = TYPE_THEMES[type] || TYPE_THEMES.DEFAULT;
-  const text = encodeURIComponent(card.keyword || card.name || theme.label);
-  return `https://placehold.co/400x300/${theme.color}/FFFFFF?text=${text}`;
+  const keyword = card.keyword || card.name || theme.label;
+  return `https://placehold.co/400x300/${theme.color}/FFFFFF?text=${encodeURIComponent(keyword)}`;
 }
 
 function renderStack() {
@@ -263,12 +253,13 @@ function init() {
     el.introForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      // 연령대 계산 및 타겟 그룹 설정
+      // 연령대 계산 및 타겟 그룹 설정 (사용자 요청: adult/child)
       const birthDateVal = document.getElementById('birthdate').value;
       if (birthDateVal) {
         const birthYear = new Date(birthDateVal).getFullYear();
         const currentYear = new Date().getFullYear();
         const age = currentYear - birthYear;
+        // 요청하신 폴더명 'child' 적용
         state.targetGroup = age < 13 ? 'child' : 'adult';
       }
 
