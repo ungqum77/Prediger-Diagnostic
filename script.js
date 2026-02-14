@@ -1,10 +1,34 @@
+
 import { GoogleGenAI } from "@google/genai";
+
+// GSAP 플러그인 등록
+if (window.gsap && window.Draggable) {
+  gsap.registerPlugin(Draggable);
+}
 
 /**
  * Google GenAI SDK 초기화
+ * ReferenceError 방지를 위해 process 존재 여부 체크
  */
-const API_KEY = process.env.API_KEY;
-window.ai = new GoogleGenAI({ apiKey: API_KEY });
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY;
+  } catch (e) {
+    console.warn("API_KEY access failed, using empty string.");
+    return "";
+  }
+};
+
+const API_KEY = getApiKey();
+// window.ai는 실제 호출 직전에 생성하는 것이 좋으나, 현재 구조 유지를 위해 안전하게 생성
+let aiInstance = null;
+try {
+  if (API_KEY) {
+    aiInstance = new GoogleGenAI({ apiKey: API_KEY });
+  }
+} catch (e) {
+  console.error("AI Initialization failed:", e);
+}
 
 // --- MOCK DATA (Fallback) ---
 const MOCK_CARDS = [
@@ -46,38 +70,39 @@ const state = {
   user: { name: '', age: 0 }
 };
 
-// --- DOM ELEMENTS ---
-const el = {
-  introSection: document.getElementById('intro-section'),
-  sortingSection: document.getElementById('sorting-section'),
-  select9Section: document.getElementById('select9-section'),
-  rank3Section: document.getElementById('rank3-section'),
-  adsOverlay: document.getElementById('adsense-overlay'),
-  resultSection: document.getElementById('result-section'),
-  introForm: document.getElementById('intro-form'),
-  cardStack: document.getElementById('card-stack'),
-  s9Grid: document.getElementById('s9-grid'),
-  s9Count: document.getElementById('s9-count'),
-  btnS9Next: document.getElementById('btn-s9-next'),
-  r3Grid: document.getElementById('r3-grid'),
-  r3Count: document.getElementById('r3-count'),
-  btnR3Next: document.getElementById('btn-r3-next'),
-  btnSkipAd: document.getElementById('btn-skip-ad'),
-  resTitle: document.getElementById('result-title'),
-  resSummary: document.getElementById('result-summary'),
-  resTraits: document.getElementById('result-traits'),
-  resJobs: document.getElementById('result-jobs'),
-  resMajors: document.getElementById('result-majors'),
-  resTag: document.getElementById('result-tag'),
-  resGallery: document.getElementById('result-gallery-grid'),
-  btnDownloadPdf: document.getElementById('btn-download-pdf'),
-  likedList: document.getElementById('liked-list'),
-  heldList: document.getElementById('held-list'),
-  progressBar: document.getElementById('progress-bar'),
-  progressText: document.getElementById('progress-text-display'),
-  countLike: document.getElementById('count-like'),
-  countHold: document.getElementById('count-hold'),
-  countNope: document.getElementById('count-nope')
+// --- DOM ELEMENTS (Lazy Selection) ---
+const el = {};
+const populateElements = () => {
+  el.introSection = document.getElementById('intro-section');
+  el.sortingSection = document.getElementById('sorting-section');
+  el.select9Section = document.getElementById('select9-section');
+  el.rank3Section = document.getElementById('rank3-section');
+  el.adsOverlay = document.getElementById('adsense-overlay');
+  el.resultSection = document.getElementById('result-section');
+  el.introForm = document.getElementById('intro-form');
+  el.cardStack = document.getElementById('card-stack');
+  el.s9Grid = document.getElementById('s9-grid');
+  el.s9Count = document.getElementById('s9-count');
+  el.btnS9Next = document.getElementById('btn-s9-next');
+  el.r3Grid = document.getElementById('r3-grid');
+  el.r3Count = document.getElementById('r3-count');
+  el.btnR3Next = document.getElementById('btn-r3-next');
+  el.btnSkipAd = document.getElementById('btn-skip-ad');
+  el.resTitle = document.getElementById('result-title');
+  el.resSummary = document.getElementById('result-summary');
+  el.resTraits = document.getElementById('result-traits');
+  el.resJobs = document.getElementById('result-jobs');
+  el.resMajors = document.getElementById('result-majors');
+  el.resTag = document.getElementById('result-tag');
+  el.resGallery = document.getElementById('result-gallery-grid');
+  el.btnDownloadPdf = document.getElementById('btn-download-pdf');
+  el.likedList = document.getElementById('liked-list');
+  el.heldList = document.getElementById('held-list');
+  el.progressBar = document.getElementById('progress-bar');
+  el.progressText = document.getElementById('progress-text-display');
+  el.countLike = document.getElementById('count-like');
+  el.countHold = document.getElementById('count-hold');
+  el.countNope = document.getElementById('count-nope');
 };
 
 // --- UTILITIES ---
@@ -87,7 +112,10 @@ function parseMarkdown(text) {
 }
 
 function transition(from, to, display = 'block') {
-  if (!from || !to) return;
+  if (!from || !to) {
+    console.error("Transition elements missing:", { from, to });
+    return;
+  }
   from.classList.add('hidden');
   from.style.display = 'none';
   to.classList.remove('hidden');
@@ -128,7 +156,6 @@ function calculateResultKey(scores) {
     if (r2[0] === 'I') return "IDEAS_THINGS";
   }
   
-  // Default coordinate based
   const di = scores.D - scores.I;
   const tp = scores.T - scores.P;
   if (di >= 0 && tp >= 0) return "DATA_THINGS";
@@ -139,19 +166,23 @@ function calculateResultKey(scores) {
 
 // --- CORE FUNCTIONS ---
 async function loadData() {
+  console.log("Loading data...");
   try {
-    const cardsRes = await fetch(`/assets/data/cards_kr.json`);
-    if (!cardsRes.ok) throw new Error();
-    state.cards = (await cardsRes.json()).cards;
+    const cardsRes = await fetch(`assets/data/cards_kr.json`);
+    if (!cardsRes.ok) throw new Error("Cards file not found");
+    const data = await cardsRes.json();
+    state.cards = data.cards || data;
   } catch (e) {
+    console.warn("Using mock cards due to:", e.message);
     state.cards = MOCK_CARDS;
   }
 
   try {
-    const contentRes = await fetch(`/assets/data/contents_db_kr.json`);
-    if (!contentRes.ok) throw new Error();
+    const contentRes = await fetch(`assets/data/contents_db_kr.json`);
+    if (!contentRes.ok) throw new Error("DB file not found");
     state.contentsDB = await contentRes.json();
   } catch (e) {
+    console.warn("Using mock DB due to:", e.message);
     state.contentsDB = MOCK_DB;
   }
 }
@@ -163,6 +194,11 @@ function renderStack() {
   const pool = isMain ? state.cards : state.heldCards;
   const current = pool.slice(state.currentIndex, state.currentIndex + 3).reverse();
 
+  if (current.length === 0 && pool.length > 0) {
+    finishSorting();
+    return;
+  }
+
   current.forEach((card, i) => {
     const cardEl = document.createElement('div');
     cardEl.className = 'card-item';
@@ -170,13 +206,16 @@ function renderStack() {
     cardEl.style.zIndex = i;
     cardEl.style.transform = `scale(${1 - depth * 0.05}) translateY(${depth * 15}px)`;
     
+    // 이미지 경로 상대 경로로 수정 및 대체 이미지 처리 강화
+    const imgSrc = card.adult?.img ? `assets/images/adult/${card.adult.img}` : `https://placehold.co/400x300?text=${card.keyword}`;
+    
     cardEl.innerHTML = `
       <div class="h-1/2 bg-slate-100 flex items-center justify-center overflow-hidden">
-        <img src="/assets/images/adult/${card.adult.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300?text=${card.keyword}'">
+        <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300?text=${card.keyword}'">
       </div>
       <div class="p-6 text-center">
         <h3 class="text-xl font-bold mb-2">${card.keyword}</h3>
-        <p class="text-sm text-slate-500">${card.adult.desc}</p>
+        <p class="text-sm text-slate-500">${card.adult?.desc || ""}</p>
       </div>
       <div class="absolute top-4 right-4 bg-white/80 px-2 py-1 rounded text-[10px] font-bold shadow-sm">${card.type}</div>
     `;
@@ -238,7 +277,8 @@ function addToThumbnailList(card, target) {
   if (!listEl) return;
   const thumb = document.createElement('div');
   thumb.className = 'liked-thumb relative rounded-lg overflow-hidden h-20 bg-slate-100 border border-slate-200';
-  thumb.innerHTML = `<img src="/assets/images/adult/${card.adult.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100?text=${card.keyword}'">`;
+  const imgSrc = card.adult?.img ? `assets/images/adult/${card.adult.img}` : `https://placehold.co/100x100?text=${card.keyword}`;
+  thumb.innerHTML = `<img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100?text=${card.keyword}'">`;
   listEl.appendChild(thumb);
 }
 
@@ -263,8 +303,9 @@ function renderSelect9Grid() {
   state.likedCards.forEach(card => {
     const d = document.createElement('div');
     d.className = 'selection-card relative rounded-xl overflow-hidden aspect-[3/4] shadow-sm border border-slate-200 cursor-pointer bg-white';
+    const imgSrc = card.adult?.img ? `assets/images/adult/${card.adult.img}` : `https://placehold.co/200x260?text=${card.keyword}`;
     d.innerHTML = `
-      <img src="/assets/images/adult/${card.adult.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x260?text=${card.keyword}'">
+      <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x260?text=${card.keyword}'">
       <div class="absolute inset-x-0 bottom-0 bg-black/60 p-2 text-white text-[10px] text-center font-bold">${card.keyword}</div>
     `;
     d.onclick = () => {
@@ -293,8 +334,9 @@ function renderRank3Grid() {
   state.top9Cards.forEach(card => {
     const d = document.createElement('div');
     d.className = 'selection-card relative rounded-xl overflow-hidden aspect-[3/4] shadow-sm border border-slate-200 cursor-pointer bg-white';
+    const imgSrc = card.adult?.img ? `assets/images/adult/${card.adult.img}` : `https://placehold.co/200x260?text=${card.keyword}`;
     d.innerHTML = `
-      <img src="/assets/images/adult/${card.adult.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x260?text=${card.keyword}'">
+      <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x260?text=${card.keyword}'">
       <div class="absolute inset-x-0 bottom-0 bg-black/60 p-2 text-white text-[10px] text-center font-bold">${card.keyword}</div>
       <div class="badge-container absolute top-2 right-2"></div>
     `;
@@ -309,12 +351,14 @@ function renderRank3Grid() {
         d.classList.add('selected');
         d.querySelector('.badge-container').innerHTML = `<div class="rank-badge">${state.rankedCards.length}</div>`;
       }
-      // Re-render all badges to ensure order is correct
+      // 배지 번호 동적 업데이트
       document.querySelectorAll('#r3-grid .selection-card').forEach((elCard, i) => {
         const c = state.top9Cards[i];
         const rIdx = state.rankedCards.indexOf(c);
         if (rIdx !== -1) {
            elCard.querySelector('.badge-container').innerHTML = `<div class="rank-badge">${rIdx + 1}</div>`;
+        } else {
+           elCard.querySelector('.badge-container').innerHTML = '';
         }
       });
       if (el.r3Count) el.r3Count.textContent = state.rankedCards.length;
@@ -349,7 +393,7 @@ function renderReport(key, scores, vector) {
   if (el.resTitle) el.resTitle.innerHTML = `<span class="text-blue-600">${data.title}</span> 타입입니다.`;
   if (el.resSummary) el.resSummary.textContent = data.summary;
   if (el.resTag) el.resTag.textContent = key;
-  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || "";
+  if (el.resTraits) el.resTraits.textContent = data.traits?.desc || data.traits || "";
   
   const pointer = document.getElementById('result-pointer');
   if (pointer && window.gsap) {
@@ -360,7 +404,7 @@ function renderReport(key, scores, vector) {
     });
   }
 
-  if (el.resJobs) el.resJobs.innerHTML = (data.job_families || []).map(j => `<span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">${j}</span>`).join('');
+  if (el.resJobs) el.resJobs.innerHTML = (data.job_families || data.jobs || []).map(j => `<span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">${j}</span>`).join('');
   
   const max = Math.max(...Object.values(scores), 1);
   ['D','I','P','T'].forEach(k => {
@@ -374,7 +418,8 @@ function renderReport(key, scores, vector) {
     state.top9Cards.forEach(card => {
       const g = document.createElement('div');
       g.className = 'relative rounded-lg overflow-hidden aspect-[3/4] border border-slate-100 shadow-sm';
-      g.innerHTML = `<img src="/assets/images/adult/${card.adult.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x130?text=${card.keyword}'">`;
+      const imgSrc = card.adult?.img ? `assets/images/adult/${card.adult.img}` : `https://placehold.co/100x130?text=${card.keyword}`;
+      g.innerHTML = `<img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x130?text=${card.keyword}'">`;
       el.resGallery.appendChild(g);
     });
   }
@@ -393,6 +438,7 @@ async function generateAndDisplayReport(userResults, contentsDB) {
   reportContainer.innerHTML = `<div class="flex flex-col items-center py-12 gap-4"><div class="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div><p class="text-slate-500 font-bold">진로 컨설턴트 AI가 분석 리포트를 작성 중입니다...</p></div>`;
 
   try {
+    if (!aiInstance) throw new Error("AI Instance not initialized");
     const vectorData = calculatePredigerVector(userResults.rankedCards);
     const aiData = extractAiData(userResults.finalKey, contentsDB, vectorData);
     const top3 = userResults.rankedCards.map(c => c.keyword).join(', ');
@@ -402,10 +448,11 @@ async function generateAndDisplayReport(userResults, contentsDB) {
     [Fact] 특징: ${aiData.keywords}, 직업: ${aiData.jobs}
     [Request] 수치적 근거를 언급하며 잠재력과 커리어 로드맵을 마크다운 형식으로 풍성하게 작성해 주세요.`;
 
-    const response = await window.ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
+    const response = await aiInstance.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
     reportContainer.innerHTML = `<div class="flex items-center gap-4 mb-6"><div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl">📋</div><h3 class="text-xl font-black">AI 심층 커리어 리포트</h3></div><div class="prose prose-slate max-w-none text-slate-700 leading-relaxed font-medium">${parseMarkdown(response.text)}</div>`;
   } catch (e) {
-    reportContainer.innerHTML = `<div class="p-6 bg-red-50 text-red-600 rounded-2xl text-center font-bold">분석 리포트를 생성하는 중 오류가 발생했습니다.</div>`;
+    console.error("AI Generation failed:", e);
+    reportContainer.innerHTML = `<div class="p-6 bg-red-50 text-red-600 rounded-2xl text-center font-bold">분석 리포트를 생성하는 중 오류가 발생했습니다. (API 키 확인 필요)</div>`;
   }
 }
 
@@ -413,45 +460,65 @@ function extractAiData(userType, contentsDB, vectorData) {
   const data = contentsDB[userType] || contentsDB["CENTER"];
   return {
     typeName: data.title || "정보 없음",
-    keywords: (data.job_families || []).join(', '),
-    jobs: (data.job_families || []).join(', '),
+    keywords: (data.job_families || data.jobs || []).join(', '),
+    jobs: (data.job_families || data.jobs || []).join(', '),
     vectorAnalysis: `D/I: ${vectorData.diScore.toFixed(2)}, T/P: ${vectorData.tpScore.toFixed(2)}`
   };
 }
 
 // --- INITIALIZATION ---
 function init() {
+  console.log("App Initialization started...");
+  populateElements();
+
   if (el.introForm) {
     el.introForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log("Form submitted");
       const name = document.getElementById('username').value;
       const birth = document.getElementById('birthdate').value;
-      if (!name || !birth) return;
+      if (!name || !birth) {
+        alert("이름과 생년월일을 입력해 주세요.");
+        return;
+      }
       
       const btn = document.getElementById('btn-start');
-      btn.disabled = true;
-      btn.innerHTML = '<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+      }
       
       try {
         state.user = { name };
         await loadData();
+        console.log("Data loaded, transitioning...");
         transition(el.introSection, el.sortingSection, 'flex');
         state.currentIndex = 0;
         state.currentSortingStep = 'main';
         renderStack();
       } catch (err) {
-        alert('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-        btn.disabled = false;
-        btn.textContent = '진단 시작하기';
+        console.error("Startup error:", err);
+        alert('데이터를 불러오지 못했습니다. 네트워크를 확인해 주세요.');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '진단 시작하기';
+        }
       }
     });
+  } else {
+    console.error("Intro form not found!");
   }
 
-  document.getElementById('btn-swipe-left').onclick = () => swipeManual('left');
-  document.getElementById('btn-swipe-right').onclick = () => swipeManual('right');
-  document.getElementById('btn-swipe-up').onclick = () => swipeManual('up');
-  document.getElementById('btn-exit').onclick = () => location.reload();
-  document.getElementById('btn-restart').onclick = () => location.reload();
+  const registerClick = (id, fn) => {
+    const element = document.getElementById(id);
+    if (element) element.onclick = fn;
+  };
+
+  registerClick('btn-swipe-left', () => swipeManual('left'));
+  registerClick('btn-swipe-right', () => swipeManual('right'));
+  registerClick('btn-swipe-up', () => swipeManual('up'));
+  registerClick('btn-exit', () => location.reload());
+  registerClick('btn-restart', () => location.reload());
   
   if (el.btnS9Next) el.btnS9Next.onclick = startRanking;
   if (el.btnR3Next) el.btnR3Next.onclick = startAnalysis;
@@ -460,6 +527,7 @@ function init() {
 }
 
 function swipeManual(dir) {
+  if (!el.cardStack) return;
   const top = el.cardStack.querySelector('.card-item:last-child');
   const pool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
   if (top) handleSwipe(dir, top, pool[state.currentIndex]);
