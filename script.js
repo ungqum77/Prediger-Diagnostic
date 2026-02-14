@@ -137,24 +137,13 @@ function setupDraggable(cardEl, cardData) {
   Draggable.create(cardEl, {
     type: "x,y",
     onDrag: function() {
-      // Rotate and Show Stamps based on drag
       gsap.set(this.target, { rotation: this.x * 0.05 });
-      
       const xVal = this.x;
       const yVal = this.y;
-
-      if (xVal > 50) {
-        gsap.set(stampLike, { opacity: Math.min(xVal / 150, 1) });
-        gsap.set([stampNope, stampHold], { opacity: 0 });
-      } else if (xVal < -50) {
-        gsap.set(stampNope, { opacity: Math.min(Math.abs(xVal) / 150, 1) });
-        gsap.set([stampLike, stampHold], { opacity: 0 });
-      } else if (yVal < -50) {
-        gsap.set(stampHold, { opacity: Math.min(Math.abs(yVal) / 150, 1) });
-        gsap.set([stampLike, stampNope], { opacity: 0 });
-      } else {
-        gsap.set([stampLike, stampNope, stampHold], { opacity: 0 });
-      }
+      if (xVal > 50) { gsap.set(stampLike, { opacity: Math.min(xVal / 150, 1) }); gsap.set([stampNope, stampHold], { opacity: 0 }); }
+      else if (xVal < -50) { gsap.set(stampNope, { opacity: Math.min(Math.abs(xVal) / 150, 1) }); gsap.set([stampLike, stampHold], { opacity: 0 }); }
+      else if (yVal < -50) { gsap.set(stampHold, { opacity: Math.min(Math.abs(yVal) / 150, 1) }); gsap.set([stampLike, stampNope], { opacity: 0 }); }
+      else { gsap.set([stampLike, stampNope, stampHold], { opacity: 0 }); }
     },
     onDragEnd: function() {
       if (this.x > 100) handleSwipe('right', cardEl, cardData);
@@ -169,38 +158,17 @@ function setupDraggable(cardEl, cardData) {
 }
 
 function handleSwipe(dir, cardEl, cardData) {
-  if (dir === 'right') {
-    state.likedCards.push(cardData);
-    addToThumbnailList(cardData, 'liked');
-  } else if (dir === 'up') {
-    state.heldCards.push(cardData);
-    addToThumbnailList(cardData, 'held');
-  } else {
-    state.rejectedCards.push(cardData);
-  }
-
-  gsap.to(cardEl, {
-    x: dir === 'right' ? 600 : dir === 'left' ? -600 : 0,
-    y: dir === 'up' ? -600 : 0,
-    opacity: 0,
-    duration: 0.4,
-    onComplete: () => {
-      state.currentIndex++;
-      const pool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
-      if (state.currentIndex >= pool.length) {
-        if (state.currentSortingStep === 'main' && state.heldCards.length > 0) {
-          state.currentSortingStep = 'held';
-          state.currentIndex = 0;
-          renderStack();
-        } else {
-          finishSorting();
-        }
-      } else {
-        renderStack();
-      }
-    }
-  });
-  // 즉각적인 카운트 및 대시보드 업데이트
+  if (dir === 'right') { state.likedCards.push(cardData); addToThumbnailList(cardData, 'liked'); }
+  else if (dir === 'up') { state.heldCards.push(cardData); addToThumbnailList(cardData, 'held'); }
+  else { state.rejectedCards.push(cardData); }
+  gsap.to(cardEl, { x: dir === 'right' ? 600 : dir === 'left' ? -600 : 0, y: dir === 'up' ? -600 : 0, opacity: 0, duration: 0.4, onComplete: () => {
+    state.currentIndex++;
+    const pool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
+    if (state.currentIndex >= pool.length) {
+      if (state.currentSortingStep === 'main' && state.heldCards.length > 0) { state.currentSortingStep = 'held'; state.currentIndex = 0; renderStack(); }
+      else { finishSorting(); }
+    } else { renderStack(); }
+  }});
   updateProgress();
 }
 
@@ -212,44 +180,19 @@ function addToThumbnailList(card, target) {
   const keyword = getCardKeyword(card);
   const imgFile = getCardImg(card);
   const imgSrc = imgFile ? `assets/images/adult/${imgFile}` : `https://placehold.co/100x130?text=${keyword}`;
-  thumb.innerHTML = `
-    <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x130?text=${keyword}'">
-    <div class="absolute inset-x-0 bottom-0 bg-black/40 p-1 text-white text-[8px] text-center font-bold truncate">${keyword}</div>
-  `;
-  listEl.prepend(thumb); // 최신 선택이 위로 오게 prepend
+  thumb.innerHTML = `<img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x130?text=${keyword}'"><div class="absolute inset-x-0 bottom-0 bg-black/40 p-1 text-white text-[8px] text-center font-bold truncate">${keyword}</div>`;
+  listEl.prepend(thumb);
 }
 
 function updateProgress() {
   const pool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
   const total = pool.length;
   const currentNum = Math.min(state.currentIndex + 1, total);
-  
-  if (el.progressBar) {
-    const p = (state.currentIndex / Math.max(total, 1)) * 100;
-    el.progressBar.style.width = `${p}%`;
-  }
-  if (el.progressTextDisplay) {
-    el.progressTextDisplay.textContent = `${currentNum} / ${total}`;
-  }
-  
-  // 카운트 업데이트
+  if (el.progressBar) el.progressBar.style.width = `${(state.currentIndex / Math.max(total, 1)) * 100}%`;
+  if (el.progressTextDisplay) el.progressTextDisplay.textContent = `${currentNum} / ${total}`;
   if (el.countLike) el.countLike.textContent = state.likedCards.length;
   if (el.countHold) el.countHold.textContent = state.heldCards.length;
   if (el.countNope) el.countNope.textContent = state.rejectedCards.length;
-
-  // 페이즈 표시기 업데이트
-  const phaseIndicator = document.getElementById('phase-indicator');
-  if (phaseIndicator) {
-    const badges = phaseIndicator.querySelectorAll('.phase-badge');
-    if (state.currentSortingStep === 'main') {
-      badges[0].classList.add('active');
-      badges[1].classList.remove('active');
-    } else {
-      badges[0].classList.add('done');
-      badges[0].classList.remove('active');
-      badges[1].classList.add('active');
-    }
-  }
 }
 
 function finishSorting() { transition(el.sortingSection, el.select9Section, 'flex'); renderSelect9Grid(); }
@@ -257,15 +200,22 @@ function finishSorting() { transition(el.sortingSection, el.select9Section, 'fle
 function renderSelect9Grid() {
   el.s9Grid.innerHTML = '';
   state.likedCards.forEach(card => {
+    const isSelected = state.top9Cards.includes(card);
     const d = document.createElement('div');
-    d.className = 'selection-card relative rounded-xl overflow-hidden aspect-[3/4] shadow-sm border border-slate-200 cursor-pointer bg-white';
+    // 선택 여부에 따른 스타일 바인딩 강화
+    d.className = `selection-card relative rounded-xl overflow-hidden aspect-[3/4] shadow-sm border-4 cursor-pointer transition-all duration-300 ${isSelected ? 'border-blue-500 scale-95 shadow-blue-200' : 'border-slate-100 hover:border-slate-300 bg-white'}`;
     const keyword = getCardKeyword(card);
     const imgFile = getCardImg(card);
     const imgSrc = imgFile ? `assets/images/adult/${imgFile}` : `https://placehold.co/200x260?text=${keyword}`;
-    d.innerHTML = `<img src="${imgSrc}" class="w-full h-full object-cover"><div class="absolute inset-x-0 bottom-0 bg-black/60 p-2 text-white text-[10px] text-center font-bold">${keyword}</div>`;
+    d.innerHTML = `
+      <img src="${imgSrc}" class="w-full h-full object-cover">
+      <div class="absolute inset-x-0 bottom-0 bg-black/60 p-2 text-white text-[10px] text-center font-bold">${keyword}</div>
+      ${isSelected ? '<div class="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1 shadow-lg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg></div>' : ''}
+    `;
     d.onclick = () => {
       if (state.top9Cards.includes(card)) state.top9Cards = state.top9Cards.filter(c => c !== card);
       else if (state.top9Cards.length < 9) state.top9Cards.push(card);
+      renderSelect9Grid(); // 상태 변화 시 전체 그리드 리렌더링 (UI 동기화)
       el.s9Count.textContent = state.top9Cards.length;
       el.btnS9Next.disabled = state.top9Cards.length !== 9;
       el.btnS9Next.classList.toggle('bg-blue-600', state.top9Cards.length === 9);
@@ -303,6 +253,7 @@ function renderRank3Grid() {
 }
 
 async function startAnalysis() {
+  // transition 호출 시 대상 el.adsOverlay가 null이 아니어야 함 (HTML ID 수정 완료)
   transition(el.rank3Section, el.adsOverlay, 'flex');
   const messages = ["1단계: 키워드 분류 중...", "2단계: 좌표 연산 중...", "3단계: 리포트 작성 중..."];
   let msgIdx = 0;
@@ -318,11 +269,8 @@ async function startAnalysis() {
     state.likedCards.forEach(c => { const type = getCardType(c); if(scores[type]!==undefined) scores[type]++; });
     state.rankedCards.forEach((c, i) => { const type = getCardType(c); if(scores[type]!==undefined) scores[type] += (3 - i); });
 
-    const finalKey = calculateResultKey(scores);
-    const vectorData = calculatePredigerVector(state.rankedCards);
-    const aiData = extractAiData(finalKey, state.contentsDB);
     const top3 = state.rankedCards.map(c => getCardKeyword(c)).join(', ');
-    const prompt = `프레디저 분석 리포트 작성. 유형: ${aiData.typeName}, 상위카드: ${top3}.`;
+    const prompt = `프레디저 분석 리포트 작성. 상위카드: ${top3}.`;
 
     if (aiInstance) {
       const response = await aiInstance.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
@@ -339,53 +287,18 @@ async function startAnalysis() {
 }
 
 async function showResult() {
-  const scores = { D: 0, I: 0, P: 0, T: 0 };
-  state.likedCards.forEach(c => { const type = getCardType(c); if(scores[type]!==undefined) scores[type]++; });
-  state.rankedCards.forEach((c, i) => { const type = getCardType(c); if(scores[type]!==undefined) scores[type] += (3 - i); });
-  const finalKey = calculateResultKey(scores);
-  const vectorData = calculatePredigerVector(state.rankedCards);
-  renderReport(finalKey, scores, vectorData);
   transition(el.adsOverlay, el.resultSection, 'block');
   const aiReportEl = document.getElementById('ai-result');
   const aiLoaderEl = document.getElementById('ai-loader');
   if (aiReportEl && aiLoaderEl) {
     aiLoaderEl.classList.add('hidden');
     aiReportEl.classList.remove('hidden');
-    aiReportEl.innerHTML = parseMarkdown(state.aiAnalysisResult || "결과 생성 불가");
+    aiReportEl.innerHTML = parseMarkdown(state.aiAnalysisResult || "분석 결과를 생성 중이거나 오류가 발생했습니다.");
   }
 }
 
-function calculatePredigerVector(rankedCards) {
-  const riasecPoints = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
-  const weights = [4, 2, 1];
-  rankedCards.forEach((card, idx) => {
-    const type = card.riasec || (getCardType(card) === 'D' ? 'C' : getCardType(card) === 'I' ? 'A' : getCardType(card) === 'P' ? 'S' : 'R');
-    if (riasecPoints[type] !== undefined) riasecPoints[type] += weights[idx];
-  });
-  return { 
-    diScore: (1.73 * riasecPoints.E) + (1.73 * riasecPoints.C) - (1.73 * riasecPoints.I) - (1.73 * riasecPoints.A),
-    tpScore: (2.0 * riasecPoints.R) + (1.0 * riasecPoints.I) + (1.0 * riasecPoints.C) - (2.0 * riasecPoints.S) - (1.0 * riasecPoints.E) - (1.0 * riasecPoints.A)
-  };
-}
-
-function calculateResultKey(scores) {
-  const ranks = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const r1 = ranks[0], r2 = ranks[1];
-  if (r1[0] === 'D' || r1[0] === 'I') return r2[0] === 'T' ? "DATA_THINGS" : "DATA_PEOPLE";
-  return r2[0] === 'D' ? "DATA_THINGS" : "IDEAS_THINGS";
-}
-
-function renderReport(key, scores, vector) {
-  const data = state.contentsDB[key] || { title: "탐험가형", summary: "분석 중..." };
-  if (el.resultTitle) el.resultTitle.innerHTML = `<span class="text-blue-600">${data.title}</span> 타입입니다.`;
-  if (el.resultSummary) el.resultSummary.textContent = data.summary;
-  const pointer = document.getElementById('result-pointer');
-  if (pointer) gsap.to(pointer, { left: `calc(50% + ${Math.max(-1, Math.min(1, vector.tpScore / 10)) * 50}%)`, top: `calc(50% + ${-Math.max(-1, Math.min(1, vector.diScore / 10)) * 50}%)`, opacity: 1, duration: 2 });
-}
-
-function extractAiData(userType, contentsDB) { return { typeName: contentsDB[userType]?.title || "정보 없음" }; }
 function parseMarkdown(text) { return text ? text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>') : ""; }
-function transition(from, to, display = 'block') { if(!from || !to) return; from.classList.add('hidden'); from.style.display = 'none'; to.classList.remove('hidden'); to.style.display = display; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function transition(from, to, display = 'block') { if(!from || !to) { console.error("Transition failed: element missing", {from, to}); return; } from.classList.add('hidden'); from.style.display = 'none'; to.classList.remove('hidden'); to.style.display = display; window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 function init() {
   populateElements();
@@ -399,20 +312,11 @@ function init() {
     });
   }
   const reg = (id, fn) => { const x = document.getElementById(id); if (x) x.onclick = fn; };
-  reg('btn-swipe-left', () => swipeManual('left'));
-  reg('btn-swipe-right', () => swipeManual('right'));
-  reg('btn-swipe-up', () => swipeManual('up'));
   reg('btn-exit', () => location.reload());
   reg('btn-restart', () => location.reload());
   if (el.btnS9Next) el.btnS9Next.onclick = startRanking;
   if (el.btnR3Next) el.btnR3Next.onclick = startAnalysis;
   if (el.btnSkipAd) el.btnSkipAd.onclick = showResult;
-}
-
-function swipeManual(dir) {
-  const top = el.cardStack.querySelector('.card-item:last-child');
-  const pool = state.currentSortingStep === 'main' ? state.cards : state.heldCards;
-  if (top) handleSwipe(dir, top, pool[state.currentIndex]);
 }
 
 document.addEventListener('DOMContentLoaded', init);
