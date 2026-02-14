@@ -26,8 +26,8 @@
 {
   "imports": {
     "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
   }
 }
 </script>
@@ -56,7 +56,7 @@
     <section id="intro-section" class="w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/50 p-8 text-center my-4 transition-all duration-500">
       <div class="mb-6 intro-anim">
         <div class="inline-block p-4 mb-4 rounded-[2rem] bg-blue-50 text-4xl shadow-sm rotate-3">✨</div>
-        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mb-2 leading-tight">프레디저<br>적성 검사</h1>
+        <h1 id="hero-title" class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mb-2 leading-tight">프레디저<br>적성 검사</h1>
         <p class="text-slate-400 font-medium text-xs tracking-wide uppercase">Prediger Career Diagnosis</p>
       </div>
 
@@ -182,7 +182,7 @@
           <span id="s9-count" class="text-blue-600 text-3xl">0</span> <span class="text-sm">/ 9</span> <span id="s9-text-selected" class="text-[10px] uppercase tracking-widest ml-2">Selected</span>
         </div>
         <button id="btn-s9-next" disabled class="w-full sm:w-[320px] py-4 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3">
-           <span class="text-base">다음 단계로 이동</span>
+           <span id="btn-s9-next-text" class="text-base">다음 단계로 이동</span>
         </button>
       </div>
     </section>
@@ -207,7 +207,7 @@
           <span id="r3-count" class="text-indigo-600 text-3xl">0</span> <span class="text-sm">/ 3</span> <span id="r3-text-selected" class="text-[10px] uppercase tracking-widest ml-2">Ranked</span>
         </div>
         <button id="btn-r3-next" disabled class="w-full sm:w-[320px] py-4 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all shadow-lg hover:translate-y-[-2px] flex items-center justify-center gap-3">
-           <span class="text-base">분석 리포트 생성하기</span>
+           <span id="btn-r3-next-text" class="text-base">분석 리포트 생성하기</span>
         </button>
       </div>
     </section>
