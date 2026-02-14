@@ -4,218 +4,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>프레디저 적성 검사 | Prediger</title>
-  
-  <!-- Tailwind CSS -->
+  <title>프레디저 적성 검사 | AI Career Path</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  
-  <!-- GSAP & Draggable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
-  
-  <!-- HTML2PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <link rel="stylesheet" href="style.css">
-
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; background-color: #F8FAFC; }
+    .card-stack-container { perspective: 1000px; }
+    .card-item { position: absolute; cursor: grab; user-select: none; transition: transform 0.1s; }
+    .card-item:active { cursor: grabbing; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+  </style>
   <script type="importmap">
 {
   "imports": {
     "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4",
+    "react-dom/client": "https://esm.sh/react-dom@^19.2.4/client",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
   }
 }
 </script>
 </head>
-<body class="bg-[#F1F5F9] text-slate-900 font-['Noto_Sans_KR',_sans-serif] selection:bg-blue-100">
-
-  <!-- Full Screen Ad Overlay (Analysis Phase) -->
-  <div id="ads-overlay" class="hidden fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
-    <div id="ads-container" class="w-full max-w-2xl aspect-video bg-slate-50 border border-dashed border-slate-200 rounded-3xl flex items-center justify-center text-slate-300 font-bold mb-8">
-      GOOGLE ADSENSE CONTAINER
-    </div>
-    <div class="space-y-4">
-      <div id="ana-loader" class="flex justify-center gap-2">
-        <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
-        <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-        <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-      </div>
-      <p class="text-xl font-black text-slate-800" id="ana-status-text">심층 분석을 진행 중입니다...</p>
-      <button id="btn-skip-ad" class="hidden px-8 py-3 bg-slate-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-slate-800 transition-all">결과 확인하기</button>
-    </div>
-  </div>
-
-  <main id="app" class="w-full max-w-[1550px] mx-auto flex flex-col items-center p-4 sm:p-6 py-10">
-    
-    <!-- 1. INTRO SECTION -->
-    <section id="intro-section" class="w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/50 p-8 text-center my-4 transition-all duration-500">
-      <div class="mb-6 intro-anim">
-        <div class="inline-block p-4 mb-4 rounded-[2rem] bg-blue-50 text-4xl shadow-sm rotate-3">✨</div>
-        <h1 id="hero-title" class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mb-2 leading-tight">프레디저<br>적성 검사</h1>
-        <p class="text-slate-400 font-medium text-xs tracking-wide uppercase">Prediger Career Diagnosis</p>
-      </div>
-
-      <form id="intro-form" class="space-y-4 intro-anim text-left">
-        <div class="group">
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 ml-2">이름 (Name)</label>
-          <input type="text" id="username" required placeholder="이름을 입력하세요" 
-            class="w-full px-6 py-3 bg-slate-50 border border-slate-100 rounded-[1.2rem] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-base">
-        </div>
-        <div class="group">
-          <label id="label-birth" class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 ml-2">생년월일 (Birth Date)</label>
-          <input type="date" id="birthdate" required 
-            class="w-full px-6 py-3 bg-slate-50 border border-slate-100 rounded-[1.2rem] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-base">
-        </div>
-        <button type="submit" id="btn-start" class="w-full py-5 bg-blue-600 text-white font-black rounded-[1.5rem] shadow-xl shadow-blue-500/30 hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4">
-          <span class="text-base">진단 시작하기</span> <span class="text-xl">&rarr;</span>
-        </button>
-      </form>
-    </section>
-
-    <!-- 2 & 3. SORTING SECTION -->
-    <section id="sorting-section" class="hidden w-full max-w-[1500px] flex-col bg-white rounded-[3rem] shadow-2xl overflow-hidden my-4 min-h-[600px] h-[85vh]">
-      <!-- Header Dashboard -->
-      <div class="px-6 py-4 bg-white border-b border-slate-50 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <button id="btn-exit" class="text-slate-300 hover:text-slate-900 transition-colors text-[10px] font-black tracking-widest uppercase flex items-center gap-2">
-            <span>&larr;</span> <span id="text-exit">EXIT</span>
-          </button>
-          <div id="phase-indicator" class="flex gap-2">
-             <div class="phase-badge active" data-phase="1">1. 카드 선택</div>
-             <div class="phase-badge" data-phase="2">2. 보류 리뷰</div>
-          </div>
-        </div>
-        <div class="flex items-center gap-6">
-          <div class="flex gap-4">
-            <div class="dashboard-item"><span class="label">LIKED</span><span id="count-like" class="val text-blue-600">0</span></div>
-            <div class="dashboard-item"><span class="label">HELD</span><span id="count-hold" class="val text-amber-500">0</span></div>
-          </div>
-          <div class="flex flex-col items-end">
-            <span id="progress-text-display" class="text-[10px] font-black text-blue-600 tabular-nums mb-1">0 / 52</span>
-            <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div id="progress-bar" class="h-full bg-blue-600 w-0 transition-all duration-300"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        <div class="hidden lg:flex w-[280px] bg-amber-50/20 border-r border-slate-100 flex-col shadow-inner">
-          <div class="p-6 pb-2"><h2 class="text-lg font-black text-amber-600 leading-tight">보류한 카드</h2></div>
-          <div class="flex-1 p-4 overflow-y-auto custom-scrollbar"><div id="held-list" class="grid grid-cols-2 gap-2"></div></div>
-        </div>
-        <div class="flex-1 bg-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-          <div id="card-stack" class="relative w-full max-w-[300px] aspect-[3/4]"></div>
-          <div class="flex items-center gap-6 mt-6 mb-2 z-50">
-            <button id="btn-swipe-left" class="sorting-btn btn-nope">X</button>
-            <button id="btn-swipe-up" class="sorting-btn btn-pass">HOLD</button>
-            <button id="btn-swipe-right" class="sorting-btn btn-like">✔</button>
-          </div>
-        </div>
-        <div class="hidden lg:flex w-[280px] bg-blue-50/20 border-l border-slate-100 flex-col shadow-inner">
-          <div class="p-6 pb-2"><h2 class="text-lg font-black text-blue-600 leading-tight">선택한 카드</h2></div>
-          <div class="flex-1 p-4 overflow-y-auto custom-scrollbar"><div id="liked-list" class="grid grid-cols-2 gap-2"></div></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. SELECT TOP 9 SECTION -->
-    <section id="select9-section" class="hidden w-full max-w-[1300px] bg-white rounded-[3rem] shadow-2xl flex-col my-6">
-      <div class="p-8 sm:p-10">
-        <div class="text-center mb-8">
-          <h2 class="text-2xl font-black text-slate-900 mb-2">9장 핵심 카드 선택</h2>
-          <p class="text-slate-500">좋아하는 카드들 중 나에게 가장 잘 맞는 9장을 골라주세요.</p>
-        </div>
-        <div id="s9-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-3"></div>
-      </div>
-      <div class="p-6 bg-slate-50 border-t border-slate-100 rounded-b-[3rem] flex items-center justify-center gap-6">
-        <div class="text-lg font-black text-slate-400"><span id="s9-count" class="text-blue-600 text-3xl">0</span> / 9</div>
-        <button id="btn-s9-next" disabled class="w-[320px] py-4 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all shadow-lg">다음 단계</button>
-      </div>
-    </section>
-
-    <!-- 5. RANK TOP 3 SECTION -->
-    <section id="rank3-section" class="hidden w-full max-w-[1000px] bg-white rounded-[3rem] shadow-2xl flex-col my-6">
-      <div class="p-8 sm:p-10 flex flex-col items-center">
-        <div class="text-center mb-8"><h2 class="text-2xl font-black text-slate-900">최종 3장 순위 결정</h2></div>
-        <div id="r3-grid" class="grid grid-cols-3 gap-3 w-full max-w-[500px]"></div>
-      </div>
-      <div class="p-6 bg-slate-50 border-t border-slate-100 rounded-b-[3rem] flex items-center justify-center gap-6 w-full">
-        <div class="text-lg font-black text-slate-400"><span id="r3-count" class="text-indigo-600 text-3xl">0</span> / 3</div>
-        <button id="btn-r3-next" disabled class="w-[320px] py-4 bg-slate-200 text-slate-400 font-black rounded-2xl transition-all shadow-lg">분석 리포트 생성하기</button>
-      </div>
-    </section>
-
-    <!-- 7. RESULT SECTION -->
-    <section id="result-section" class="hidden w-full max-w-7xl bg-white rounded-[3rem] shadow-2xl my-6">
-      <div class="p-8 sm:p-16">
-        <div class="mb-16 pb-16 border-b border-slate-100">
-          <h1 id="result-title" class="text-5xl font-black text-slate-900 mb-6 leading-[1.1]">... 타입입니다.</h1>
-          <p id="result-summary" class="text-2xl text-slate-500 font-medium leading-relaxed">...</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24">
-           <div class="lg:col-span-5 flex flex-col items-center">
-              <div class="bg-slate-50/50 p-8 rounded-[3rem] border border-slate-100 w-full max-w-[420px] flex flex-col items-center">
-                <div class="relative w-full aspect-square bg-white rounded-full border border-slate-200 shadow-inner">
-                  <div class="absolute inset-0 flex items-center justify-center"><div class="w-px h-full bg-slate-100"></div><div class="h-px w-full bg-slate-100"></div></div>
-                  <div id="result-pointer" class="absolute w-8 h-8 bg-blue-600 rounded-full border-[5px] border-white shadow-2xl z-20 transition-all duration-1000 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0"></div>
-                </div>
-              </div>
-           </div>
-           <div class="lg:col-span-7">
-              <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-8">
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">특성 분석 (Traits)</h3>
-                <p id="result-traits" class="text-xl text-slate-700 font-bold leading-relaxed">...</p>
-              </div>
-           </div>
-        </div>
-
-        <div class="mb-24">
-            <h2 class="text-2xl font-black text-slate-900 mb-8">핵심 키워드 9</h2>
-            <div id="result-gallery-grid" class="grid grid-cols-3 md:grid-cols-9 gap-4"></div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div class="lg:col-span-7">
-                <div class="bg-gradient-to-br from-blue-600 to-blue-900 rounded-[3.5rem] p-12 text-white shadow-2xl">
-                  <h3 class="font-black text-2xl mb-8 flex items-center gap-3">🤖 AI 종합 분석 리포트</h3>
-                  <div id="ai-loader" class="flex flex-col items-center py-10 gap-4">
-                    <div class="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    <p class="text-blue-100 animate-pulse">분석 결과를 정리하고 있습니다...</p>
-                  </div>
-                  <div id="ai-result" class="hidden text-blue-50 text-lg leading-relaxed space-y-4"></div>
-                </div>
-            </div>
-            <div class="lg:col-span-5 space-y-8">
-                <div class="bg-white p-10 rounded-[3.5rem] border border-slate-100 shadow-sm space-y-8">
-                    <div><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">추천 직업군</h3><div id="result-jobs" class="flex flex-wrap gap-2"></div></div>
-                    <div><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">추천 학과</h3><div id="result-majors" class="flex flex-wrap gap-2"></div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Debug Section -->
-        <div id="debug-section" class="mt-20 pt-10 border-t border-slate-100">
-            <button onclick="document.getElementById('debug-raw').classList.toggle('hidden')" class="text-slate-300 text-[10px] uppercase font-black hover:text-slate-600">Debug Mode: Show Raw AI Output</button>
-            <div id="debug-raw" class="hidden mt-4 p-6 bg-slate-900 text-green-400 font-mono text-xs rounded-2xl overflow-x-auto whitespace-pre-wrap">
-              WAITING FOR AI RESPONSE...
-            </div>
-        </div>
-      </div>
-
-      <div class="px-8 sm:px-16 flex flex-col gap-4 mt-16 pb-24">
-          <button id="btn-restart" class="w-full py-6 bg-slate-100 text-slate-400 font-black rounded-[2rem] hover:bg-slate-900 hover:text-white transition-all">다시 진단하기</button>
-      </div>
-    </section>
-  </main>
-
-  <script type="module" src="script.js"></script>
+<body class="text-slate-900">
+  <div id="root"></div>
+  <script type="module" src="index.tsx"></script>
 </body>
 </html>
