@@ -16,7 +16,7 @@ const initAI = () => {
 };
 initAI();
 
-// --- RIASEC 유형별 테마 컬러 및 기본값 ---
+// --- RIASEC 유형별 테마 컬러 (D, I, P, T) ---
 const TYPE_THEMES = {
   D: { color: "1E88E5", label: "Data" },
   T: { color: "E53935", label: "Things" },
@@ -58,26 +58,34 @@ async function loadData() {
     const res = await fetch(`assets/data/cards_kr.json`);
     if (!res.ok) throw new Error("JSON 파일을 찾을 수 없습니다.");
     const data = await res.json();
-    // 데이터 구조에 따른 유연한 처리 (data.cards 혹은 data 배열 자체)
     state.cards = data.cards || (Array.isArray(data) ? data : []);
-    if (state.cards.length === 0) throw new Error("카드가 비어있습니다.");
+    console.log("[Debug] JSON 데이터 로드 완료:", state.cards.length, "개의 카드");
   } catch (e) {
     console.error("데이터 로드 실패:", e);
     alert("카드 데이터를 불러오지 못했습니다. 경로를 확인해주세요.");
   }
 }
 
-// 동적 이미지 경로 생성 함수 (사용자 요청: adult / child 폴더 구분)
+/**
+ * 동적 이미지 경로 생성 함수
+ * JSON 구조 반영: card[state.targetGroup].img
+ */
 function getImgSrc(card) {
-  if (!card || !card.img) return "";
-  return `assets/images/${state.targetGroup}/${card.img}`;
+  const groupData = card[state.targetGroup];
+  if (!groupData || !groupData.img) {
+    console.warn(`[Debug] 해당 연령대(${state.targetGroup})의 이미지 정보가 없습니다.`, card);
+    return "";
+  }
+  const fullPath = `assets/images/${state.targetGroup}/${groupData.img}`;
+  console.log(`[Debug] 이미지 로딩 시도 - 폴더: ${state.targetGroup}, 경로: ${fullPath}`);
+  return fullPath;
 }
 
 // 플레이스홀더 생성 함수 (이미지 로드 실패 시 보완책)
 function getFallbackImg(card) {
-  const type = card.type || 'DEFAULT';
+  const type = card.dimension || 'DEFAULT';
   const theme = TYPE_THEMES[type] || TYPE_THEMES.DEFAULT;
-  const keyword = card.keyword || card.name || theme.label;
+  const keyword = card.keyword_kr || "Card";
   return `https://placehold.co/400x300/${theme.color}/FFFFFF?text=${encodeURIComponent(keyword)}`;
 }
 
@@ -106,9 +114,11 @@ function renderStack() {
     cardEl.style.zIndex = i;
     cardEl.style.transform = `scale(${1 - depth * 0.05}) translateY(${depth * 15}px)`;
     
-    const keyword = card.keyword || card.name || "전문 분야";
-    const desc = card.desc || "상세 설명이 곧 업데이트될 예정입니다.";
-    const type = card.type || "D";
+    // JSON 구조에 따른 데이터 맵핑 (keyword_kr, dimension, nested desc)
+    const keyword = card.keyword_kr || "제목 없음";
+    const groupData = card[state.targetGroup] || {};
+    const desc = groupData.desc || "상세 설명이 존재하지 않습니다.";
+    const type = card.dimension || "D";
     const themeColor = TYPE_THEMES[type]?.color || TYPE_THEMES.DEFAULT.color;
     
     cardEl.innerHTML = `
@@ -214,7 +224,7 @@ function renderSelect9Grid() {
     d.innerHTML = `
       <img src="${getImgSrc(card)}" class="w-full h-full object-cover" 
         onerror="this.onerror=null; this.src='${getFallbackImg(card)}';">
-      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] text-center font-black">${card.keyword || card.name}</div>
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] text-center font-black">${card.keyword_kr || "제목"}</div>
     `;
     d.onclick = () => {
       if (state.top9Cards.includes(card)) state.top9Cards = state.top9Cards.filter(c => c !== card);
@@ -253,14 +263,13 @@ function init() {
     el.introForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      // 연령대 계산 및 타겟 그룹 설정 (사용자 요청: adult/child)
       const birthDateVal = document.getElementById('birthdate').value;
       if (birthDateVal) {
         const birthYear = new Date(birthDateVal).getFullYear();
         const currentYear = new Date().getFullYear();
         const age = currentYear - birthYear;
-        // 요청하신 폴더명 'child' 적용
         state.targetGroup = age < 13 ? 'child' : 'adult';
+        console.log(`[Debug] 사용자 설정 - 나이: ${age}, 그룹: ${state.targetGroup}`);
       }
 
       try { 
