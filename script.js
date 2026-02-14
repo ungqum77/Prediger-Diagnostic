@@ -16,15 +16,16 @@ const initAI = () => {
 };
 initAI();
 
-// --- RIASEC 유형별 테마 컬러 ---
+// --- RIASEC 유형별 테마 컬러 및 기본값 ---
 const TYPE_THEMES = {
   D: { color: "1E88E5", label: "Data" },
   T: { color: "E53935", label: "Things" },
   P: { color: "FDD835", label: "People" },
-  I: { color: "43A047", label: "Ideas" }
+  I: { color: "43A047", label: "Ideas" },
+  DEFAULT: { color: "CBD5E1", label: "General" }
 };
 
-// --- 정교화된 52장 전체 카드 데이터 (constants.ts 기준) ---
+// --- 정교화된 52장 전체 카드 데이터 (파일명 매칭) ---
 const MOCK_CARDS = [
   { id: 1, type: "D", keyword: "기록하기", desc: "자료를 기록하고 정리하는 것을 좋아합니다.", img: "card_01_D_records.png" },
   { id: 2, type: "I", keyword: "아이디어", desc: "새로운 생각을 떠올리고 상상하는 것을 좋아합니다.", img: "card_02_I_ideas.png" },
@@ -38,7 +39,6 @@ const MOCK_CARDS = [
   { id: 10, type: "T", keyword: "운전/조종", desc: "자동차나 드론 등을 조종하는 것을 좋아합니다.", img: "card_10_T_drive.png" },
   { id: 11, type: "I", keyword: "관찰하기", desc: "사물이나 자연을 자세히 관찰하는 것을 좋아합니다.", img: "card_11_I_observe.png" },
   { id: 12, type: "P", keyword: "상담하기", desc: "사람들의 마음을 위로하고 대화하는 것을 좋아합니다.", img: "card_12_P_counsel.png" }
-  // ... 필요한 경우 52장까지 추가 가능
 ];
 
 const state = {
@@ -49,7 +49,8 @@ const state = {
   rankedCards: [],
   currentIndex: 0,
   currentSortingStep: 'main',
-  isAnimating: false
+  isAnimating: false,
+  targetGroup: 'adult' // 'adult' | 'child'
 };
 
 const el = {};
@@ -76,10 +77,17 @@ async function loadData() {
   }
 }
 
-// 유형별로 예쁜 대체 이미지를 반환하는 함수
+// 동적 이미지 경로 생성 함수
+function getImgSrc(card) {
+  if (!card || !card.img) return "";
+  return `assets/images/${state.targetGroup}/${card.img}`;
+}
+
+// 플레이스홀더 생성 함수 (이미지 로드 실패 시)
 function getFallbackImg(card) {
-  const theme = TYPE_THEMES[card.type] || { color: "CBD5E1", label: "Card" };
-  const text = encodeURIComponent(card.keyword || theme.label);
+  const type = card.type || 'DEFAULT';
+  const theme = TYPE_THEMES[type] || TYPE_THEMES.DEFAULT;
+  const text = encodeURIComponent(card.keyword || card.name || theme.label);
   return `https://placehold.co/400x300/${theme.color}/FFFFFF?text=${text}`;
 }
 
@@ -110,14 +118,15 @@ function renderStack() {
     
     const keyword = card.keyword || card.name || "전문 분야";
     const desc = card.desc || "상세 설명이 곧 업데이트될 예정입니다.";
-    const imgSrc = `assets/images/adult/${card.img}`;
+    const type = card.type || "D";
+    const themeColor = TYPE_THEMES[type]?.color || TYPE_THEMES.DEFAULT.color;
     
     cardEl.innerHTML = `
-      <div class="h-1/2 overflow-hidden relative" style="background-color: #${TYPE_THEMES[card.type]?.color || 'F1F5F9'}22">
-        <img src="${imgSrc}" class="w-full h-full object-cover" 
+      <div class="h-1/2 overflow-hidden relative" style="background-color: #${themeColor}22">
+        <img src="${getImgSrc(card)}" class="w-full h-full object-cover" 
           onerror="this.onerror=null; this.src='${getFallbackImg(card)}';">
-        <div class="absolute top-4 right-4 px-2 py-1 bg-white/90 backdrop-blur rounded text-[10px] font-black shadow-sm">
-          ${card.type} TYPE
+        <div class="absolute top-4 right-4 px-2 py-1 bg-white/95 backdrop-blur rounded text-[10px] font-black shadow-sm text-slate-800 border border-slate-100">
+          ${type} TYPE
         </div>
       </div>
       <div class="p-6 text-center flex flex-col justify-center flex-1">
@@ -141,7 +150,7 @@ function setupDraggable(cardEl, cardData) {
       else if (this.x < -threshold) handleSwipe('left', cardEl, cardData);
       else if (this.y < -threshold && state.currentSortingStep === 'main') handleSwipe('up', cardEl, cardData);
       else {
-        gsap.to(this.target, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "back.out" });
+        gsap.to(this.target, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "back.out(1.7)" });
         state.isAnimating = false;
       }
     }
@@ -178,7 +187,7 @@ function updateThumbnailList(type, card) {
   const item = document.createElement('div');
   item.className = 'w-full aspect-[3/4] rounded-xl bg-white border border-slate-100 overflow-hidden mb-3 shadow-sm transition-all hover:scale-105';
   item.innerHTML = `
-    <img src="assets/images/adult/${card.img}" class="w-full h-full object-cover" 
+    <img src="${getImgSrc(card)}" class="w-full h-full object-cover" 
       onerror="this.onerror=null; this.src='${getFallbackImg(card)}';">
   `;
   list.prepend(item);
@@ -213,9 +222,9 @@ function renderSelect9Grid() {
     const d = document.createElement('div');
     d.className = `selection-card relative rounded-2xl overflow-hidden aspect-[3/4] border-4 cursor-pointer transition-all ${isSelected ? 'border-blue-500 scale-95 shadow-xl' : 'border-slate-50 bg-white shadow-md'}`;
     d.innerHTML = `
-      <img src="assets/images/adult/${card.img}" class="w-full h-full object-cover" 
+      <img src="${getImgSrc(card)}" class="w-full h-full object-cover" 
         onerror="this.onerror=null; this.src='${getFallbackImg(card)}';">
-      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] text-center font-black">${card.keyword}</div>
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] text-center font-black">${card.keyword || card.name}</div>
     `;
     d.onclick = () => {
       if (state.top9Cards.includes(card)) state.top9Cards = state.top9Cards.filter(c => c !== card);
@@ -253,6 +262,16 @@ function init() {
   if (el.introForm) {
     el.introForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      // 연령대 계산 및 타겟 그룹 설정
+      const birthDateVal = document.getElementById('birthdate').value;
+      if (birthDateVal) {
+        const birthYear = new Date(birthDateVal).getFullYear();
+        const currentYear = new Date().getFullYear();
+        const age = currentYear - birthYear;
+        state.targetGroup = age < 13 ? 'child' : 'adult';
+      }
+
       try { 
         await loadData(); 
         transition(el.introSection, el.sortingSection, 'flex'); 
