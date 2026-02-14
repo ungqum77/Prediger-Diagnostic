@@ -5,16 +5,55 @@ if (window.gsap && window.Draggable) {
   gsap.registerPlugin(Draggable);
 }
 
-const getApiKey = () => { try { return process.env.API_KEY; } catch (e) { return ""; } };
-const API_KEY = getApiKey();
-let aiInstance = null;
-
-const initAI = () => {
-  if (API_KEY) {
-    aiInstance = new GoogleGenAI({ apiKey: API_KEY });
+// API 키 가져오기
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || "";
+  } catch (e) {
+    return "";
   }
 };
-initAI();
+
+const API_KEY = getApiKey();
+let isAIReady = false;
+
+// AI 초기화 및 연결 테스트 메시지 표시
+function checkAIConnection() {
+  const statusEl = document.createElement('div');
+  statusEl.id = 'ai-status-indicator';
+  statusEl.className = 'mt-4 text-[10px] font-bold text-center uppercase tracking-widest transition-all';
+  
+  const introForm = document.getElementById('intro-form');
+  if (introForm) introForm.appendChild(statusEl);
+
+  if (!API_KEY) {
+    statusEl.textContent = "⚠️ AI 시스템 연결 실패 (API_KEY 누락)";
+    statusEl.classList.add('text-red-500');
+    console.error("[AI] API_KEY가 설정되지 않았습니다.");
+    const startBtn = document.getElementById('btn-start');
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.classList.replace('bg-blue-600', 'bg-slate-300');
+      startBtn.innerHTML = 'AI 연결 대기 중...';
+    }
+    return;
+  }
+
+  try {
+    // 인스턴스 생성이 가능하면 준비된 것으로 간주
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    if (ai) {
+      isAIReady = true;
+      statusEl.textContent = "● AI 시스템 연결됨";
+      statusEl.classList.add('text-emerald-500');
+      console.log("[AI] Gemini Engine Ready.");
+    }
+  } catch (e) {
+    statusEl.textContent = "⚠️ AI 엔진 초기화 오류";
+    statusEl.classList.add('text-red-500');
+    console.error("[AI] Initialization Error:", e);
+  }
+}
 
 const TYPE_THEMES = {
   D: { color: "1E88E5", label: "Data" },
@@ -44,7 +83,7 @@ const populateElements = () => {
     'r3-grid', 'r3-count', 'btn-r3-next', 'btn-skip-ad', 'result-title', 'result-summary', 
     'result-traits', 'result-jobs', 'result-majors', 'result-gallery-grid', 
     'liked-list', 'held-list', 'progress-bar', 'progress-text-display', 
-    'count-like', 'count-hold', 'ana-status-text', 'ai-result', 'ai-loader'
+    'count-like', 'count-hold', 'ana-status-text', 'ai-result', 'ai-loader', 'debug-raw'
   ];
   ids.forEach(id => { 
     const found = document.getElementById(id);
@@ -192,9 +231,6 @@ function renderSelect9Grid() {
   });
 }
 
-/**
- * 최종 3장 순위 결정 화면 렌더링 함수 (누락분 추가)
- */
 function renderRank3Grid() {
   if (!el.r3Grid) return;
   el.r3Grid.innerHTML = '';
@@ -221,23 +257,39 @@ function renderRank3Grid() {
 
 async function startAnalysis() {
   transition(el.rank3Section, el.adsOverlay, 'flex');
-  // AI 분석 시뮬레이션 및 실제 호출
+  
+  if (!API_KEY) {
+    el.anaStatusText.textContent = "API 키가 없어 분석을 시작할 수 없습니다.";
+    el.btnSkipAd.classList.remove('hidden');
+    return;
+  }
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const prompt = `사용자가 선택한 상위 3가지 흥미 키워드: ${state.rankedCards.map(c => c.keyword_kr).join(", ")}. 이 데이터를 기반으로 사용자의 RIASEC 성향을 분석하고 추천 직업과 학과를 한국어로 상세히 리포트해주세요.`;
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const prompt = `당신은 프레디저 직업 상담사입니다. 사용자가 선택한 상위 3가지 키워드는 [${state.rankedCards.map(c => c.keyword_kr).join(", ")}]입니다. 
+    이 데이터를 바탕으로 사용자의 흥미 유형을 분석하고, 추천 직업 5가지와 추천 학과 3가지를 한국어로 친절하게 리포트 형식으로 작성해주세요.`;
+
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
-      config: { temperature: 0.7 }
+      config: { 
+        temperature: 0.7,
+        systemInstruction: "사용자에게 따뜻하고 전문적인 어조로 답변하세요. HTML 태그를 적절히 섞어서 가독성 있게 작성하세요."
+      }
     });
     
-    el.aiResult.innerHTML = response.text.replace(/\n/g, '<br>');
+    const analysisText = response.text;
+    el.aiResult.innerHTML = analysisText.replace(/\n/g, '<br>');
+    if (el.debugRaw) el.debugRaw.textContent = analysisText;
+    
     el.aiLoader.classList.add('hidden');
     el.aiResult.classList.remove('hidden');
     el.btnSkipAd.classList.remove('hidden');
+    el.anaStatusText.textContent = "분석이 완료되었습니다!";
   } catch (err) {
-    console.error(err);
-    el.anaStatusText.textContent = "분석 중 오류가 발생했습니다.";
+    console.error("[AI Analysis Error]", err);
+    el.anaStatusText.textContent = "분석 서버 응답 오류가 발생했습니다.";
+    if (el.debugRaw) el.debugRaw.textContent = `Error: ${err.message}\nStack: ${err.stack}`;
     el.btnSkipAd.classList.remove('hidden');
   }
 }
@@ -259,6 +311,8 @@ function swipeManual(dir) {
 
 function init() {
   populateElements();
+  checkAIConnection(); // 앱 시작 시 AI 연결 체크
+  
   if (el.introForm) {
     el.introForm.addEventListener('submit', async (e) => {
       e.preventDefault();
