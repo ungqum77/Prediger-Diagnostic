@@ -5,56 +5,7 @@ if (window.gsap && window.Draggable) {
   gsap.registerPlugin(Draggable);
 }
 
-// API 키 가져오기
-const getApiKey = () => {
-  try {
-    return process.env.API_KEY || "";
-  } catch (e) {
-    return "";
-  }
-};
-
-const API_KEY = getApiKey();
-let isAIReady = false;
-
-// AI 초기화 및 연결 테스트 메시지 표시
-function checkAIConnection() {
-  const statusEl = document.createElement('div');
-  statusEl.id = 'ai-status-indicator';
-  statusEl.className = 'mt-4 text-[10px] font-bold text-center uppercase tracking-widest transition-all';
-  
-  const introForm = document.getElementById('intro-form');
-  if (introForm) introForm.appendChild(statusEl);
-
-  if (!API_KEY) {
-    statusEl.textContent = "⚠️ AI 시스템 연결 실패 (API_KEY 누락)";
-    statusEl.classList.add('text-red-500');
-    console.error("[AI] API_KEY가 설정되지 않았습니다.");
-    const startBtn = document.getElementById('btn-start');
-    if (startBtn) {
-      startBtn.disabled = true;
-      startBtn.classList.replace('bg-blue-600', 'bg-slate-300');
-      startBtn.innerHTML = 'AI 연결 대기 중...';
-    }
-    return;
-  }
-
-  try {
-    // 인스턴스 생성이 가능하면 준비된 것으로 간주
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
-    if (ai) {
-      isAIReady = true;
-      statusEl.textContent = "● AI 시스템 연결됨";
-      statusEl.classList.add('text-emerald-500');
-      console.log("[AI] Gemini Engine Ready.");
-    }
-  } catch (e) {
-    statusEl.textContent = "⚠️ AI 엔진 초기화 오류";
-    statusEl.classList.add('text-red-500');
-    console.error("[AI] Initialization Error:", e);
-  }
-}
-
+// RIASEC 유형별 테마 컬러 및 라벨
 const TYPE_THEMES = {
   D: { color: "1E88E5", label: "Data" },
   T: { color: "E53935", label: "Things" },
@@ -257,29 +208,28 @@ function renderRank3Grid() {
 
 async function startAnalysis() {
   transition(el.rank3Section, el.adsOverlay, 'flex');
-  
-  if (!API_KEY) {
-    el.anaStatusText.textContent = "API 키가 없어 분석을 시작할 수 없습니다.";
-    el.btnSkipAd.classList.remove('hidden');
-    return;
-  }
+  el.anaStatusText.textContent = "AI가 심층 분석을 진행 중입니다...";
+  el.btnSkipAd.classList.add('hidden');
+  el.aiLoader.classList.remove('hidden');
 
   try {
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
-    const prompt = `당신은 프레디저 직업 상담사입니다. 사용자가 선택한 상위 3가지 키워드는 [${state.rankedCards.map(c => c.keyword_kr).join(", ")}]입니다. 
-    이 데이터를 바탕으로 사용자의 흥미 유형을 분석하고, 추천 직업 5가지와 추천 학과 3가지를 한국어로 친절하게 리포트 형식으로 작성해주세요.`;
+    // 런타임 환경에서 주입된 API 키를 사용하여 호출 시점에 인스턴스 생성
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `당신은 프레디저 직업 상담사입니다. 사용자가 선택한 최종 3가지 키워드는 [${state.rankedCards.map(c => c.keyword_kr).join(", ")}]입니다. 
+    이 데이터를 바탕으로 사용자의 흥미 유형을 분석하고, 추천 직업 5가지와 추천 학과 3가지를 한국어로 친절하고 전문적인 어조로 리포트 형식으로 작성해 주세요. 
+    HTML 태그(<b>, <br>, <ul>, <li>)를 사용하여 가독성 있게 응답해 주세요.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { 
-        temperature: 0.7,
-        systemInstruction: "사용자에게 따뜻하고 전문적인 어조로 답변하세요. HTML 태그를 적절히 섞어서 가독성 있게 작성하세요."
+        temperature: 0.8,
+        systemInstruction: "사용자의 꿈을 응원하는 커리어 상담사로서 답변하세요."
       }
     });
     
     const analysisText = response.text;
-    el.aiResult.innerHTML = analysisText.replace(/\n/g, '<br>');
+    el.aiResult.innerHTML = analysisText;
     if (el.debugRaw) el.debugRaw.textContent = analysisText;
     
     el.aiLoader.classList.add('hidden');
@@ -288,9 +238,10 @@ async function startAnalysis() {
     el.anaStatusText.textContent = "분석이 완료되었습니다!";
   } catch (err) {
     console.error("[AI Analysis Error]", err);
-    el.anaStatusText.textContent = "분석 서버 응답 오류가 발생했습니다.";
-    if (el.debugRaw) el.debugRaw.textContent = `Error: ${err.message}\nStack: ${err.stack}`;
-    el.btnSkipAd.classList.remove('hidden');
+    el.anaStatusText.textContent = "현재 분석 서버에 연결할 수 없습니다. 다시 시도해 주세요.";
+    if (el.debugRaw) el.debugRaw.textContent = `Error Message: ${err.message}\n${err.stack}`;
+    el.aiLoader.classList.add('hidden');
+    el.btnSkipAd.classList.remove('hidden'); // 에러 상황에서도 결과 확인하기 버튼은 노출하여 다음 페이지 이동 가능하게 함
   }
 }
 
@@ -311,7 +262,6 @@ function swipeManual(dir) {
 
 function init() {
   populateElements();
-  checkAIConnection(); // 앱 시작 시 AI 연결 체크
   
   if (el.introForm) {
     el.introForm.addEventListener('submit', async (e) => {
